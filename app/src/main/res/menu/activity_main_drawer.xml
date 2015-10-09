@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_heart" android:icon="@android:drawable/ic_menu_camera"
+            android:title="@string/nav_heart_rate" />
+        <item android:id="@+id/nav_test" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/nav_test" />
+        <item android:id="@+id/nav_resources" android:icon="@android:drawable/ic_menu_slideshow"
+            android:title="@string/Resources" />
+        <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
+            android:title="@string/nav_manage" />
+    </group>
+
+    <item android:title="@string/nav_support">
+        <menu>
+            <item android:id="@+id/nav_hotline" android:icon="@android:drawable/ic_menu_share"
+                android:title="@string/nav_call" />
+            <item android:id="@+id/nav_support" android:icon="@android:drawable/ic_menu_send"
+                android:title="@string/nav_website" />
+        </menu>
+    </item>
+
+</menu>
