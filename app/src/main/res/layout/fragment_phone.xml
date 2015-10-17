@@ -1,12 +1,51 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="me.tylercarberry.ptsd.PhoneFragment">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="me.tylercarberry.ptsd.PhoneFragment"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin">
 
-    <!-- TODO: Update blank fragment layout -->
+
     <TextView
+        android:id="@+id/phone_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is the phone fragment"
-        android:layout_centerHorizontal="true"/>
+        android:text="Call PTSD Support"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/suicide_lifeline_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Suicide Lifeline: 1-800-555-1234"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/veteran_support_phone_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Veteran Support: 1-800-555-5678"
+        android:layout_below="@id/suicide_lifeline_textview"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/safe_helpline_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SAFE Helpline: 1-800-555-0000"
+        android:layout_below="@id/veteran_support_phone_textview"
+        android:layout_centerHorizontal="true" />
+
+
+
+
+
 
 </RelativeLayout>

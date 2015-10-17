@@ -1,18 +1,20 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PhoneFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link PhoneFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -64,7 +66,44 @@ public class PhoneFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_phone, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
+
+        TextView suicideLifelifeTextview = (TextView) rootView.findViewById(R.id.suicide_lifeline_textview);
+        suicideLifelifeTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(getString(R.string.phone_suicide_lifeline));
+            }
+        });
+
+        TextView veteranSupportTextview = (TextView) rootView.findViewById(R.id.veteran_support_phone_textview);
+        veteranSupportTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(getString(R.string.phone_veteran_support));
+            }
+        });
+
+        TextView safeHotlineTextview = (TextView) rootView.findViewById(R.id.safe_helpline_textview);
+        safeHotlineTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(getString(R.string.phone_safe_hotline));
+            }
+        });
+
+        return rootView;
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    private void openDialer(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        startActivity(intent);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
