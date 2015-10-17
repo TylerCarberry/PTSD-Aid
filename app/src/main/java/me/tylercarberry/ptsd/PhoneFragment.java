@@ -69,29 +69,35 @@ public class PhoneFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
 
 
-        CardView suicideLifelifeTextview = (CardView) rootView.findViewById(R.id.suicide_lifeline_cardview);
-        suicideLifelifeTextview.setOnClickListener(new View.OnClickListener() {
+        CardView veteransCrisisLineCardView = (CardView) rootView.findViewById(R.id.veterans_crisis_line_cardview);
+        veteransCrisisLineCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(getString(R.string.phone_veterans_crisis_line));
+            }
+        });
+
+        CardView suicideLifelineCardView = (CardView) rootView.findViewById(R.id.suicide_lifeline_cardview);
+        suicideLifelineCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialer(getString(R.string.phone_suicide_lifeline));
             }
         });
 
-
-        CardView veteranSupportCardview = (CardView) rootView.findViewById(R.id.veteran_support_phone_cardview);
-        veteranSupportCardview.setOnClickListener(new View.OnClickListener() {
+        CardView alcoholismCardView = (CardView) rootView.findViewById(R.id.alcoholism_cardview);
+        alcoholismCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialer(getString(R.string.phone_veteran_support));
+                openDialer(getString(R.string.phone_alcoholism));
             }
         });
 
-
-        CardView safeHotlineTextview = (CardView) rootView.findViewById(R.id.safe_helpline_cardview);
-        safeHotlineTextview.setOnClickListener(new View.OnClickListener() {
+        CardView veteransFoundationCardView = (CardView) rootView.findViewById(R.id.veterans_foundation_cardview);
+        veteransFoundationCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialer(getString(R.string.phone_safe_hotline));
+                openDialer(getString(R.string.phone_veterans_foundation_hotline));
             }
         });
 

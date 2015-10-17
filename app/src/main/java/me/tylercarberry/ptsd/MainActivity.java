@@ -1,5 +1,6 @@
 package me.tylercarberry.ptsd;
 
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -106,62 +107,29 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        Fragment newFragment = null;
+
         if (id == R.id.nav_simple_test) {
-            MainFragment newFragment = new MainFragment();
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
+            newFragment = new MainFragment();
         } else if (id == R.id.nav_test) {
-            StressTestFragment newFragment = new StressTestFragment();
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
+            newFragment = new StressTestFragment();
 
         } else if (id == R.id.nav_resources) {
-            ResourcesFragment newFragment = new ResourcesFragment();
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
+            newFragment = new ResourcesFragment();
 
         } else if (id == R.id.nav_manage) {
-            ManageFragment newFragment = new ManageFragment();
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
+            newFragment = new ManageFragment();
 
         } else if (id == R.id.nav_hotline) {
-            PhoneFragment newFragment = new PhoneFragment();
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
+            newFragment = new PhoneFragment();
 
         } else if (id == R.id.nav_websites) {
-            WebsiteFragment newFragment = new WebsiteFragment();
+            newFragment = new WebsiteFragment();
+
+
+        }
+
+        if(newFragment != null) {
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment
@@ -170,7 +138,6 @@ public class MainActivity extends AppCompatActivity
 
             // Commit the transaction
             transaction.commit();
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

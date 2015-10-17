@@ -13,31 +13,15 @@
     <string name="nav_manage">Manage</string>
     <string name="nav_test">Stress Test</string>
 
-    <string name="phone_suicide_lifeline">1-800-555-1234</string>
-    <string name="phone_veteran_support">1-800-555-5678</string>
-    <string name="phone_safe_hotline">1-800-555-000</string>
+    <string name="phone_veterans_crisis_line">1-800-273-8255</string>
+    <string name="phone_suicide_lifeline">1-800-273-8255</string>
+    <string name="phone_veterans_foundation_hotline">1-888-777-4443</string>
+    <string name="phone_alcoholism">1-800-622-2255</string>
+    <string name="phone_gulf_war_hotline">1-800-796-9699</string>
 
     <string name="website_nimh">http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml</string>
     <string name="website_wikipedia">https://en.wikipedia.org/wiki/Posttraumatic_stress_disorder</string>
     <string name="website_va">http://www.ptsd.va.gov/</string>
-
-    <string name="question1">Repeated, disturbing memories, thoughts, or images of a stressful military experience?</string>
-    <string name="question2">Repeated, disturbing dreams of a stressful military experience?</string>
-    <string name="question3">Suddenly acting or feeling as if a stressful military experience were happening again (as if you were reliving it)?</string>
-    <string name="question4">Feeling very upset when something reminded you of a stressful military experience?</string>
-    <string name="question5">Having physical reactions (e.g., heart pounding, trouble breathing, sweating) when something reminded you of a stressful military experience?</string>
-    <string name="question6">Avoiding thinking about or talking about a stressful military experience or avoiding having feelings related to it?</string>
-    <string name="question7">Avoiding activities or situations because they reminded you of a stressful military experience?</string>
-    <string name="question8">Trouble remembering important parts of a stressful military experience?</string>
-    <string name="question9">Loss of interest in activities that you used to enjoy?</string>
-    <string name="question10">Feeling distant or cut off from other people?</string>
-    <string name="question11">Feeling emotionally numb or being unable to have loving feelings for those close to you?</string>
-    <string name="question12">Feeling as if your future somehow will be cut short?</string>
-    <string name="question13">Trouble falling or staying asleep?</string>
-    <string name="question14">Feeling irritable or having angry outbursts?</string>
-    <string name="question15">Having difficulty concentrating?</string>
-    <string name="question16">Being "superalert" or watchful or on guard?</string>
-    <string name="question17">Feeling jumpy or easily startled?</string>
 
     <string name="not_at_all">Not at all</string>
     <string name="little_bit">A little bit</string>
