@@ -4,44 +4,141 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.tylercarberry.ptsd.PhoneFragment"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin">
+    tools:context="me.tylercarberry.ptsd.PhoneFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
 
-    <TextView
-        android:id="@+id/phone_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Call PTSD Support"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/veteran_support_phone_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/suicide_lifeline_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Suicide Lifeline: 1-800-555-1234"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
 
-    <TextView
-        android:id="@+id/veteran_support_phone_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Veteran Support: 1-800-555-5678"
-        android:layout_below="@id/suicide_lifeline_textview"
-        android:layout_centerHorizontal="true" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/veteran_support_imageview"
+                        android:src="@drawable/veterans_crisis_line_logo"
+                        android:adjustViewBounds="true"/>
 
-    <TextView
-        android:id="@+id/safe_helpline_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SAFE Helpline: 1-800-555-0000"
-        android:layout_below="@id/veteran_support_phone_textview"
-        android:layout_centerHorizontal="true" />
+                    <TextView
+                        android:id="@+id/veteran_support_phone_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_support_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Veteran Support: 800-123-4567"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/veteran_support_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_support_phone_textview"
+                        android:text="More info about the veteran support hotline goes here"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/veteran_support_phone_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:id="@+id/suicide_lifeline_cardview" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/suicide_lifeline_imageview"
+                        android:src="@drawable/nspl"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/suicide_lifeline_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/suicide_lifeline_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Suicide Lifeline: 800-123-4567"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/suicide_lifeline_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/suicide_lifeline_textview"
+                        android:text="More info about the suicide lifeline goes here"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/suicide_lifeline_cardview"
+                android:id="@+id/safe_helpline_cardview" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/safe_helpline_imageview"
+                        android:src="@drawable/veterans_crisis_line_logo"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/safe_helpline_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/safe_helpline_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Veteran Support: 800-123-4567"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/safe_helpline_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/safe_helpline_textview"
+                        android:text="More info about the veteran support hotline goes here"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
 
 
 

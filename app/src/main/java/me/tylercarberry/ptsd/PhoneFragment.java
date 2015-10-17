@@ -5,10 +5,10 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 
 /**
@@ -68,7 +68,8 @@ public class PhoneFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
 
-        TextView suicideLifelifeTextview = (TextView) rootView.findViewById(R.id.suicide_lifeline_textview);
+
+        CardView suicideLifelifeTextview = (CardView) rootView.findViewById(R.id.suicide_lifeline_cardview);
         suicideLifelifeTextview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,15 +77,17 @@ public class PhoneFragment extends Fragment {
             }
         });
 
-        TextView veteranSupportTextview = (TextView) rootView.findViewById(R.id.veteran_support_phone_textview);
-        veteranSupportTextview.setOnClickListener(new View.OnClickListener() {
+
+        CardView veteranSupportCardview = (CardView) rootView.findViewById(R.id.veteran_support_phone_cardview);
+        veteranSupportCardview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialer(getString(R.string.phone_veteran_support));
             }
         });
 
-        TextView safeHotlineTextview = (TextView) rootView.findViewById(R.id.safe_helpline_textview);
+
+        CardView safeHotlineTextview = (CardView) rootView.findViewById(R.id.safe_helpline_cardview);
         safeHotlineTextview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
