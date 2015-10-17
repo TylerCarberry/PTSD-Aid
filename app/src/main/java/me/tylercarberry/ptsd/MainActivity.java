@@ -109,24 +109,26 @@ public class MainActivity extends AppCompatActivity
 
         Fragment newFragment = null;
 
-        if (id == R.id.nav_simple_test) {
-            newFragment = new MainFragment();
-        } else if (id == R.id.nav_test) {
-            newFragment = new StressTestFragment();
+        switch(id) {
+            case R.id.nav_simple_test:
+                newFragment = new MainFragment();
+                break;
+            case R.id.nav_test:
+                newFragment = new StressTestFragment();
+                break;
+            case R.id.nav_resources:
+                newFragment = new ResourcesFragment();
+                break;
+            case R.id.nav_manage:
+                newFragment = new ManageFragment();
+                break;
+            case R.id.nav_hotline:
+                newFragment = new PhoneFragment();
+                break;
 
-        } else if (id == R.id.nav_resources) {
-            newFragment = new ResourcesFragment();
-
-        } else if (id == R.id.nav_manage) {
-            newFragment = new ManageFragment();
-
-        } else if (id == R.id.nav_hotline) {
-            newFragment = new PhoneFragment();
-
-        } else if (id == R.id.nav_websites) {
-            newFragment = new WebsiteFragment();
-
-
+            case R.id.nav_websites:
+                newFragment = new WebsiteFragment();
+                break;
         }
 
         if(newFragment != null) {
