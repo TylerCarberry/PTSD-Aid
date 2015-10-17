@@ -5,7 +5,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="nav_heart_rate">Heart Rate</string>
+    <string name="nav_simple_test">Home</string>
     <string name="nav_support">Support</string>
     <string name="nav_call">Call</string>
     <string name="nav_website">Website</string>

@@ -8,12 +8,16 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
+    <!-- There is a bug where the navigation pane gets stuck if it is opened within 20dp
+         from the side of the screen. Adding android:clickable="true" fixes this bug.
+         http://stackoverflow.com/questions/18029874/drawerlayout-getting-stuck-on-swipe -->
     <RelativeLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/mainBackground"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_marginTop="?attr/actionBarSize"
+        android:clickable="true">
 
     </RelativeLayout>
 

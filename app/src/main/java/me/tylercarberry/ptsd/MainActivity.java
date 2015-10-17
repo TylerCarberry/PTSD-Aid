@@ -15,8 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        MainFragment.OnFragmentInteractionListener, PhoneFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,13 +106,48 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_heart) {
-            // Handle the camera action
+        if (id == R.id.nav_simple_test) {
+            MainFragment newFragment = new MainFragment();
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
         } else if (id == R.id.nav_test) {
+            StressTestFragment newFragment = new StressTestFragment();
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
 
         } else if (id == R.id.nav_resources) {
+            ResourcesFragment newFragment = new ResourcesFragment();
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
 
         } else if (id == R.id.nav_manage) {
+            ManageFragment newFragment = new ManageFragment();
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
 
         } else if (id == R.id.nav_hotline) {
             PhoneFragment newFragment = new PhoneFragment();
@@ -126,7 +160,16 @@ public class MainActivity extends AppCompatActivity
             // Commit the transaction
             transaction.commit();
 
-        } else if (id == R.id.nav_support) {
+        } else if (id == R.id.nav_websites) {
+            WebsiteFragment newFragment = new WebsiteFragment();
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
 
         }
 
