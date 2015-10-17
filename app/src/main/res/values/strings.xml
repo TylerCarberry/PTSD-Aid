@@ -13,11 +13,13 @@
     <string name="nav_manage">Manage</string>
     <string name="nav_test">Stress Test</string>
 
-
-
     <string name="phone_suicide_lifeline">1-800-555-1234</string>
     <string name="phone_veteran_support">1-800-555-5678</string>
     <string name="phone_safe_hotline">1-800-555-000</string>
+
+    <string name="website_nimh">http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml</string>
+    <string name="website_wikipedia">https://en.wikipedia.org/wiki/Posttraumatic_stress_disorder</string>
+    <string name="website_va">http://www.ptsd.va.gov/</string>
 
 
 </resources>

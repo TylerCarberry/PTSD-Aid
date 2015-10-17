@@ -1,13 +1,43 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.tylercarberry.ptsd.WebsiteFragment">
+    tools:context="me.tylercarberry.ptsd.WebsiteFragment"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/website_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Website fragment" />
+        android:text="Website PTSD Support"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/website_national_health_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="National Institute of Mental Health"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/website_wikipedia_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wikipedia"
+        android:layout_below="@id/website_national_health_textview"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/website_va_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Veterans Affairs"
+        android:layout_below="@id/website_wikipedia_textview"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

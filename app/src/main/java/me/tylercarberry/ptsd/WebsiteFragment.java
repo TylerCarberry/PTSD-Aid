@@ -1,18 +1,20 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link WebsiteFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link WebsiteFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -64,7 +66,44 @@ public class WebsiteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_website, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_website, container, false);
+
+        TextView nimhWebsiteTextview = (TextView) rootView.findViewById(R.id.website_national_health_textview);
+        nimhWebsiteTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBrowser(getString(R.string.website_nimh));
+            }
+        });
+
+        TextView wikipediaTextview = (TextView) rootView.findViewById(R.id.website_wikipedia_textview);
+        wikipediaTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBrowser(getString(R.string.website_wikipedia));
+            }
+        });
+
+        TextView vaWebsiteTextview = (TextView) rootView.findViewById(R.id.website_va_textview);
+        vaWebsiteTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBrowser(getString(R.string.website_va));
+            }
+        });
+
+        return rootView;
+    }
+
+    /**
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
+     */
+    private void openBrowser(String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
