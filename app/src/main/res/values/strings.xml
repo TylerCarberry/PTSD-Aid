@@ -21,5 +21,52 @@
     <string name="website_wikipedia">https://en.wikipedia.org/wiki/Posttraumatic_stress_disorder</string>
     <string name="website_va">http://www.ptsd.va.gov/</string>
 
+    <string name="question1">Repeated, disturbing memories, thoughts, or images of a stressful military experience?</string>
+    <string name="question2">Repeated, disturbing dreams of a stressful military experience?</string>
+    <string name="question3">Suddenly acting or feeling as if a stressful military experience were happening again (as if you were reliving it)?</string>
+    <string name="question4">Feeling very upset when something reminded you of a stressful military experience?</string>
+    <string name="question5">Having physical reactions (e.g., heart pounding, trouble breathing, sweating) when something reminded you of a stressful military experience?</string>
+    <string name="question6">Avoiding thinking about or talking about a stressful military experience or avoiding having feelings related to it?</string>
+    <string name="question7">Avoiding activities or situations because they reminded you of a stressful military experience?</string>
+    <string name="question8">Trouble remembering important parts of a stressful military experience?</string>
+    <string name="question9">Loss of interest in activities that you used to enjoy?</string>
+    <string name="question10">Feeling distant or cut off from other people?</string>
+    <string name="question11">Feeling emotionally numb or being unable to have loving feelings for those close to you?</string>
+    <string name="question12">Feeling as if your future somehow will be cut short?</string>
+    <string name="question13">Trouble falling or staying asleep?</string>
+    <string name="question14">Feeling irritable or having angry outbursts?</string>
+    <string name="question15">Having difficulty concentrating?</string>
+    <string name="question16">Being "superalert" or watchful or on guard?</string>
+    <string name="question17">Feeling jumpy or easily startled?</string>
+
+    <string name="not_at_all">Not at all</string>
+    <string name="little_bit">A little bit</string>
+    <string name="moderately">Moderately</string>
+    <string name="quite_a_bit">Quite a bit</string>
+    <string name="extremely">Extremely</string>
+    <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
+
+    <string-array
+        name="stress_questions">
+        <item>Repeated, disturbing memories, thoughts, or images of a stressful military experience?</item>
+        <item>Repeated, disturbing dreams of a stressful military experience?</item>
+        <item>Suddenly acting or feeling as if a stressful military experience were happening again (as if you were reliving it)?</item>
+        <item>Feeling very upset when something reminded you of a stressful military experience?</item>
+        <item>Having physical reactions (e.g., heart pounding, trouble breathing, sweating) when something reminded you of a stressful military experience?</item>
+        <item>Avoiding thinking about or talking about a stressful military experience or avoiding having feelings related to it?</item>
+        <item>Avoiding activities or situations because they reminded you of a stressful military experience?</item>
+        <item>Trouble remembering important parts of a stressful military experience?</item>
+        <item>Loss of interest in activities that you used to enjoy?</item>
+        <item>Feeling distant or cut off from other people?</item>
+        <item>Feeling emotionally numb or being unable to have loving feelings for those close to you?</item>
+        <item>Feeling as if your future somehow will be cut short?</item>
+        <item>Trouble falling or staying asleep?</item>
+        <item>Feeling irritable or having angry outbursts?</item>
+        <item>Having difficulty concentrating?</item>
+        <item>Being "superalert" or watchful or on guard?</item>
+        <item>Feeling jumpy or easily startled?</item>
+
+    </string-array>
+
 
 </resources>
