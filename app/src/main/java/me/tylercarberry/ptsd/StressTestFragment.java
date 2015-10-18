@@ -1,7 +1,9 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -11,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 /**
@@ -114,7 +116,153 @@ public class StressTestFragment extends Fragment {
             Snackbar.make(getView(), "Please answer all of the questions", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         else
-            Toast.makeText(getActivity(), "Score:" + score, Toast.LENGTH_LONG).show();
+            showResults(score);
+    }
+
+    /**
+     * Display an AlertDialog with the results of the test
+     * @param score The score that the user received
+     */
+    private void showResults(int score) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.stress_test_result, null, false);
+
+        String resultText;
+        String nextActions;
+
+        if(score <= 20) {
+            resultText = "Your screen results indicate that you have few or no symptoms of PTSD";
+            nextActions = "However, you still may wish to consult a professional";
+        }
+
+        else if(score <= 29) {
+            resultText = "Your screen results are consistent with minimal symptoms of PTSD";
+            nextActions = "You may benefit from seeking help from a professional";
+        }
+
+        else {
+            resultText = "Your screen results are consistent with many of the symptoms of PTSD.";
+            nextActions = "You are advised to see your physician or a qualified mental health professional immediately for a complete assessment";
+        }
+
+        TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
+        resultTextView.setText(resultText);
+
+        TextView nextActionsTextview = (TextView) layout.findViewById(R.id.next_steps_textview);
+        nextActionsTextview.setText(nextActions);
+
+        final Button shareResultsButton = (Button) layout.findViewById(R.id.share_results_button);
+        shareResultsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareResults();
+            }
+        });
+
+        final Button findProfessionalButton = (Button) layout.findViewById(R.id.find_professional_button);
+        findProfessionalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findProfessional();
+            }
+        });
+
+        alertDialog.setView(layout);
+        alertDialog.show();
+    }
+
+    // TODO
+    private void findProfessional() {
+
+    }
+
+    /**
+     * Share the results of the test
+     * Creates a share intent. The user can share the results with any app.
+     */
+    private void shareResults() {
+        String shareText = generateShareText();
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, shareText);
+        startActivity(Intent.createChooser(intent, "Share via"));
+    }
+
+    /**
+     * Generate the text to be shared when completing the test.
+     * This includes each question and the answer that was selected.
+     * @return A string of the text to be shared
+     */
+    private String generateShareText() {
+        String[] questions = getResources().getStringArray(R.array.stress_questions);
+        int[] answers = getEachAnswer();
+
+        String shareText = getString(R.string.stress_prompt);
+        shareText += "\n\n";
+
+        for(int i = 0; i < questions.length; i++) {
+
+            // Include each question prompt
+            shareText += (i+1) + ") ";
+            shareText += questions[i] + "\n";
+            shareText += "-";
+
+            switch (answers[i]) {
+                case R.id.questions_not_at_all:
+                    shareText += getString(R.string.not_at_all);
+                    break;
+                case R.id.questions_little_bit:
+                    shareText += getString(R.string.little_bit);
+                    break;
+                case R.id.questions_moderately:
+                    shareText += getString(R.string.moderately);
+                    break;
+                case R.id.questions_quite_a_bit:
+                    shareText += getString(R.string.quite_a_bit);
+                    break;
+                case R.id.questions_extremely:
+                    shareText += getString(R.string.extremely);
+                    break;
+                default:
+                    shareText += "N/A";
+                    break;
+            }
+
+            // Skip a line between each question
+            shareText += "\n\n";
+        }
+
+        return shareText;
+    }
+
+    /**
+     * Get each answer that the user has selected.
+     * Each element of the array has the id of the radio button that was selected for that question,
+     * -1 if no answer was provided for that question
+     * @return An array of the answers
+     */
+    private int[] getEachAnswer() {
+        LinearLayout questionsLinearLayout = (LinearLayout) getView().findViewById(R.id.questions_linearlayout);
+
+        // TODO The number of questions is hard coded
+        int score[] = new int[17];
+        int questionCount = 0;
+
+        for(int i = 0; i < questionsLinearLayout.getChildCount();i++) {
+            View childView = questionsLinearLayout.getChildAt(i);
+
+            if(childView instanceof ViewGroup) {
+                RadioGroup radioGroup = (RadioGroup) childView.findViewById(R.id.questions_radio_group);
+                score[questionCount] = radioGroup.getCheckedRadioButtonId();
+                questionCount++;
+            }
+        }
+
+        return score;
     }
 
     /**
@@ -124,40 +272,28 @@ public class StressTestFragment extends Fragment {
      * @return The total score of the questions
      */
     private int getScore() {
-        LinearLayout questionsLinearLayout = (LinearLayout) getView().findViewById(R.id.questions_linearlayout);
-
         int score = 0;
+        int[] eachAnswer = getEachAnswer();
 
-        for(int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
-            View childView = questionsLinearLayout.getChildAt(i);
-
-            if(childView instanceof ViewGroup) {
-
-                RadioGroup radioGroup = (RadioGroup) childView.findViewById(R.id.questions_radio_group);
-
-                int radioButtonId = radioGroup.getCheckedRadioButtonId();
-
-                switch (radioButtonId){
-                    case R.id.questions_not_at_all:
-                        score += 1;
-                        break;
-                    case R.id.questions_little_bit:
-                        score += 2;
-                        break;
-                    case R.id.questions_moderately:
-                        score += 3;
-                        break;
-                    case R.id.questions_quite_a_bit:
-                        score += 4;
-                        break;
-                    case R.id.questions_extremely:
-                        score += 5;
-                        break;
-
-                    // A question was not answered
-                    default:
-                        return -1;
-                }
+        for(int num : eachAnswer) {
+            switch (num) {
+                case R.id.questions_not_at_all:
+                    score += 1;
+                    break;
+                case R.id.questions_little_bit:
+                    score += 2;
+                    break;
+                case R.id.questions_moderately:
+                    score += 3;
+                    break;
+                case R.id.questions_quite_a_bit:
+                    score += 4;
+                    break;
+                case R.id.questions_extremely:
+                    score += 5;
+                    break;
+                default:
+                    return -1;
             }
         }
 
