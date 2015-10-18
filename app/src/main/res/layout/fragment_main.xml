@@ -1,12 +1,95 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="me.tylercarberry.ptsd.MainFragment">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    tools:context="me.tylercarberry.ptsd.MainFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/welcome_test_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is the main fragment"
-        android:layout_centerHorizontal="true"/>
+        android:text="Welcome!"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/prompt_emotion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:text="How are you feeling right now?"
+        android:textSize="20sp"
+        android:layout_below="@+id/welcome_test_view"
+        android:layout_centerHorizontal="true" />
+
+
+
+    <LinearLayout
+        android:id="@+id/emotions_linear_layout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/prompt_emotion"
+        android:gravity="center">
+
+
+        <TextView
+            android:id="@+id/happy_face"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="70sp"
+            android:layout_weight="1"
+            android:text=":)"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/meh_face"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="70sp"
+            android:layout_weight="1"
+            android:text=":|"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/sad_face"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="70sp"
+            android:text=":("
+            android:layout_weight="1"
+            android:gravity="center" />
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/recommendations_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/emotions_linear_layout"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+
+        <FrameLayout
+            android:id="@+id/inner_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+        </FrameLayout>
+
+    </FrameLayout>
+
 
 </RelativeLayout>

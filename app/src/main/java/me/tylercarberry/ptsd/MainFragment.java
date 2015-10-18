@@ -1,12 +1,17 @@
 package me.tylercarberry.ptsd;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 /**
@@ -64,7 +69,92 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        rootView.findViewById(R.id.happy_face).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotionHappy();
+            }
+        });
+
+        rootView.findViewById(R.id.meh_face).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotionOk();
+            }
+        });
+
+        rootView.findViewById(R.id.sad_face).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotionSad();
+            }
+        });
+
+
+
+
+        return rootView;
+    }
+
+    private void emotionOk() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
+
+        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendations.setText("Take the stress test to determine if you suffer from PTSD");
+
+        animateInRecommendations(layout);
+    }
+
+    private void emotionHappy() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
+
+        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendations.setText("Great! Look at the resources for veterans.");
+
+        animateInRecommendations(layout);
+    }
+
+    private void emotionSad() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
+
+        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendations.setText("Consider talking with someone");
+
+        animateInRecommendations(layout);
+    }
+
+    private void animateInRecommendations(final ViewGroup layout) {
+        FrameLayout recommendationContainer = (FrameLayout) getView().findViewById(R.id.inner_frame);
+        recommendationContainer.removeAllViews();
+
+        // Prepare the View for the animation
+        layout.setVisibility(View.VISIBLE);
+        layout.setAlpha(0.0f);
+
+        recommendationContainer.addView(layout);
+
+
+        // Start the animation
+        layout.animate()
+                .translationY(500).setDuration(0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                layout.animate()
+                        .translationY(0)
+                        .alpha(1.0f).setDuration(1000);
+            }
+        });
+
+
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
