@@ -1,49 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/stress_question_textview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
 
-    <RadioGroup
-        android:id="@+id/questions_radio_group"
+    <SeekBar
+        android:id="@+id/result_seekbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <RadioButton
-            android:id="@+id/questions_not_at_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/not_at_all" />
-
-        <RadioButton
-            android:id="@+id/questions_little_bit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/little_bit" />
-
-        <RadioButton
-            android:id="@+id/questions_moderately"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/moderately" />
-
-        <RadioButton
-            android:id="@+id/questions_quite_a_bit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/quite_a_bit" />
-
-        <RadioButton
-            android:id="@+id/questions_extremely"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/extremely" />
+        android:layout_height="wrap_content"
+        android:max="4"/>
 
 
-    </RadioGroup>
 
 </LinearLayout>

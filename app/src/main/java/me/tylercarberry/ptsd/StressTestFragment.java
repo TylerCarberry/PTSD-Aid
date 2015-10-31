@@ -7,13 +7,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 
@@ -34,6 +35,8 @@ public class StressTestFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private static final String LOG_TAG = StressTestFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
 
@@ -108,6 +111,7 @@ public class StressTestFragment extends Fragment {
     }
 
     /**
+     * The user has pressed the submit button.
      * Calculate the total score and notify the user appropriately
      */
     private void submit() {
@@ -212,19 +216,19 @@ public class StressTestFragment extends Fragment {
             shareText += "-";
 
             switch (answers[i]) {
-                case R.id.questions_not_at_all:
+                case 1:
                     shareText += getString(R.string.not_at_all);
                     break;
-                case R.id.questions_little_bit:
+                case 2:
                     shareText += getString(R.string.little_bit);
                     break;
-                case R.id.questions_moderately:
+                case 3:
                     shareText += getString(R.string.moderately);
                     break;
-                case R.id.questions_quite_a_bit:
+                case 4:
                     shareText += getString(R.string.quite_a_bit);
                     break;
-                case R.id.questions_extremely:
+                case 5:
                     shareText += getString(R.string.extremely);
                     break;
                 default:
@@ -243,6 +247,7 @@ public class StressTestFragment extends Fragment {
      * Get each answer that the user has selected.
      * Each element of the array has the id of the radio button that was selected for that question,
      * -1 if no answer was provided for that question
+     * 1-5
      * @return An array of the answers
      */
     private int[] getEachAnswer() {
@@ -256,9 +261,21 @@ public class StressTestFragment extends Fragment {
             View childView = questionsLinearLayout.getChildAt(i);
 
             if(childView instanceof ViewGroup) {
+
+                SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
+                score[questionCount] = seekBar.getProgress() + 1;
+
+                Log.d(LOG_TAG, seekBar.getProgress() + 1 + "");
+
+                questionCount++;
+
+                /*
+
                 RadioGroup radioGroup = (RadioGroup) childView.findViewById(R.id.questions_radio_group);
                 score[questionCount] = radioGroup.getCheckedRadioButtonId();
                 questionCount++;
+
+                */
             }
         }
 
@@ -276,25 +293,11 @@ public class StressTestFragment extends Fragment {
         int[] eachAnswer = getEachAnswer();
 
         for(int num : eachAnswer) {
-            switch (num) {
-                case R.id.questions_not_at_all:
-                    score += 1;
-                    break;
-                case R.id.questions_little_bit:
-                    score += 2;
-                    break;
-                case R.id.questions_moderately:
-                    score += 3;
-                    break;
-                case R.id.questions_quite_a_bit:
-                    score += 4;
-                    break;
-                case R.id.questions_extremely:
-                    score += 5;
-                    break;
-                default:
-                    return -1;
-            }
+
+            if(num > 0)
+                score += num;
+            else
+                return -1;
         }
 
         return score;
