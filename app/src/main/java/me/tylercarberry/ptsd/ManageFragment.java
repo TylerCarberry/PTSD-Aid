@@ -1,9 +1,9 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,10 +61,18 @@ public class ManageFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_manage, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_manage, container, false);
+
+        /*
+        NumberPicker ageNumberPicker = (NumberPicker) rootView.findViewById(R.id.age_number_picker);
+        ageNumberPicker.setMinValue(0);
+        ageNumberPicker.setMaxValue(120);
+        ageNumberPicker.setWrapSelectorWheel(false);
+        */
+
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

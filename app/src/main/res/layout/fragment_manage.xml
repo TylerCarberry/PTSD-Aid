@@ -1,14 +1,130 @@
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+
     tools:context="me.tylercarberry.ptsd.ManageFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/manage_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Manage fragment" />
+        android:layout_centerHorizontal="true"
+        android:textSize="25sp"
+        android:text="About Me (Optional)" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/name_prompt_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/manage_title"
+        android:text="Name:"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/name_edittext"
+        android:inputType="text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/name_prompt_textview"
+        android:layout_toRightOf="@id/name_prompt_textview"/>
+
+    <TextView
+        android:id="@+id/age_prompt_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Age:"
+        android:textSize="20sp"
+        android:layout_below="@id/name_prompt_textview"/>
+
+    <EditText
+        android:id="@+id/age_edittext"
+        android:inputType="number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/age_prompt_textview"
+        android:layout_alignBottom="@id/age_prompt_textview"/>
+
+    <TextView
+        android:id="@+id/gender_prompt_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/age_prompt_textview"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Gender:"
+        android:textSize="20sp"/>
+
+    <RadioGroup
+        android:id="@+id/gender_radiogroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignBottom="@id/gender_prompt_textview"
+        android:layout_alignTop="@id/gender_prompt_textview"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/gender_prompt_textview">
+
+        <RadioButton
+            android:id="@+id/male_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Male"/>
+        <RadioButton
+            android:id="@+id/female_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Female"/>
+
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/branch_prompt_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gender_prompt_textview"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Branch of Military:"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/branch_prompt_textview"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/army_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Army"/>
+
+        <CheckBox
+            android:id="@+id/navy_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Navy"/>
+
+        <CheckBox
+            android:id="@+id/air_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Air"/>
+
+        <CheckBox
+            android:id="@+id/marine_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Marines"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>
