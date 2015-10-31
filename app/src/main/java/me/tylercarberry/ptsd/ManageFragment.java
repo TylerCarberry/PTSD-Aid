@@ -2,11 +2,16 @@ package me.tylercarberry.ptsd;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 
 /**
@@ -72,8 +77,81 @@ public class ManageFragment extends Fragment {
         ageNumberPicker.setWrapSelectorWheel(false);
         */
 
+        EditText nameEditText = (EditText) rootView.findViewById(R.id.name_edittext);
+        nameEditText.setText(getSharedPreferenceString(getString(R.string.pref_name_key), ""));
+        nameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String name = s.toString();
+                saveSharedPreference(getString(R.string.pref_name_key), name);
+            }
+        });
+
+        EditText ageEditText = (EditText) rootView.findViewById(R.id.age_edittext);
+        ageEditText.setText(""+getSharedPreferenceInt(getString(R.string.pref_age_key), 18));
+        ageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    int age = Integer.parseInt(s.toString());
+                    saveSharedPreference(getString(R.string.pref_age_key), age);
+                }
+                catch (NumberFormatException e) {
+                    // The user has not entered a valid age. Do not save the input.
+                    // This also occurs when the EditText is empty ""
+                }
+
+
+            }
+        });
+
+
+
         return rootView;
     }
+
+    private void saveSharedPreference(String prefKey, String value) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(prefKey, value);
+        editor.apply();
+    }
+
+    private void saveSharedPreference(String prefKey, int value) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(prefKey, value);
+        editor.apply();
+    }
+
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(prefKey, defaultValue);
+    }
+
+    private int getSharedPreferenceInt(String prefKey, int defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getInt(prefKey, defaultValue);
+    }
+
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

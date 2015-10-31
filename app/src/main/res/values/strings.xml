@@ -29,6 +29,8 @@
     <string name="quite_a_bit">Quite a bit</string>
     <string name="extremely">Extremely</string>
     <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
+    <string name="pref_name_key">name_key</string>
+    <string name="pref_age_key">age_key</string>
 
     <string-array
         name="stress_questions">
