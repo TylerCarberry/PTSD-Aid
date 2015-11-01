@@ -38,6 +38,8 @@
     <string name="counseling">Are you a combat Veteran looking for confidential counseling servcies? Vet Centers provide bereavement, miulitary sexual trauma, substance abuse, screening and referral for medical issues including\tTBI,\tdepression,\tetc.\tFor\tmore\tinfromation\tor\tto\tfind\tthe\tnearest\tVet\tCenter\tvisit\t\t\t\t\t http:/www.vetcenter.va.gov/index.asp.</string>
     <string name="self_help">The\tNational\tCenter\tfor\tPTSD-Veterans\tAffairs\toffers\tadditional\tinformation\ton\tPTSD,\t treatment\toptions\tand\tself-help\tfor\tcoping\twith\tPTSD.\t http://www.ptsd.va.gov/public/index.asp Make\tthe\tConnection.net\tis\tthe\tDepartment\tof\tVeteran\tAffairs\'\tpublic\tawareness\tcapaign\tthat\t provides\ttestimonials\ton\tthe\tsigns,\ttreatment\tand\tsteps\tto\ttake\tif\tyou\thave\tPTSD. http://maketheconnection.net/conditions/ptsd</string>
 
+    <string name="alarm_service_label">Alarm Service Label</string>
+
     <string-array
         name="stress_questions">
         <item>Repeated, disturbing memories, thoughts, or images of a stressful military experience?</item>
