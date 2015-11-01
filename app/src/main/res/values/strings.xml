@@ -29,8 +29,22 @@
     <string name="quite_a_bit">Quite a bit</string>
     <string name="extremely">Extremely</string>
     <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
+
     <string name="pref_name_key">name_key</string>
     <string name="pref_age_key">age_key</string>
+    <string name="pref_gender_key">gender_key</string>
+    <string name="pref_army_key">army_key</string>
+    <string name="pref_navy_key">navy_key</string>
+    <string name="pref_air_key">air_key</string>
+    <string name="pref_marines_key">marines_key</string>
+
+    <string name="male_id">male</string>
+    <string name="female_id">female</string>
+    <string name="other_gender_id">other</string>
+    <string name="unknown_gender_id">unknown</string>
+
+
+
     <string name="symptoms">Symptoms of PTSD usually start soon after the event but may not appear for months or years later. Symptoms include: • Re-experiencing the event in nightmares or flashbacks. • Avoing situations that remind you of an event, avoiding situations or people that trigger memories. • Negative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy (this is another way to avoid memories). • Hyperarousal, always alert, jumpy, may have trouble concentrating or sleeping. • Co-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
     <string name="causes">PTSD can occur after a traumatic event. How PTSD develops depends on many things: the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
     <string name="diagnosis">For a diagnosis, visit a mental health professional.</string>

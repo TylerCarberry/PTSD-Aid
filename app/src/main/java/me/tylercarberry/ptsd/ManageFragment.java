@@ -11,7 +11,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 
 /**
@@ -99,12 +103,9 @@ public class ManageFragment extends Fragment {
         ageEditText.setText(""+getSharedPreferenceInt(getString(R.string.pref_age_key), 18));
         ageEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -116,10 +117,82 @@ public class ManageFragment extends Fragment {
                     // The user has not entered a valid age. Do not save the input.
                     // This also occurs when the EditText is empty ""
                 }
-
-
             }
         });
+
+        int gender = getSharedPreferenceInt(getString(R.string.pref_gender_key), -1);
+        switch (gender) {
+            case R.id.male_radiobutton:
+                RadioButton maleRadioButton = (RadioButton) rootView.findViewById(R.id.male_radiobutton);
+                maleRadioButton.toggle();
+                break;
+            case R.id.female_radiobutton:
+                RadioButton femaleRadioButton = (RadioButton) rootView.findViewById(R.id.female_radiobutton);
+                femaleRadioButton.toggle();
+                break;
+            case R.id.other_gender_radiobutton:
+                RadioButton otherGenderRadioButton = (RadioButton) rootView.findViewById(R.id.other_gender_radiobutton);
+                otherGenderRadioButton.toggle();
+                break;
+        }
+
+        RadioGroup genderRadioGroup = (RadioGroup) rootView.findViewById(R.id.gender_radiogroup);
+        genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                try {
+                    saveSharedPreference(getString(R.string.pref_gender_key), checkedId);
+                } catch (NumberFormatException e) {
+                    // The user has not entered a valid age. Do not save the input.
+                    // This also occurs when the EditText is empty ""
+                }
+            }
+        });
+
+        CheckBox armyCheckBox = (CheckBox) rootView.findViewById(R.id.army_checkbox);
+        boolean army = getSharedPreferenceBoolean(getString(R.string.pref_army_key), false);
+        if(army)
+            armyCheckBox.toggle();
+        armyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSharedPreference(getString(R.string.pref_army_key), isChecked);
+            }
+        });
+        CheckBox navyCheckBox = (CheckBox) rootView.findViewById(R.id.navy_checkbox);
+        boolean navy = getSharedPreferenceBoolean(getString(R.string.pref_navy_key), false);
+        if(navy)
+            navyCheckBox.toggle();
+        navyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSharedPreference(getString(R.string.pref_navy_key), isChecked);
+            }
+        });
+
+        CheckBox airCheckBox = (CheckBox) rootView.findViewById(R.id.air_checkbox);
+        boolean air = getSharedPreferenceBoolean(getString(R.string.pref_air_key), false);
+        if(air)
+            airCheckBox.toggle();
+        airCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSharedPreference(getString(R.string.pref_air_key), isChecked);
+            }
+        });
+
+        CheckBox marinesCheckBox = (CheckBox) rootView.findViewById(R.id.marine_checkbox);
+        boolean marines = getSharedPreferenceBoolean(getString(R.string.pref_marines_key), false);
+        if(marines)
+            marinesCheckBox.toggle();
+        marinesCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSharedPreference(getString(R.string.pref_marines_key), isChecked);
+            }
+        });
+
+
 
 
 
@@ -140,6 +213,13 @@ public class ManageFragment extends Fragment {
         editor.apply();
     }
 
+    private void saveSharedPreference(String prefKey, boolean value) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(prefKey, value);
+        editor.apply();
+    }
+
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
@@ -148,6 +228,11 @@ public class ManageFragment extends Fragment {
     private int getSharedPreferenceInt(String prefKey, int defaultValue) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getInt(prefKey, defaultValue);
+    }
+
+    private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getBoolean(prefKey, defaultValue);
     }
 
 
