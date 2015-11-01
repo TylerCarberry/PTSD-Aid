@@ -1,14 +1,112 @@
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
     tools:context="me.tylercarberry.ptsd.ResourcesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Resources fragment" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/symptoms_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Symptoms" />
+
+            <TextView
+                android:id="@+id/symptoms_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/symptoms_title_textview"
+                android:text="@string/symptoms"/>
+
+            <TextView
+                android:id="@+id/causes_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/symptoms_textview"
+                android:text="Causes"/>
+
+            <TextView
+                android:id="@+id/causes_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/causes_title_textview"
+                android:text="@string/causes"/>
+
+            <TextView
+                android:id="@+id/diagnosis_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/causes_textview"
+                android:text="Diagnosis"/>
+
+            <TextView
+                android:id="@+id/diagnosis_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/diagnosis_title_textview"
+                android:text="@string/diagnosis"/>
+
+            <TextView
+                android:id="@+id/treatment_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/diagnosis_textview"
+                android:text="Treatment"/>
+
+            <TextView
+                android:id="@+id/treatment_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/treatment_title_textview"
+                android:text="@string/treatment"/>
+
+            <TextView
+                android:id="@+id/counseling_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/treatment_textview"
+                android:text="@string/counseling"/>
+
+            <TextView
+                android:id="@+id/self_help_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/counseling_textview"
+                android:text="Self Help"/>
+
+            <TextView
+                android:id="@+id/self_help_textview"
+                android:theme="@style/SmallText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/self_help_title_textview"
+                android:text="@string/self_help"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>
