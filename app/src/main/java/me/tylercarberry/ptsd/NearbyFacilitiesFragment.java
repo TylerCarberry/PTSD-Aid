@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -132,7 +134,6 @@ public class NearbyFacilitiesFragment extends Fragment {
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
 
-                    String names = "";
                     for(int i = 1; i < 10; i++) {
 
                         JSONObject locationJson = rootJson.getJSONObject(""+i);
@@ -140,24 +141,28 @@ public class NearbyFacilitiesFragment extends Fragment {
                         String name = (String) locationJson.get("FAC_NAME");
                         Log.d(LOG_TAG, name);
 
-                        names += name + "\n";
+
+                        String description = "Desc";
+
+                        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
 
 
-                        double locationLat = locationJson.getDouble("LATITUDE");
-                        double locationLong = locationJson.getDouble("LONGITUDE");
 
                         double userLocation[] = getGPS();
+                        double distance = 0;
 
                         if(userLocation[0] != 0 && userLocation[1] != 0) {
-                            double distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+                            double locationLat = locationJson.getDouble("LATITUDE");
+                            double locationLong = locationJson.getDouble("LONGITUDE");
+
+                            distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
 
                             DecimalFormat df = new DecimalFormat("#.##");
-                            names += "Distance: " + df.format(distance) + " miles\n\n";
+                            description = "Distance: " + df.format(distance) + " miles";
                         }
-                    }
 
-                    TextView outputTextView = (TextView) getView().findViewById(R.id.nearby_facilities_textview);
-                    outputTextView.setText(names);
+                        addFacilityCard(name, description, phoneNumber);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -177,6 +182,26 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(stringRequest);
+    }
+
+    private void addFacilityCard(String name, String description, String phone) {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
+
+        TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
+        nameTextView.setText(name);
+
+        TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
+        descriptionTextView.setText(description);
+
+        TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
+        phoneTextView.setText(phone);
+
+
+        LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
+        parentLinearLayout.addView(cardRelativeLayout);
+
+
     }
 
 
