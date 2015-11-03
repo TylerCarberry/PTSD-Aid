@@ -19,8 +19,11 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
 
+    private final static String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Log.d(LOG_TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -32,20 +35,18 @@ public class MainActivity extends AppCompatActivity
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
-            if (savedInstanceState != null) {
-                return;
+            if (savedInstanceState == null) {
+                // Create a new Fragment to be placed in the activity layout
+                MainFragment firstFragment = new MainFragment();
+
+                // In case this activity was started with special instructions from an
+                // Intent, pass the Intent's extras to the fragment as arguments
+                firstFragment.setArguments(getIntent().getExtras());
+
+                // Add the fragment to the 'fragment_container' FrameLayout
+                getFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, firstFragment).commit();
             }
-
-            // Create a new Fragment to be placed in the activity layout
-            MainFragment firstFragment = new MainFragment();
-
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            firstFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, firstFragment).commit();
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -66,13 +67,14 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onStart() {
+        //Log.d(LOG_TAG, "onStart");
+
         AlarmService alarmService = new AlarmService(getBaseContext());
         alarmService.cancelAlarm();
 
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onStop() {
+        //Log.d(LOG_TAG, "onStop");
+
         AlarmService alarmService = new AlarmService(getBaseContext());
         alarmService.startAlarm(24);
 
