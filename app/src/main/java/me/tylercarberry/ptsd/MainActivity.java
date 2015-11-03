@@ -12,24 +12,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.android.volley.Cache;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Network;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
@@ -73,63 +58,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-
-
-                String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=Facility_byRegionIDandType_detail_array&fac_fld=reg_id&fac_val=5,7&license="
-                        + getString(R.string.api_key_va_facilities)
-                        + "&ReturnFormat=JSON";
-
-                RequestQueue requestQueue;
-
-                // Instantiate the cache
-                Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-                // Set up the network to use HttpURLConnection as the HTTP client.
-                Network network = new BasicNetwork(new HurlStack());
-
-                // Instantiate the RequestQueue with the cache and network.
-                requestQueue = new RequestQueue(cache, network);
-
-                // Start the queue
-                requestQueue.start();
-
-                StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(LOG_TAG, response);
-
-                        response = response.substring(2);
-
-                        try {
-                            JSONObject rootJson = new JSONObject(response);
-
-
-                            JSONObject jsonObj = rootJson.getJSONObject("RESULTS");
-
-
-                            for(int i = 1; i < 10; i++) {
-                                String name = (String) jsonObj.getJSONObject(""+i).get("FAC_NAME");
-                                Log.d(LOG_TAG, name);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, error.toString());
-                    }
-                });
-
-                //Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-                //Volley does retry for you if you have specified the policy.
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                requestQueue.add(stringRequest);
             }
         });
 
@@ -224,6 +152,9 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_websites:
                 newFragment = new WebsiteFragment();
+                break;
+            case R.id.nav_nearby:
+                newFragment = new NearbyFacilitiesFragment();
                 break;
         }
 
