@@ -1,9 +1,12 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +27,9 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DecimalFormat;
+import java.util.List;
 
 
 /**
@@ -98,7 +104,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         Toast.makeText(getActivity(), "LOADING...", Toast.LENGTH_LONG).show();
 
-        String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=Facility_byRegionIDandType_detail_array&fac_fld=reg_id&fac_val=5,7&license="
+        String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=Facility_byRegionIDandType_detail_array&fac_fld=NJ&fac_val=5,7&license="
                 + getString(R.string.api_key_va_facilities)
                 + "&ReturnFormat=JSON";
 
@@ -124,18 +130,30 @@ public class NearbyFacilitiesFragment extends Fragment {
                 response = response.substring(2);
 
                 try {
-                    JSONObject rootJson = new JSONObject(response);
-
-
-                    JSONObject jsonObj = rootJson.getJSONObject("RESULTS");
-
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
 
                     String names = "";
                     for(int i = 1; i < 10; i++) {
-                        String name = (String) jsonObj.getJSONObject(""+i).get("FAC_NAME");
+
+                        JSONObject locationJson = rootJson.getJSONObject(""+i);
+
+                        String name = (String) locationJson.get("FAC_NAME");
                         Log.d(LOG_TAG, name);
 
                         names += name + "\n";
+
+
+                        double locationLat = locationJson.getDouble("LATITUDE");
+                        double locationLong = locationJson.getDouble("LONGITUDE");
+
+                        double userLocation[] = getGPS();
+
+                        if(userLocation[0] != 0 && userLocation[1] != 0) {
+                            double distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            names += "Distance: " + df.format(distance) + " miles\n\n";
+                        }
                     }
 
                     TextView outputTextView = (TextView) getView().findViewById(R.id.nearby_facilities_textview);
@@ -159,6 +177,73 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(stringRequest);
+    }
+
+
+    private double[] getGPS() {
+        double[] gps = new double[2];
+
+        LocationManager lm = (LocationManager) getActivity().getSystemService(
+                Context.LOCATION_SERVICE);
+        List<String> providers = lm.getProviders(true);
+
+        Location l = null;
+
+        for (int i = providers.size()-1; i >= 0; i--) {
+            try {
+                l = lm.getLastKnownLocation(providers.get(i));
+            } catch (SecurityException e) {
+                // The user has blocked location
+            }
+            if (l != null) break;
+        }
+
+        if (l != null) {
+            gps[0] = l.getLatitude();
+            gps[1] = l.getLongitude();
+        }
+
+        return gps;
+    }
+
+
+    /**
+     * Calculate the distance between coordinates
+     * @param lat1 Latitude of coordinate 1
+     * @param lon1 Longitude of coordinate 1
+     * @param lat2 Latitude of coordinate 2
+     * @param lon2 Longitude of coordinate 2
+     * @param unit The unit that the result should be in. (M)iles (K)ilometers (N)autical Miles
+     * @return The distance between the two coordinates in the specified unit
+     */
+    private double distanceBetweenCoordinates(double lat1, double lon1, double lat2, double lon2, String unit) {
+        double theta = lon1 - lon2;
+        double distance =
+                Math.sin(degreesToRadians(lat1)) * Math.sin(degreesToRadians(lat2))
+                + Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * Math.cos(degreesToRadians(theta));
+
+        distance = Math.acos(distance);
+        distance = radiansToDegrees(distance);
+
+        // Miles
+        distance = distance * 60 * 1.1515;
+
+        // Kilometers
+        if (unit.equalsIgnoreCase("K"))
+            distance = distance * 1.609344;
+        // Nautical Miles
+        else if (unit.equalsIgnoreCase("N"))
+            distance = distance * 0.8684;
+
+        return distance;
+    }
+
+    private static double degreesToRadians(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private static double radiansToDegrees(double rad) {
+        return (rad * 180 / Math.PI);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
