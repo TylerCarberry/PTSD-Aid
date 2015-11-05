@@ -144,14 +144,19 @@ public class NearbyFacilitiesFragment extends Fragment {
                         Log.d(LOG_TAG, name);
 
                         String description = "Desc";
-                        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
 
+                        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
                         String address = (String) locationJson.get("ADDRESS");
                         String city = (String) locationJson.get("CITY");
                         String state = (String) locationJson.get("STATE");
-
+                        String zip = (String) locationJson.get("ZIP");
+                        
                         double locationLat = locationJson.getDouble("LATITUDE");
                         double locationLong = locationJson.getDouble("LONGITUDE");
+
+                        int facilityID = locationJson.getInt("FAC_ID");
+
+                        Facility facility = new Facility(facilityID, name, phoneNumber, address, city, state, zip, locationLat, locationLong);
 
                         double userLocation[] = getGPSLocation();
                         double distance = 0;
