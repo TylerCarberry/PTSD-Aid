@@ -33,14 +33,10 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.List;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,6 +61,10 @@ public class NearbyFacilitiesFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     private RequestQueue requestQueue;
+
+    // Dimensions for the Google Maps ImageView
+    private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
+    private static final int MAP_IMAGEVIEW_HEIGHT = 300;
 
     /**
      * Use this factory method to create a new instance of
@@ -107,50 +107,41 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         loadNearbyFacilities();
     }
 
 
+    /**
+     * Load nearby VA facilities from the VA API.
+     * TODO: Load facilities near the user's location
+     */
     public void loadNearbyFacilities() {
-
-        Toast.makeText(getActivity(), "LOADING...", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
 
         String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=Facility_byRegionIDandType_detail_array&fac_fld=NJ&fac_val=5,7&license="
                 + getString(R.string.api_key_va_facilities)
                 + "&ReturnFormat=JSON";
 
-        if(requestQueue == null) {
-            // Instantiate the cache
-            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
-
-            // Set up the network to use HttpURLConnection as the HTTP client.
-            Network network = new BasicNetwork(new HurlStack());
-
-            // Instantiate the RequestQueue with the cache and network.
-            requestQueue = new RequestQueue(cache, network);
-
-            // Start the queue
-            requestQueue.start();
-        }
+        if(requestQueue == null)
+            instantiateRequestQueue();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(LOG_TAG, response);
 
+                // The JSON that the sever responds starts with //
+                // I am cropping the first two characters to create valid JSON.
                 response = response.substring(2);
 
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
 
                     for(int i = 1; i < 10; i++) {
-
                         JSONObject locationJson = rootJson.getJSONObject(""+i);
 
                         String name = (String) locationJson.get("FAC_NAME");
                         Log.d(LOG_TAG, name);
-
 
                         String description = "Desc";
                         String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
@@ -162,19 +153,17 @@ public class NearbyFacilitiesFragment extends Fragment {
                         double locationLat = locationJson.getDouble("LATITUDE");
                         double locationLong = locationJson.getDouble("LONGITUDE");
 
-                        double userLocation[] = getGPS();
+                        double userLocation[] = getGPSLocation();
                         double distance = 0;
 
                         if(userLocation[0] != 0 && userLocation[1] != 0) {
-
-
                             distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
 
                             DecimalFormat df = new DecimalFormat("#.##");
                             description = "Distance: " + df.format(distance) + " miles";
                         }
 
-                        addFacilityCard(name, description, phoneNumber, locationLat, locationLong, address, city, state);
+                        addFacilityCard(name, description, phoneNumber, address, city, state);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -188,8 +177,8 @@ public class NearbyFacilitiesFragment extends Fragment {
             }
         });
 
-        //Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        //Volley does retry for you if you have specified the policy.
+        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
+        // Volley does retry for you if you have specified the policy.
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
@@ -197,90 +186,95 @@ public class NearbyFacilitiesFragment extends Fragment {
         requestQueue.add(stringRequest);
     }
 
-    private void loadStreetViewImage(final ImageView imageView, final String address, final String city, final String state) throws UnsupportedEncodingException {
+    /**
+     * Load the facility image and place it into facilityImageView.
+     * Try the street view image first, then the map image, then the default image.
+     * @param facilityImageView The ImageView to place the image into
+     * @param address The street address
+     * @param city The city
+     * @param state The state. Can be initials or full name.
+     */
+    private void loadFacilityImage(ImageView facilityImageView, String address, String city, String state) {
+        loadStreetViewImage(facilityImageView, address, city, state);
+    }
+
+    /**
+     * Load the street view imagery for the given address.
+     * If there is no street view imagery, it uses the map view instead.
+     * You should not call this directly. Call loadFacilityImage instead
+     * @param imageView The ImageView to place the image into
+     * @param address The street address
+     * @param city The city
+     * @param state The state. Can be initials or full name
+     * @throws UnsupportedEncodingException
+     */
+    private void loadStreetViewImage(final ImageView imageView, final String address, final String city, final String state) {
         Log.d(LOG_TAG, "Entering load street view image.");
 
+        String url = "";
 
-        String url = calculateStreetViewUrl(address, city, state);
+        // If the street view url cannot be created, load the map view instead
+        try {
+            url = calculateStreetViewUrl(address, city, state);
+        } catch (UnsupportedEncodingException e) {
+            loadMapImage(imageView, address, city, state);
+            return;
+        }
         Log.d(LOG_TAG, url);
-
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
-                        Log.d(LOG_TAG, "IMAGE onResponse");
+                        Log.d(LOG_TAG, "Street View Image onResponse");
 
-
-
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
-                        byte[] bitmapBytes = baos.toByteArray();
-
-                        try {
-                            byte[] md5Hash = MessageDigest.getInstance("MD5").digest(bitmapBytes);
-
-                            String s = new String(md5Hash);
-
-                            Log.d("HELLO", s);
-
-
-                            //bitmap.getPixel(100,100).
-
-
-                            Log.d("YOLO " + address, ""+bitmap.getPixel(100,100));
-
-                            int pixel = bitmap.getPixel(100, 100);
-
-
-                            if(pixel == -1776674) {
-                                loadMapImage(imageView, address, city, state);
-                            }
-
-
-
-                        } catch (NoSuchAlgorithmException e) {
-                            e.printStackTrace();
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        imageView.setImageBitmap(bitmap);
+                        // If there is no street view image for the address use the map view instead
+                        if(validStreetViewBitmap(bitmap))
+                            imageView.setImageBitmap(bitmap);
+                        else
+                            loadMapImage(imageView, address, city, state);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(LOG_TAG, "IMAGE errorListener");
-                        imageView.setImageResource(R.drawable.nspl);
+                        Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
+
+                        // Load the map view instead
+                        loadMapImage(imageView, address, city, state);
                     }
                 });
 
-        if(requestQueue == null) {
-            // Instantiate the cache
-            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+        if(requestQueue == null)
+            instantiateRequestQueue();
 
-            // Set up the network to use HttpURLConnection as the HTTP client.
-            Network network = new BasicNetwork(new HurlStack());
-
-            // Instantiate the RequestQueue with the cache and network.
-            requestQueue = new RequestQueue(cache, network);
-
-            // Start the queue
-            requestQueue.start();
-        }
-
-
+        // Start loading the image in the background
         requestQueue.add(request);
     }
 
 
-    private void loadMapImage(final ImageView imageView, String address, String city, String state) throws UnsupportedEncodingException {
+    /**
+     * Load the Google Maps imagery for the given address.
+     * If there is no map imagery, it uses the default image instead.
+     * You should not call this directly. Call loadFacilityImage instead
+     * @param imageView The ImageView to place the image into
+     * @param address The street address
+     * @param city The city
+     * @param state The state. Can be initials or full name
+     */
+    private void loadMapImage(final ImageView imageView, String address, String city, String state) {
         Log.d(LOG_TAG, "Entering load map image.");
 
+        final int defaultImageId = R.drawable.nspl;
 
-        String url = calculateMapUrl(address, city, state);
+        String url = null;
+        try {
+            url = calculateMapUrl(address, city, state);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            imageView.setImageResource(defaultImageId);
+            return;
+        }
         Log.d(LOG_TAG, url);
 
 
@@ -296,51 +290,104 @@ public class NearbyFacilitiesFragment extends Fragment {
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d(LOG_TAG, "IMAGE errorListener");
-                        imageView.setImageResource(R.drawable.nspl);
+                        imageView.setImageResource(defaultImageId);
                     }
                 });
 
-        if(requestQueue == null) {
-            // Instantiate the cache
-            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+        if(requestQueue == null)
+            instantiateRequestQueue();
 
-            // Set up the network to use HttpURLConnection as the HTTP client.
-            Network network = new BasicNetwork(new HurlStack());
-
-            // Instantiate the RequestQueue with the cache and network.
-            requestQueue = new RequestQueue(cache, network);
-
-            // Start the queue
-            requestQueue.start();
-        }
-
-
+        // Start loading the image in the background
         requestQueue.add(request);
     }
 
+
+    /**
+     * Create the request queue. This is used to connect to the API in the background
+     */
+    private void instantiateRequestQueue() {
+        // Instantiate the cache
+        Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+
+        // Set up the network to use HttpURLConnection as the HTTP client.
+        Network network = new BasicNetwork(new HurlStack());
+
+        // Instantiate the RequestQueue with the cache and network.
+        requestQueue = new RequestQueue(cache, network);
+
+        // Start the queue
+        requestQueue.start();
+    }
+
+
+    /**
+     * Determine if the response from the Street View API was a valid street view image
+     *
+     * If there is no street view imagery for the address, Google returns an image
+     * stating that there is no imagery. I then load a map of the address instead.
+     *
+     * I cannot find a way to check if the street view exists properly. However, since the image
+     * is always the same, I check the color of one of the pixels.
+     *
+     *** This code will break if Google changes the error message image. ***
+     *
+     * @param streetViewResponse The bitmap response that the Street View API gave
+     * @return Whether the response was a valid street view image
+     */
+    private boolean validStreetViewBitmap(Bitmap streetViewResponse) {
+        int pixel = streetViewResponse.getPixel(100, 100);
+        return pixel != -1776674;
+    }
+
+    /**
+     * Get the url for the Street View Api
+     * @param address The street address
+     * @param town The town
+     * @param state The state. Can be initials or full name
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
     private String calculateStreetViewUrl(String address, String town, String state) throws UnsupportedEncodingException {
+        String url = "https://maps.googleapis.com/maps/api/streetview?size="+MAP_IMAGEVIEW_WIDTH+"x"+MAP_IMAGEVIEW_HEIGHT+"&location=";
 
-        String url = "https://maps.googleapis.com/maps/api/streetview?size=800x400&location="; // + "&fov=90&heading=235&pitch=10";
+        // Encode the address
         String params = address + ", " + town + ", " + state;
-
         return url + URLEncoder.encode(params, "UTF-8");
     }
 
 
+    /**
+     * Get the url for the Google Maps Api
+     * @param address The street address
+     * @param town The town
+     * @param state The state. Can be initials or full name
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
     private String calculateMapUrl(String address, String town, String state) throws UnsupportedEncodingException {
         String url = "http://maps.google.com/maps/api/staticmap?center=";
 
-
+        // Encode the address
         String paramLocation = address + ", " + town + ", " + state;
         paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
 
-
-        url += paramLocation + "&zoom=15&size=1000x300&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
+        // Place a red marker over the location
+        url += paramLocation + "&zoom=15&size=" + MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT
+                + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
 
         return url;
     }
 
-    private void addFacilityCard(String name, String description, String phone, double lat, double lon, String address, String city, String state) {
+    /**
+     * Add a card to the list containing information about the facility
+     * @param name The name of the facility
+     * @param description A description of the facility
+     * @param phone The phone number of the facility
+     * @param address The street address of the facility
+     * @param city The city of the facility
+     * @param state The state. Can be initials or full name
+     */
+    private void addFacilityCard(String name, String description, String phone, String address, String city, String state) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
@@ -354,29 +401,18 @@ public class NearbyFacilitiesFragment extends Fragment {
         phoneTextView.setText(phone);
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-        try {
-            loadStreetViewImage(facilityImageView, address, city, state);
-        }
-        // No street view imagery available
-        catch (IllegalStateException e) {
-            try {
-                loadMapImage(facilityImageView, address, city, state);
-            } catch (Exception e2) {
-                e.printStackTrace();
-            }
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-
+        loadFacilityImage(facilityImageView, address, city, state);
 
         LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
         parentLinearLayout.addView(cardRelativeLayout);
     }
 
 
-    private double[] getGPS() {
+    /**
+     * Get the user's GPS location
+     * @return The GPS coordinates: latitude, longitude
+     */
+    private double[] getGPSLocation() {
         double[] gps = new double[2];
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(
