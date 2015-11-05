@@ -33,8 +33,11 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -194,11 +197,90 @@ public class NearbyFacilitiesFragment extends Fragment {
         requestQueue.add(stringRequest);
     }
 
-    private void loadImage(final ImageView imageView, double lat, double lon, String address, String city, String state) throws UnsupportedEncodingException {
-        Log.d(LOG_TAG, "Entering load image. Lat: " + lat + " Lon: " + lon);
+    private void loadStreetViewImage(final ImageView imageView, final String address, final String city, final String state) throws UnsupportedEncodingException {
+        Log.d(LOG_TAG, "Entering load street view image.");
 
 
-        String url = calculateMapUrl(lat, lon, address, city, state);
+        String url = calculateStreetViewUrl(address, city, state);
+        Log.d(LOG_TAG, url);
+
+
+        // Retrieves an image specified by the URL, displays it in the UI.
+        ImageRequest request = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        Log.d(LOG_TAG, "IMAGE onResponse");
+
+
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
+                        byte[] bitmapBytes = baos.toByteArray();
+
+                        try {
+                            byte[] md5Hash = MessageDigest.getInstance("MD5").digest(bitmapBytes);
+
+                            String s = new String(md5Hash);
+
+                            Log.d("HELLO", s);
+
+
+                            //bitmap.getPixel(100,100).
+
+
+                            Log.d("YOLO " + address, ""+bitmap.getPixel(100,100));
+
+                            int pixel = bitmap.getPixel(100, 100);
+
+
+                            if(pixel == -1776674) {
+                                loadMapImage(imageView, address, city, state);
+                            }
+
+
+
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(LOG_TAG, "IMAGE errorListener");
+                        imageView.setImageResource(R.drawable.nspl);
+                    }
+                });
+
+        if(requestQueue == null) {
+            // Instantiate the cache
+            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+
+            // Set up the network to use HttpURLConnection as the HTTP client.
+            Network network = new BasicNetwork(new HurlStack());
+
+            // Instantiate the RequestQueue with the cache and network.
+            requestQueue = new RequestQueue(cache, network);
+
+            // Start the queue
+            requestQueue.start();
+        }
+
+
+        requestQueue.add(request);
+    }
+
+
+    private void loadMapImage(final ImageView imageView, String address, String city, String state) throws UnsupportedEncodingException {
+        Log.d(LOG_TAG, "Entering load map image.");
+
+
+        String url = calculateMapUrl(address, city, state);
         Log.d(LOG_TAG, url);
 
 
@@ -236,15 +318,26 @@ public class NearbyFacilitiesFragment extends Fragment {
         requestQueue.add(request);
     }
 
-    private String calculateMapUrl(double lat, double lon, String address, String town, String state) throws UnsupportedEncodingException {
+    private String calculateStreetViewUrl(String address, String town, String state) throws UnsupportedEncodingException {
 
         String url = "https://maps.googleapis.com/maps/api/streetview?size=800x400&location="; // + "&fov=90&heading=235&pitch=10";
         String params = address + ", " + town + ", " + state;
 
         return url + URLEncoder.encode(params, "UTF-8");
+    }
 
 
-        //return "http://maps.google.com/maps/api/staticmap?center=" + lat + "," + lon + "&zoom=20&size=1000x300&sensor=false&markers=color:redzlabel:A%7C" + lat + "," + lon;
+    private String calculateMapUrl(String address, String town, String state) throws UnsupportedEncodingException {
+        String url = "http://maps.google.com/maps/api/staticmap?center=";
+
+
+        String paramLocation = address + ", " + town + ", " + state;
+        paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
+
+
+        url += paramLocation + "&zoom=15&size=1000x300&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
+
+        return url;
     }
 
     private void addFacilityCard(String name, String description, String phone, double lat, double lon, String address, String city, String state) {
@@ -262,16 +355,24 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
         try {
-            loadImage(facilityImageView, lat, lon, address, city, state);
-        } catch (UnsupportedEncodingException e) {
+            loadStreetViewImage(facilityImageView, address, city, state);
+        }
+        // No street view imagery available
+        catch (IllegalStateException e) {
+            try {
+                loadMapImage(facilityImageView, address, city, state);
+            } catch (Exception e2) {
+                e.printStackTrace();
+            }
+        }
+        catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
 
+
         LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
         parentLinearLayout.addView(cardRelativeLayout);
-
-
     }
 
 
