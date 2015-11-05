@@ -3,6 +3,7 @@ package me.tylercarberry.ptsd;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,11 +27,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -56,6 +61,8 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    private RequestQueue requestQueue;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -75,7 +82,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     public NearbyFacilitiesFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -110,19 +117,19 @@ public class NearbyFacilitiesFragment extends Fragment {
                 + getString(R.string.api_key_va_facilities)
                 + "&ReturnFormat=JSON";
 
-        RequestQueue requestQueue;
+        if(requestQueue == null) {
+            // Instantiate the cache
+            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
 
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+            // Set up the network to use HttpURLConnection as the HTTP client.
+            Network network = new BasicNetwork(new HurlStack());
 
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
+            // Instantiate the RequestQueue with the cache and network.
+            requestQueue = new RequestQueue(cache, network);
 
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
+            // Start the queue
+            requestQueue.start();
+        }
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -143,17 +150,20 @@ public class NearbyFacilitiesFragment extends Fragment {
 
 
                         String description = "Desc";
-
                         String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
 
+                        String address = (String) locationJson.get("ADDRESS");
+                        String city = (String) locationJson.get("CITY");
+                        String state = (String) locationJson.get("STATE");
 
+                        double locationLat = locationJson.getDouble("LATITUDE");
+                        double locationLong = locationJson.getDouble("LONGITUDE");
 
                         double userLocation[] = getGPS();
                         double distance = 0;
 
                         if(userLocation[0] != 0 && userLocation[1] != 0) {
-                            double locationLat = locationJson.getDouble("LATITUDE");
-                            double locationLong = locationJson.getDouble("LONGITUDE");
+
 
                             distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
 
@@ -161,7 +171,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                             description = "Distance: " + df.format(distance) + " miles";
                         }
 
-                        addFacilityCard(name, description, phoneNumber);
+                        addFacilityCard(name, description, phoneNumber, locationLat, locationLong, address, city, state);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -184,7 +194,60 @@ public class NearbyFacilitiesFragment extends Fragment {
         requestQueue.add(stringRequest);
     }
 
-    private void addFacilityCard(String name, String description, String phone) {
+    private void loadImage(final ImageView imageView, double lat, double lon, String address, String city, String state) throws UnsupportedEncodingException {
+        Log.d(LOG_TAG, "Entering load image. Lat: " + lat + " Lon: " + lon);
+
+
+        String url = calculateMapUrl(lat, lon, address, city, state);
+        Log.d(LOG_TAG, url);
+
+
+        // Retrieves an image specified by the URL, displays it in the UI.
+        ImageRequest request = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        Log.d(LOG_TAG, "IMAGE onResponse");
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(LOG_TAG, "IMAGE errorListener");
+                        imageView.setImageResource(R.drawable.nspl);
+                    }
+                });
+
+        if(requestQueue == null) {
+            // Instantiate the cache
+            Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
+
+            // Set up the network to use HttpURLConnection as the HTTP client.
+            Network network = new BasicNetwork(new HurlStack());
+
+            // Instantiate the RequestQueue with the cache and network.
+            requestQueue = new RequestQueue(cache, network);
+
+            // Start the queue
+            requestQueue.start();
+        }
+
+
+        requestQueue.add(request);
+    }
+
+    private String calculateMapUrl(double lat, double lon, String address, String town, String state) throws UnsupportedEncodingException {
+
+        String url = "https://maps.googleapis.com/maps/api/streetview?size=800x400&location="; // + "&fov=90&heading=235&pitch=10";
+        String params = address + ", " + town + ", " + state;
+
+        return url + URLEncoder.encode(params, "UTF-8");
+
+
+        //return "http://maps.google.com/maps/api/staticmap?center=" + lat + "," + lon + "&zoom=20&size=1000x300&sensor=false&markers=color:redzlabel:A%7C" + lat + "," + lon;
+    }
+
+    private void addFacilityCard(String name, String description, String phone, double lat, double lon, String address, String city, String state) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
@@ -196,6 +259,13 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
         phoneTextView.setText(phone);
+
+        ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
+        try {
+            loadImage(facilityImageView, lat, lon, address, city, state);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
 
         LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
