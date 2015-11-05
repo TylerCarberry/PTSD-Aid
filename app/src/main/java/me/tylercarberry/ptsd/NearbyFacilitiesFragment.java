@@ -37,7 +37,9 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,6 +68,8 @@ public class NearbyFacilitiesFragment extends Fragment {
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
     private static final int MAP_IMAGEVIEW_HEIGHT = 400;
+
+    private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
     /**
      * Use this factory method to create a new instance of
@@ -115,9 +119,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
 
     public void loadNearbyPTSDPrograms() {
-
         Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
-
 
         String url = "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
                 + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
@@ -137,17 +139,32 @@ public class NearbyFacilitiesFragment extends Fragment {
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
 
-                    for(int i = 1; i < 30; i++) {
+                    for(int i = 1; i < 100; i++) {
                         JSONObject locationJson = rootJson.getJSONObject("" + i);
 
                         int facilityID = locationJson.getInt("FAC_ID");
 
                         String program = (String) locationJson.get("PROGRAM");
 
-                        loadFacility(facilityID, program);
+                        Facility facility;
+                        if(knownFacilities.containsKey(facilityID))
+                            facility = knownFacilities.get(facilityID);
+                        else
+                            facility = new Facility(facilityID);
+
+                        facility.addProgram(program);
+                        knownFacilities.put(facilityID, facility);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                Toast.makeText(getActivity(), "Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
+
+                for(int facilityId : knownFacilities.keySet()) {
+                    Facility facility = knownFacilities.get(facilityId);
+
+                    loadFacility(facility);
                 }
 
             }
@@ -174,11 +191,11 @@ public class NearbyFacilitiesFragment extends Fragment {
      * Load nearby VA facilities from the VA API.
      * TODO: Load facilities near the user's location
      */
-    public void loadFacility(int facilityId, final String program) {
+    public void loadFacility(final Facility facility) {
         //Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
 
         String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
-                + facilityId + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
+                + facility.getFacilityId() + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
 
         if(requestQueue == null)
             instantiateRequestQueue();
@@ -206,14 +223,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                     String city = (String) locationJson.get("CITY");
                     String state = (String) locationJson.get("STATE");
                     String zip = ""+locationJson.get("ZIP");
-                    //String zip = "";
 
                     double locationLat = locationJson.getDouble("LATITUDE");
                     double locationLong = locationJson.getDouble("LONGITUDE");
-
-                    int facilityID = locationJson.getInt("FAC_ID");
-
-                    Facility facility = new Facility(facilityID, name, phoneNumber, address, city, state, zip, locationLat, locationLong);
 
                     double userLocation[] = getGPSLocation();
                     double distance = 0;
@@ -222,10 +234,22 @@ public class NearbyFacilitiesFragment extends Fragment {
                         distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
 
                         DecimalFormat df = new DecimalFormat("#.##");
-                        description = "Distance: " + df.format(distance) + " miles";
+                        description = "Distance: " + df.format(distance) + " miles\n\n";
                     }
 
-                    addFacilityCard(name, program + "\n" + description, phoneNumber, address, city, state);
+                    Set<String> programs = facility.getPrograms();
+                    for(String program : programs)
+                        description += program + "\n";
+
+                    facility.setName(name);
+                    facility.setPhoneNumber(phoneNumber);
+                    facility.setStreetAddress(address);
+                    facility.setCity(city);
+                    facility.setState(state);
+                    facility.setZip(zip);
+                    facility.setDescription(description);
+
+                    addFacilityCard(facility);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -257,6 +281,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * Load nearby VA facilities from the VA API.
      * TODO: Load facilities near the user's location
      */
+    /*
     public void loadNearbyFacilities() {
         Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
 
@@ -332,6 +357,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         requestQueue.add(stringRequest);
     }
+    */
 
     /**
      * Load the facility image and place it into facilityImageView.
@@ -544,40 +570,37 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     /**
      * Add a card to the list containing information about the facility
-     * @param name The name of the facility
-     * @param description A description of the facility
-     * @param phone The phone number of the facility
-     * @param address The street address of the facility
-     * @param city The city of the facility
-     * @param state The state. Can be initials or full name
+     * @param facility The facility to add
      */
-    private void addFacilityCard(final String name, String description, final String phone, String address, final String city, final String state) {
+    private void addFacilityCard(final Facility facility) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
         TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
-        nameTextView.setText(name);
+        nameTextView.setText(facility.getName());
+
+        String description = facility.getDescription();
 
         TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
         descriptionTextView.setText(description);
 
         TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-        phoneTextView.setText(phone);
+        phoneTextView.setText(facility.getPhoneNumber());
         phoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String phoneNumber = getFirstPhoneNumber(phone);
+                String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
                 openDialer(phoneNumber);
             }
         });
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-        loadFacilityImage(facilityImageView, address, city, state);
+        loadFacilityImage(facilityImageView, facility.getStreetAddress(), facility.getCity(), facility.getState());
         facilityImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    showMap(getMapUri(name, city, state));
+                    showMap(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }

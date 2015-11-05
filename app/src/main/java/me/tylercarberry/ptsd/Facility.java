@@ -1,5 +1,8 @@
 package me.tylercarberry.ptsd;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by Tyler on 11/5/15.
  */
@@ -7,6 +10,7 @@ public class Facility {
 
     private final int FACILITY_ID;
     private String name;
+    private String description;
 
     private String phoneNumber;
     private String streetAddress;
@@ -17,11 +21,14 @@ public class Facility {
     private double latitude;
     private double longitude;
 
+    Set<String> programs;
+
     public Facility(int facilityId) {
         FACILITY_ID = facilityId;
+        programs = new HashSet<>();
     }
 
-    public Facility(int facilityId, String name, String phoneNumber, String streetAddress,
+    public Facility(int facilityId, String name, String description, String phoneNumber, String streetAddress,
                     String city, String state, String zip, double latitude, double longitude) {
 
         FACILITY_ID = facilityId;
@@ -33,6 +40,8 @@ public class Facility {
         this.zip = zip;
         this.latitude = latitude;
         this.longitude = longitude;
+
+        programs = new HashSet<>();
     }
 
     public int getFacilityId() {
@@ -45,6 +54,14 @@ public class Facility {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getPhoneNumber() {
@@ -101,5 +118,13 @@ public class Facility {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public void addProgram(String program) {
+        programs.add(program);
+    }
+
+    public Set<String> getPrograms() {
+        return programs;
     }
 }
