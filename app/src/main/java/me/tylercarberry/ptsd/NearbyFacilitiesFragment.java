@@ -64,7 +64,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
-    private static final int MAP_IMAGEVIEW_HEIGHT = 300;
+    private static final int MAP_IMAGEVIEW_HEIGHT = 500;
 
     /**
      * Use this factory method to create a new instance of
@@ -372,7 +372,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
 
         // Place a red marker over the location
-        url += paramLocation + "&zoom=15&size=" + MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT
+        url += paramLocation + "&zoom=16&size=" + MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT
                 + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
 
         return url;
