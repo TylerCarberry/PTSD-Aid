@@ -128,7 +128,7 @@ public class StressTestFragment extends Fragment {
      * @param score The score that the user received
      */
     private void showResults(int score) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.stress_test_result, null, false);
@@ -170,6 +170,7 @@ public class StressTestFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 findProfessional();
+                alertDialog.dismiss();
             }
         });
 
@@ -177,9 +178,21 @@ public class StressTestFragment extends Fragment {
         alertDialog.show();
     }
 
-    // TODO
+    /**
+     * Switch to the NearbyFacilitiesFragment and show a list of nearby facilities
+     */
     private void findProfessional() {
+        NearbyFacilitiesFragment nearbyFacilitiesFragment = new NearbyFacilitiesFragment();
 
+
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment
+        transaction.replace(R.id.fragment_container, nearbyFacilitiesFragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
     }
 
     /**
