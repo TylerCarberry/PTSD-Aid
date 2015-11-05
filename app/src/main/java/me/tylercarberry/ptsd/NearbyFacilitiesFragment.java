@@ -3,6 +3,7 @@ package me.tylercarberry.ptsd;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
@@ -384,6 +385,23 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
+     * Get the url for the Google Maps Api
+     * @param name The street address
+     * @param town The town
+     * @param state The state. Can be initials or full name
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
+    private Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
+
+        // Encode the address
+        String location = name + ", " + town + ", " + state;
+        location = URLEncoder.encode(location, "UTF-8");
+
+        return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    /**
      * Add a card to the list containing information about the facility
      * @param name The name of the facility
      * @param description A description of the facility
@@ -392,7 +410,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param city The city of the facility
      * @param state The state. Can be initials or full name
      */
-    private void addFacilityCard(String name, String description, String phone, String address, String city, String state) {
+    private void addFacilityCard(final String name, String description, final String phone, String address, final String city, final String state) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
@@ -404,12 +422,47 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
         phoneTextView.setText(phone);
+        phoneTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(phone);
+            }
+        });
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
         loadFacilityImage(facilityImageView, address, city, state);
+        facilityImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    showMap(getMapUri(name, city, state));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
         parentLinearLayout.addView(cardRelativeLayout);
+    }
+
+    public void showMap(Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    private void openDialer(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        startActivity(intent);
     }
 
 
