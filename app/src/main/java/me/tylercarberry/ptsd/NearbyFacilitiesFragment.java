@@ -425,7 +425,8 @@ public class NearbyFacilitiesFragment extends Fragment {
         phoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialer(phone);
+                String phoneNumber = getFirstPhoneNumber(phone);
+                openDialer(phoneNumber);
             }
         });
 
@@ -463,6 +464,20 @@ public class NearbyFacilitiesFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
+    }
+
+    /**
+     * Determine the first phone number in the String
+     * The Facility API returns multiple phone numbers with an or between them
+     * @param phoneNumbers A string of one or more phone numbers
+     * @return The first phone number in the string
+     */
+    private String getFirstPhoneNumber(String phoneNumbers) {
+        int orLocation = phoneNumbers.indexOf(" Or");
+
+        if(orLocation >= 0)
+            return phoneNumbers.substring(0, orLocation);
+        return phoneNumbers;
     }
 
 
