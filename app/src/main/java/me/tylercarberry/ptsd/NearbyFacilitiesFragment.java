@@ -65,7 +65,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
-    private static final int MAP_IMAGEVIEW_HEIGHT = 500;
+    private static final int MAP_IMAGEVIEW_HEIGHT = 400;
 
     /**
      * Use this factory method to create a new instance of
@@ -108,8 +108,149 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        loadNearbyFacilities();
+        loadNearbyPTSDPrograms();
+
+        //loadNearbyFacilities();
     }
+
+
+    public void loadNearbyPTSDPrograms() {
+
+        Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
+
+
+        String url = "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
+                + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
+
+        if(requestQueue == null)
+            instantiateRequestQueue();
+
+        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(LOG_TAG, response);
+
+                // The JSON that the sever responds starts with //
+                // I am cropping the first two characters to create valid JSON.
+                response = response.substring(2);
+
+                try {
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+
+                    for(int i = 1; i < 30; i++) {
+                        JSONObject locationJson = rootJson.getJSONObject("" + i);
+
+                        int facilityID = locationJson.getInt("FAC_ID");
+
+                        String program = (String) locationJson.get("PROGRAM");
+
+                        loadFacility(facilityID, program);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(LOG_TAG, error.toString());
+            }
+        });
+
+        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
+        // Volley does retry for you if you have specified the policy.
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        requestQueue.add(stringRequest);
+
+    }
+
+
+
+    /**
+     * Load nearby VA facilities from the VA API.
+     * TODO: Load facilities near the user's location
+     */
+    public void loadFacility(int facilityId, final String program) {
+        //Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
+
+        String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
+                + facilityId + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
+
+        if(requestQueue == null)
+            instantiateRequestQueue();
+
+        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(LOG_TAG, response);
+
+                // The JSON that the sever responds starts with //
+                // I am cropping the first two characters to create valid JSON.
+                response = response.substring(2);
+
+                try {
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+                    JSONObject locationJson = rootJson.getJSONObject("1");
+
+                    String name = (String) locationJson.get("FAC_NAME");
+                    Log.d(LOG_TAG, name);
+
+                    String description = "Desc";
+
+                    String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
+                    String address = (String) locationJson.get("ADDRESS");
+                    String city = (String) locationJson.get("CITY");
+                    String state = (String) locationJson.get("STATE");
+                    String zip = ""+locationJson.get("ZIP");
+                    //String zip = "";
+
+                    double locationLat = locationJson.getDouble("LATITUDE");
+                    double locationLong = locationJson.getDouble("LONGITUDE");
+
+                    int facilityID = locationJson.getInt("FAC_ID");
+
+                    Facility facility = new Facility(facilityID, name, phoneNumber, address, city, state, zip, locationLat, locationLong);
+
+                    double userLocation[] = getGPSLocation();
+                    double distance = 0;
+
+                    if(userLocation[0] != 0 && userLocation[1] != 0) {
+                        distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        description = "Distance: " + df.format(distance) + " miles";
+                    }
+
+                    addFacilityCard(name, program + "\n" + description, phoneNumber, address, city, state);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(LOG_TAG, error.toString());
+            }
+        });
+
+        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
+        // Volley does retry for you if you have specified the policy.
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        requestQueue.add(stringRequest);
+    }
+
+
+
+
+
 
 
     /**
@@ -151,7 +292,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         String city = (String) locationJson.get("CITY");
                         String state = (String) locationJson.get("STATE");
                         String zip = (String) locationJson.get("ZIP");
-                        
+
                         double locationLat = locationJson.getDouble("LATITUDE");
                         double locationLong = locationJson.getDouble("LONGITUDE");
 
@@ -525,7 +666,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         double theta = lon1 - lon2;
         double distance =
                 Math.sin(degreesToRadians(lat1)) * Math.sin(degreesToRadians(lat2))
-                + Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * Math.cos(degreesToRadians(theta));
+                        + Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * Math.cos(degreesToRadians(theta));
 
         distance = Math.acos(distance);
         distance = radiansToDegrees(distance);
@@ -536,7 +677,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         // Kilometers
         if (unit.equalsIgnoreCase("K"))
             distance = distance * 1.609344;
-        // Nautical Miles
+            // Nautical Miles
         else if (unit.equalsIgnoreCase("N"))
             distance = distance * 0.8684;
 
