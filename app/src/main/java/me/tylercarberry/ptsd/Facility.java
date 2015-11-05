@@ -1,12 +1,13 @@
 package me.tylercarberry.ptsd;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Tyler on 11/5/15.
  */
-public class Facility {
+public class Facility implements Comparator<Facility>{
 
     private final int FACILITY_ID;
     private String name;
@@ -21,6 +22,8 @@ public class Facility {
     private double latitude;
     private double longitude;
 
+    private double distance;
+
     Set<String> programs;
 
     public Facility(int facilityId) {
@@ -29,7 +32,7 @@ public class Facility {
     }
 
     public Facility(int facilityId, String name, String description, String phoneNumber, String streetAddress,
-                    String city, String state, String zip, double latitude, double longitude) {
+                    String city, String state, String zip, double latitude, double longitude, double distance) {
 
         FACILITY_ID = facilityId;
         this.name = name;
@@ -40,6 +43,7 @@ public class Facility {
         this.zip = zip;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.distance = distance;
 
         programs = new HashSet<>();
     }
@@ -120,11 +124,28 @@ public class Facility {
         this.longitude = longitude;
     }
 
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
     public void addProgram(String program) {
         programs.add(program);
     }
 
     public Set<String> getPrograms() {
         return programs;
+    }
+
+    @Override
+    public int compare(Facility lhs, Facility rhs) {
+        if(lhs.getDistance() < rhs.getDistance())
+            return -1;
+        if(lhs.getDistance() > rhs.getDistance())
+            return 1;
+        return 0;
     }
 }

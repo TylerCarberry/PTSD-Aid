@@ -138,8 +138,9 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
-                    for(int i = 1; i < 100; i++) {
+                    for(int i = 1; i < numberOfResults; i++) {
                         JSONObject locationJson = rootJson.getJSONObject("" + i);
 
                         int facilityID = locationJson.getInt("FAC_ID");
@@ -161,10 +162,12 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                 Toast.makeText(getActivity(), "Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
 
-                for(int facilityId : knownFacilities.keySet()) {
-                    Facility facility = knownFacilities.get(facilityId);
+                if(knownFacilities != null && knownFacilities.size() > 0) {
+                    for (int facilityId : knownFacilities.keySet()) {
+                        Facility facility = knownFacilities.get(facilityId);
 
-                    loadFacility(facility);
+                        loadFacility(facility);
+                    }
                 }
 
             }
@@ -235,6 +238,8 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                         DecimalFormat df = new DecimalFormat("#.##");
                         description = "Distance: " + df.format(distance) + " miles\n\n";
+
+                        facility.setDistance(distance);
                     }
 
                     Set<String> programs = facility.getPrograms();
