@@ -1,13 +1,12 @@
 package me.tylercarberry.ptsd;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Tyler on 11/5/15.
  */
-public class Facility implements Comparator<Facility>{
+public class Facility implements Comparable<Facility>{
 
     private final int FACILITY_ID;
     private String name;
@@ -141,10 +140,10 @@ public class Facility implements Comparator<Facility>{
     }
 
     @Override
-    public int compare(Facility lhs, Facility rhs) {
-        if(lhs.getDistance() < rhs.getDistance())
+    public int compareTo(Facility another) {
+        if(getDistance() < another.getDistance())
             return -1;
-        if(lhs.getDistance() > rhs.getDistance())
+        if(getDistance() > another.getDistance())
             return 1;
         return 0;
     }
