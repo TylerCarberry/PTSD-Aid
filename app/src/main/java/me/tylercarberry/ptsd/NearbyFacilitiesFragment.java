@@ -589,15 +589,21 @@ public class NearbyFacilitiesFragment extends Fragment {
         TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
         descriptionTextView.setText(description);
 
-        TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-        phoneTextView.setText(facility.getPhoneNumber());
-        phoneTextView.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener callOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
                 openDialer(phoneNumber);
             }
-        });
+        };
+
+
+        TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
+        phoneTextView.setText(facility.getPhoneNumber());
+        phoneTextView.setOnClickListener(callOnClick);
+
+        ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
+        phoneIcon.setOnClickListener(callOnClick);
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
         loadFacilityImage(facilityImageView, facility.getStreetAddress(), facility.getCity(), facility.getState());

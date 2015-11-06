@@ -32,11 +32,23 @@
                 android:background="@color/transparent_white"
                 android:textSize="25sp"/>
 
+            <ImageButton
+                android:id="@+id/facility_phone_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/facility_name_textview"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:layout_alignParentLeft="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/call_icon"/>
+
             <TextView
                 android:id="@+id/facility_phone_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/facility_name_textview"
+                android:layout_alignTop="@id/facility_phone_icon"
+                android:layout_toRightOf="@id/facility_phone_icon"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingStart="@dimen/activity_horizontal_margin"
@@ -47,6 +59,7 @@
                 android:id="@+id/facility_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingStart="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
