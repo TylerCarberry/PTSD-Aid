@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -34,6 +35,9 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -118,7 +122,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         super.onStart();
         loadNearbyPTSDPrograms();
     }
-
 
     /**
      * Load nearby PTSD programs
@@ -270,6 +273,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    numberOfLoadedFacilities++;
                 }
 
             }
@@ -277,6 +281,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, error.toString());
+                numberOfLoadedFacilities++;
             }
         });
 
@@ -293,12 +298,17 @@ public class NearbyFacilitiesFragment extends Fragment {
      * Load the facility image and place it into facilityImageView.
      * Try the street view image first, then the map image, then the default image.
      * @param facilityImageView The ImageView to place the image into
-     * @param address The street address
-     * @param city The city
-     * @param state The state. Can be initials or full name.
+     * @param facility The facility
      */
-    private void loadFacilityImage(ImageView facilityImageView, String address, String city, String state) {
-        loadStreetViewImage(facilityImageView, address, city, state);
+    private void loadFacilityImage(ImageView facilityImageView, Facility facility) {
+        Bitmap cachedBitmap = loadCacheFacilityImage(facility.getFacilityId());
+
+        if(cachedBitmap != null) {
+            facilityImageView.setImageBitmap(cachedBitmap);
+        }
+        else {
+            loadStreetViewImage(facilityImageView, facility);
+        }
     }
 
     /**
@@ -306,21 +316,19 @@ public class NearbyFacilitiesFragment extends Fragment {
      * If there is no street view imagery, it uses the map view instead.
      * You should not call this directly. Call loadFacilityImage instead
      * @param imageView The ImageView to place the image into
-     * @param address The street address
-     * @param city The city
-     * @param state The state. Can be initials or full name
+     * @param facility The facility
      * @throws UnsupportedEncodingException
      */
-    private void loadStreetViewImage(final ImageView imageView, final String address, final String city, final String state) {
+    private void loadStreetViewImage(final ImageView imageView, final Facility facility) {
         Log.d(LOG_TAG, "Entering load street view image.");
 
         String url = "";
 
         // If the street view url cannot be created, load the map view instead
         try {
-            url = calculateStreetViewUrl(address, city, state);
+            url = calculateStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
-            loadMapImage(imageView, address, city, state);
+            loadMapImage(imageView, facility);
             return;
         }
         Log.d(LOG_TAG, url);
@@ -333,10 +341,12 @@ public class NearbyFacilitiesFragment extends Fragment {
                         Log.d(LOG_TAG, "Street View Image onResponse");
 
                         // If there is no street view image for the address use the map view instead
-                        if(validStreetViewBitmap(bitmap))
+                        if(validStreetViewBitmap(bitmap)) {
                             imageView.setImageBitmap(bitmap);
+                            saveFacilityImage(bitmap, facility.getFacilityId());
+                        }
                         else
-                            loadMapImage(imageView, address, city, state);
+                            loadMapImage(imageView, facility);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -344,7 +354,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
 
                         // Load the map view instead
-                        loadMapImage(imageView, address, city, state);
+                        loadMapImage(imageView, facility);
                     }
                 });
 
@@ -361,18 +371,16 @@ public class NearbyFacilitiesFragment extends Fragment {
      * If there is no map imagery, it uses the default image instead.
      * You should not call this directly. Call loadFacilityImage instead
      * @param imageView The ImageView to place the image into
-     * @param address The street address
-     * @param city The city
-     * @param state The state. Can be initials or full name
+     * @param facility The facility
      */
-    private void loadMapImage(final ImageView imageView, String address, String city, String state) {
+    private void loadMapImage(final ImageView imageView, final Facility facility) {
         Log.d(LOG_TAG, "Entering load map image.");
 
         final int defaultImageId = R.drawable.nspl;
 
         String url = null;
         try {
-            url = calculateMapUrl(address, city, state);
+            url = calculateMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             imageView.setImageResource(defaultImageId);
@@ -388,6 +396,8 @@ public class NearbyFacilitiesFragment extends Fragment {
                     public void onResponse(Bitmap bitmap) {
                         Log.d(LOG_TAG, "IMAGE onResponse");
                         imageView.setImageBitmap(bitmap);
+
+                        saveFacilityImage(bitmap, facility.getFacilityId());
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -414,6 +424,41 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     }
 
+    private void saveFacilityImage(Bitmap bitmap, int facilityId) {
+        File file = getFacilityImageFile(facilityId);
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Bitmap loadCacheFacilityImage(int facilityId) {
+        File file = getFacilityImageFile(facilityId);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        return bitmap;
+    }
+
+    private File getFacilityImageFile(int facilityId) {
+        String fileName = "facilityImage" + facilityId;
+        File file = new File(getActivity().getFilesDir(), fileName);
+        return file;
+    }
 
     /**
      * Create the request queue. This is used to connect to the API in the background
@@ -541,7 +586,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         phoneIcon.setOnClickListener(callOnClick);
 
         ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-        loadFacilityImage(facilityImageView, facility.getStreetAddress(), facility.getCity(), facility.getState());
+        loadFacilityImage(facilityImageView, facility);
         facilityImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
