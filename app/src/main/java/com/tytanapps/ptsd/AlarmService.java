@@ -1,4 +1,4 @@
-package me.tylercarberry.ptsd;
+package com.tytanapps.ptsd;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -34,7 +34,7 @@ public class AlarmService {
      */
     public void cancelAlarm() {
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(R.string.alarm_service_label);
+        notificationManager.cancel(com.tytanapps.ptsd.R.string.alarm_service_label);
 
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(mAlarmSender);

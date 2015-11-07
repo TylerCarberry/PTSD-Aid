@@ -1,4 +1,4 @@
-package me.tylercarberry.ptsd;
+package com.tytanapps.ptsd;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

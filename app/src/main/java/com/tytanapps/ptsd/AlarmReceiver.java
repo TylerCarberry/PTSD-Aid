@@ -1,4 +1,4 @@
-package me.tylercarberry.ptsd;
+package com.tytanapps.ptsd;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,12 +23,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                     .setContentTitle("PTSD")
                     .setAutoCancel(true)
                     .setContentText("You haven't checked your symptoms of PTSD recently")
-                    .setSmallIcon(R.drawable.ncadd)
+                    .setSmallIcon(com.tytanapps.ptsd.R.drawable.ncadd)
                     .setContentIntent(contentIntent)
                             //.setLargeIcon(aBitmap)
                     .build();
 
-            notificationManager.notify(R.string.alarm_service_label, noti);
+            notificationManager.notify(com.tytanapps.ptsd.R.string.alarm_service_label, noti);
 
 
         }
