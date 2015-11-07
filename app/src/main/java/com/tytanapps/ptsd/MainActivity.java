@@ -121,6 +121,9 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Sign in to the user's Google Account
+     */
     public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -141,10 +144,14 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
+            GoogleSignInAccount googleAccount = result.getSignInAccount();
 
-            String name = acct.getDisplayName();
+            String name = googleAccount.getDisplayName();
             Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
+
+            String email = googleAccount.getEmail();
+
+            updateNavigationHeader(name, email);
 
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //updateUI(true);
@@ -152,6 +159,16 @@ public class MainActivity extends AppCompatActivity
             // Signed out, show unauthenticated UI.
             //updateUI(false);
         }
+    }
+
+    private void updateNavigationHeader(String name, String email) {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        TextView drawerNameTextView = (TextView) navigationView.findViewById(R.id.drawer_name);
+        drawerNameTextView.setText(name);
+
+        TextView drawerEmailTextView = (TextView) navigationView.findViewById(R.id.drawer_subtext);
+        drawerEmailTextView.setText(email);
     }
 
 
