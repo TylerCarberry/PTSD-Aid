@@ -3,6 +3,7 @@ package com.tytanapps.ptsd;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -117,7 +118,7 @@ public class StressTestFragment extends Fragment {
     private void submit() {
         int score = getScore();
         if(score < 0)
-            Snackbar.make(getView(), "Please answer all of the questions", Snackbar.LENGTH_LONG)
+            Snackbar.make(getView(), getString(R.string.answer_all_questions), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         else
             showResults(score);
@@ -136,19 +137,20 @@ public class StressTestFragment extends Fragment {
         String resultText;
         String nextActions;
 
+        // Low
         if(score <= 20) {
-            resultText = "Your screen results indicate that you have few or no symptoms of PTSD";
-            nextActions = "However, you still may wish to consult a professional";
+            resultText = getString(R.string.result_minimal);
+            nextActions = getString(R.string.see_professional_low);
         }
-
+        // Medium
         else if(score <= 29) {
-            resultText = "Your screen results are consistent with minimal symptoms of PTSD";
-            nextActions = "You may benefit from seeking help from a professional";
+            resultText = getString(R.string.result_medium);
+            nextActions = getString(R.string.see_professional_medium);
         }
-
+        // High
         else {
-            resultText = "Your screen results are consistent with many of the symptoms of PTSD.";
-            nextActions = "You are advised to see your physician or a qualified mental health professional immediately for a complete assessment";
+            resultText = getString(R.string.result_high);
+            nextActions = getString(R.string.see_professional_high);
         }
 
         TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
@@ -183,9 +185,7 @@ public class StressTestFragment extends Fragment {
      */
     private void findProfessional() {
         NearbyFacilitiesFragment nearbyFacilitiesFragment = new NearbyFacilitiesFragment();
-
-
-        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment
         transaction.replace(R.id.fragment_container, nearbyFacilitiesFragment);
@@ -281,14 +281,6 @@ public class StressTestFragment extends Fragment {
                 Log.d(LOG_TAG, seekBar.getProgress() + 1 + "");
 
                 questionCount++;
-
-                /*
-
-                RadioGroup radioGroup = (RadioGroup) childView.findViewById(R.id.questions_radio_group);
-                score[questionCount] = radioGroup.getCheckedRadioButtonId();
-                questionCount++;
-
-                */
             }
         }
 
@@ -309,6 +301,7 @@ public class StressTestFragment extends Fragment {
 
             if(num > 0)
                 score += num;
+            // If a question has not been answered
             else
                 return -1;
         }

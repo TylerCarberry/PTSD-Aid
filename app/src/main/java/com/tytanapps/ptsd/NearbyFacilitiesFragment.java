@@ -240,7 +240,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                     // The description contains the distance and all PTSD programs located there
                     if(userLocation[0] != 0 && userLocation[1] != 0) {
-                        distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+                        distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
                         facility.setDistance(distance);
 
                         DecimalFormat df = new DecimalFormat("#.##");
@@ -696,46 +696,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             gps[1] = l.getLongitude();
         }
         return gps;
-    }
-
-
-    /**
-     * Calculate the distance between coordinates
-     * @param lat1 Latitude of coordinate 1
-     * @param lon1 Longitude of coordinate 1
-     * @param lat2 Latitude of coordinate 2
-     * @param lon2 Longitude of coordinate 2
-     * @param unit The unit that the result should be in. (M)iles (K)ilometers (N)autical Miles
-     * @return The distance between the two coordinates in the specified unit
-     */
-    private double distanceBetweenCoordinates(double lat1, double lon1, double lat2, double lon2, String unit) {
-        double theta = lon1 - lon2;
-        double distance =
-                Math.sin(degreesToRadians(lat1)) * Math.sin(degreesToRadians(lat2))
-                        + Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * Math.cos(degreesToRadians(theta));
-
-        distance = Math.acos(distance);
-        distance = radiansToDegrees(distance);
-
-        // Miles
-        distance = distance * 60 * 1.1515;
-
-        // Kilometers
-        if (unit.equalsIgnoreCase("K"))
-            distance = distance * 1.609344;
-            // Nautical Miles
-        else if (unit.equalsIgnoreCase("N"))
-            distance = distance * 0.8684;
-
-        return distance;
-    }
-
-    private static double degreesToRadians(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private static double radiansToDegrees(double rad) {
-        return (rad * 180 / Math.PI);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

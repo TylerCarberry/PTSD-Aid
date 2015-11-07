@@ -141,6 +141,13 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="nav_nearby">Nearby</string>
+    <string name="answer_all_questions">Please answer all of the questions</string>
+    <string name="result_minimal">You have few or no symptoms of PTSD</string>
+    <string name="see_professional_low">However, you still may wish to consult with a professional</string>
+    <string name="result_medium">You have minimal symptoms of PTSD</string>
+    <string name="see_professional_medium">You may benefit from seeking help from a professional</string>
+    <string name="result_high">Your results are consistant with many of the symptoms of PTSD</string>
+    <string name="see_professional_high">You are advised to see your physician or a qualified mental health professional immediately for a complete assessment</string>
 
 
 </resources>
