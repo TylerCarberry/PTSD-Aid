@@ -4,6 +4,12 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,15 +27,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageRequest;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -38,6 +48,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener{
@@ -152,11 +164,12 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInAccount googleAccount = result.getSignInAccount();
 
             String name = googleAccount.getDisplayName();
+            String email = googleAccount.getEmail();
+            Uri profilePicture = googleAccount.getPhotoUrl();
+
             Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
 
-            String email = googleAccount.getEmail();
-
-            updateNavigationHeader(name, email);
+            updateNavigationHeader(name, email, profilePicture);
 
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //updateUI(true);
@@ -193,12 +206,48 @@ public class MainActivity extends AppCompatActivity
         Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
     }
 
-    private void updateNavigationHeader(String name, String email) {
+    private void updateNavigationHeader(String name, String email, Uri profilePicture) {
         TextView drawerNameTextView = (TextView) navHeader.findViewById(R.id.drawer_name);
         drawerNameTextView.setText(name);
 
         TextView drawerEmailTextView = (TextView) navHeader.findViewById(R.id.drawer_subtext);
         drawerEmailTextView.setText(email);
+
+        ImageView profileImageView = (ImageView) navHeader.findViewById(R.id.drawer_imageview);
+        loadProfilePicture(profileImageView, profilePicture);
+    }
+
+    /**
+     * Load the street view imagery for the given address.
+     * If there is no street view imagery, it uses the map view instead.
+     * You should not call this directly. Call loadFacilityImage instead
+     * @param imageView The ImageView to place the image into
+     * @param profilePictureUri The uri of the image to load
+     * @throws UnsupportedEncodingException
+     */
+    private void loadProfilePicture(final ImageView imageView, Uri profilePictureUri) {
+        Log.d(LOG_TAG, "Entering load street view image.");
+
+        String url = profilePictureUri.toString();
+
+        Log.d(LOG_TAG, url);
+
+        // Retrieves an image specified by the URL, displays it in the UI.
+        ImageRequest request = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        imageView.setImageBitmap(getCircularBitmap(bitmap));
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
+                    }
+                });
+
+        // Start loading the image in the background
+        getRequestQueue().add(request);
     }
 
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
@@ -278,7 +327,32 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected RequestQueue getRequestQueue() {
+        if(requestQueue == null)
+            instantiateRequestQueue();
+
         return requestQueue;
+    }
+
+    public Bitmap getCircularBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        Bitmap _bmp = Bitmap.createScaledBitmap(output, 200, 200, false);
+        return _bmp;
+        //return output;
     }
 
     /**
