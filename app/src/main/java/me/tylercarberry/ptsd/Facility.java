@@ -25,7 +25,7 @@ public class Facility implements Comparable<Facility>{
 
     private double distance;
 
-    Set<String> programs;
+    private Set<String> programs;
 
     public Facility(int facilityId) {
         FACILITY_ID = facilityId;
