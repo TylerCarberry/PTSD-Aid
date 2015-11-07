@@ -1,7 +1,9 @@
 package me.tylercarberry.ptsd;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -56,6 +58,11 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "123-555-0000"); //getString(R.string.phone_suicide_lifeline));
+                openDialer(phoneNumber);
+
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -69,6 +76,22 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(prefKey, defaultValue);
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    private void openDialer(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        startActivity(intent);
     }
 
     @Override
