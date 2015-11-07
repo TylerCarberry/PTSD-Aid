@@ -562,63 +562,66 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility to add
      */
     private void addFacilityCard(final Facility facility) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
+        View fragmentView = getView();
+        if(fragmentView != null) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
-        TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
-        nameTextView.setText(facility.getName());
+            TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
+            nameTextView.setText(facility.getName());
 
-        String description = facility.getDescription();
+            String description = facility.getDescription();
 
-        TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
-        descriptionTextView.setText(description);
+            TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
+            descriptionTextView.setText(description);
 
-        View.OnClickListener callOnClick = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
-                openDialer(phoneNumber);
-            }
-        };
-
-
-        TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-        phoneTextView.setText(facility.getPhoneNumber());
-        phoneTextView.setOnClickListener(callOnClick);
-
-        ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
-        phoneIcon.setOnClickListener(callOnClick);
-
-        ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-        loadFacilityImage(facilityImageView, facility);
-        facilityImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    showMap(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+            View.OnClickListener callOnClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
+                    openDialer(phoneNumber);
                 }
-            }
-        });
+            };
 
-        View.OnClickListener websiteOnClick = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String url = getFirstPhoneNumber(facility.getUrl());
-                openUrl(url);
-            }
-        };
 
-        ImageView webIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_website_icon);
-        webIcon.setOnClickListener(websiteOnClick);
+            TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
+            phoneTextView.setText(facility.getPhoneNumber());
+            phoneTextView.setOnClickListener(callOnClick);
 
-        TextView webTextView = (TextView) cardRelativeLayout.findViewById(R.id.website_textview);
-        webTextView.setText(facility.getUrl());
-        webTextView.setOnClickListener(websiteOnClick);
+            ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
+            phoneIcon.setOnClickListener(callOnClick);
 
-        LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
-        parentLinearLayout.addView(cardRelativeLayout);
+            ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
+            loadFacilityImage(facilityImageView, facility);
+            facilityImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        showMap(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            View.OnClickListener websiteOnClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String url = getFirstPhoneNumber(facility.getUrl());
+                    openUrl(url);
+                }
+            };
+
+            ImageView webIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_website_icon);
+            webIcon.setOnClickListener(websiteOnClick);
+
+            TextView webTextView = (TextView) cardRelativeLayout.findViewById(R.id.website_textview);
+            webTextView.setText(facility.getUrl());
+            webTextView.setOnClickListener(websiteOnClick);
+
+            LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
+            parentLinearLayout.addView(cardRelativeLayout);
+        }
     }
 
     public void showMap(Uri geoLocation) {
