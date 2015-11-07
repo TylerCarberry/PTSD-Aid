@@ -14,9 +14,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
@@ -76,6 +79,20 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
+
+
+        TextView drawerNameTextView = (TextView) navigationHeader.findViewById(R.id.drawer_name);
+        String name = getSharedPreferenceString(getString(R.string.pref_name_key), "DEFAULT NAME");
+        if(name.equals(""))
+            name = "DEFAULT NAME";
+        drawerNameTextView.setText(name);
+
+        navigationView.addHeaderView(navigationHeader);
+
     }
 
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
