@@ -237,6 +237,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                     String state = (String) locationJson.get("STATE");
                     String zip = ""+locationJson.get("ZIP");
 
+                    String url = (String) locationJson.get("FANDL_URL");
+                    url = url.replace("vaww", "www");
+
                     double locationLat = locationJson.getDouble("LATITUDE");
                     double locationLong = locationJson.getDouble("LONGITUDE");
 
@@ -258,6 +261,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                     facility.setName(name);
                     facility.setPhoneNumber(phoneNumber);
+                    facility.setUrl(url);
                     facility.setStreetAddress(address);
                     facility.setCity(city);
                     facility.setState(state);
@@ -598,6 +602,21 @@ public class NearbyFacilitiesFragment extends Fragment {
             }
         });
 
+        View.OnClickListener websiteOnClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = getFirstPhoneNumber(facility.getUrl());
+                openUrl(url);
+            }
+        };
+
+        ImageView webIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_website_icon);
+        webIcon.setOnClickListener(websiteOnClick);
+
+        TextView webTextView = (TextView) cardRelativeLayout.findViewById(R.id.website_textview);
+        webTextView.setText(facility.getUrl());
+        webTextView.setOnClickListener(websiteOnClick);
+
         LinearLayout parentLinearLayout = (LinearLayout) getView().findViewById(R.id.facilities_linear_layout);
         parentLinearLayout.addView(cardRelativeLayout);
     }
@@ -620,6 +639,13 @@ public class NearbyFacilitiesFragment extends Fragment {
         intent.setData(Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
     }
+
+    private void openUrl(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
+    }
+
 
     /**
      * Determine the first phone number in the String

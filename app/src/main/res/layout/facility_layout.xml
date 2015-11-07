@@ -66,6 +66,27 @@
                 android:layout_below="@+id/facility_phone_textview"
                 android:text="Detail Placeholder"/>
 
+            <ImageButton
+                android:id="@+id/facility_website_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/facility_details"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:layout_alignParentLeft="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/web_icon"/>
+
+            <TextView
+                android:id="@+id/website_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/facility_website_icon"
+                android:layout_below="@id/facility_details"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:text="More Info"/>
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

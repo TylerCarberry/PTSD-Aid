@@ -13,6 +13,8 @@ public class Facility implements Comparable<Facility>{
     private String description;
 
     private String phoneNumber;
+    private String url;
+
     private String streetAddress;
     private String city;
     private String state;
@@ -30,12 +32,13 @@ public class Facility implements Comparable<Facility>{
         programs = new HashSet<>();
     }
 
-    public Facility(int facilityId, String name, String description, String phoneNumber, String streetAddress,
+    public Facility(int facilityId, String name, String description, String phoneNumber, String url, String streetAddress,
                     String city, String state, String zip, double latitude, double longitude, double distance) {
 
         FACILITY_ID = facilityId;
         this.name = name;
         this.phoneNumber = phoneNumber;
+        this.url = url;
         this.streetAddress = streetAddress;
         this.city = city;
         this.state = state;
@@ -73,6 +76,14 @@ public class Facility implements Comparable<Facility>{
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getStreetAddress() {
