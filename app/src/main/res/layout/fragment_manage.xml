@@ -99,6 +99,7 @@
         android:textSize="20sp"/>
 
     <LinearLayout
+        android:id="@+id/branches_linearlayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/branch_prompt_textview"
@@ -130,6 +131,44 @@
             android:text="Marines"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/trusted_contact_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/branches_linearlayout"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:text="Trusted Contact"/>
+
+    <TextView
+        android:id="@+id/trusted_contact_name_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/trusted_contact_prompt"
+        android:text="Name: "/>
+
+    <EditText
+        android:id="@+id/trusted_contact_name_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:layout_below="@id/trusted_contact_prompt"
+        android:layout_toRightOf="@id/trusted_contact_name_prompt"/>
+
+    <TextView
+        android:id="@+id/trusted_contact_phone_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/trusted_contact_name_edittext"
+        android:text="Phone Number:"/>
+
+    <EditText
+        android:id="@+id/trusted_contact_phone_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/trusted_contact_name_edittext"
+        android:layout_toRightOf="@id/trusted_contact_phone_prompt"
+        android:inputType="phone"/>
 
 
 </RelativeLayout>

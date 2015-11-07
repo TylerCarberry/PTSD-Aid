@@ -140,12 +140,7 @@ public class ManageFragment extends Fragment {
         genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                try {
                     saveSharedPreference(getString(R.string.pref_gender_key), checkedId);
-                } catch (NumberFormatException e) {
-                    // The user has not entered a valid age. Do not save the input.
-                    // This also occurs when the EditText is empty ""
-                }
             }
         });
 
@@ -193,7 +188,38 @@ public class ManageFragment extends Fragment {
         });
 
 
+        EditText trustedNameEditText = (EditText) rootView.findViewById(R.id.trusted_contact_name_edittext);
+        String trustedName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
+        trustedNameEditText.setText(trustedName);
+        trustedNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                saveSharedPreference(getString(R.string.pref_trusted_name_key), s.toString());
+            }
+        });
+
+        EditText trustedPhoneEditText = (EditText) rootView.findViewById(R.id.trusted_contact_phone_edittext);
+        String trustedPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        trustedPhoneEditText.setText(trustedPhone);
+        trustedPhoneEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                saveSharedPreference(getString(R.string.pref_trusted_phone_key), s.toString());
+            }
+        });
 
 
         return rootView;

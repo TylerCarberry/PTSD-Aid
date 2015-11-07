@@ -37,6 +37,9 @@
     <string name="pref_navy_key">navy_key</string>
     <string name="pref_air_key">air_key</string>
     <string name="pref_marines_key">marines_key</string>
+    <string name="pref_trusted_name_key">trusted_name_key</string>
+    <string name="pref_trusted_phone_key">trusted_phone_key</string>
+
 
     <string name="male_id">male</string>
     <string name="female_id">female</string>
