@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.auth.api.Auth;
 
 
 /**
@@ -92,10 +95,21 @@ public class MainFragment extends Fragment {
             }
         });
 
+        rootView.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+
 
 
 
         return rootView;
+    }
+
+    private void signIn() {
+        ((MainActivity)getActivity()).signIn();
     }
 
     private void emotionOk() {
