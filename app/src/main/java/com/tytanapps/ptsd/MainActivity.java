@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -29,6 +30,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener{
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static GoogleApiClient mGoogleApiClient;
+
+    private ViewGroup navHeader;
 
     private static int RC_SIGN_IN = 1;
 
@@ -93,18 +98,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         LayoutInflater inflater = LayoutInflater.from(this);
         ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
 
-
-        TextView drawerNameTextView = (TextView) navigationHeader.findViewById(R.id.drawer_name);
-        String name = getSharedPreferenceString(getString(R.string.pref_name_key), "DEFAULT NAME");
-        if(name.equals(""))
-            name = "DEFAULT NAME";
-        drawerNameTextView.setText(name);
-
         navigationView.addHeaderView(navigationHeader);
+        navHeader = navigationHeader;
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -120,15 +118,6 @@ public class MainActivity extends AppCompatActivity
                 .build();
     }
 
-
-    /**
-     * Sign in to the user's Google Account
-     */
-    public void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -138,6 +127,14 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
+    }
+
+    /**
+     * Sign in to the user's Google Account
+     */
+    public void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
@@ -161,13 +158,38 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updateNavigationHeader(String name, String email) {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+    /**
+     * Sign in to the user's Google Account
+     */
+    private void silentSignIn() {
+        OptionalPendingResult<GoogleSignInResult> pendingResult =
+            Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
-        TextView drawerNameTextView = (TextView) navigationView.findViewById(R.id.drawer_name);
+        if (pendingResult.isDone()) {
+            // There's immediate result available.
+            GoogleSignInResult googleAccount = pendingResult.get();
+            handleSignInResult(googleAccount);
+        } else {
+            // There's no immediate result ready, displays some progress indicator and waits for the
+            // async callback.
+            //showProgressIndicator();
+            pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(@NonNull GoogleSignInResult result) {
+                    handleSignInResult(result);
+                    //updateButtonsAndStatusFromSignInResult(result);
+                    //hideProgressIndicator();
+                }
+            });
+        }
+        Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+    }
+
+    private void updateNavigationHeader(String name, String email) {
+        TextView drawerNameTextView = (TextView) navHeader.findViewById(R.id.drawer_name);
         drawerNameTextView.setText(name);
 
-        TextView drawerEmailTextView = (TextView) navigationView.findViewById(R.id.drawer_subtext);
+        TextView drawerEmailTextView = (TextView) navHeader.findViewById(R.id.drawer_subtext);
         drawerEmailTextView.setText(email);
     }
 
@@ -192,10 +214,16 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         //Log.d(LOG_TAG, "onStart");
 
+        super.onStart();
+
         AlarmService alarmService = new AlarmService(getBaseContext());
         alarmService.cancelAlarm();
+    }
 
-        super.onStart();
+    @Override
+    public void onResume() {
+        super.onResume();
+        silentSignIn();
     }
 
     @Override
