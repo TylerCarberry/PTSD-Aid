@@ -171,4 +171,12 @@
         android:inputType="phone"/>
 
 
+    <Button
+        android:id="@+id/debug_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/trusted_contact_prompt"
+        android:layout_toRightOf="@id/trusted_contact_prompt"
+        android:text="LOAD"/>
+
 </RelativeLayout>
