@@ -24,6 +24,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -41,6 +47,8 @@ public class MainActivity extends AppCompatActivity
     private static GoogleApiClient mGoogleApiClient;
 
     private ViewGroup navHeader;
+
+    private RequestQueue requestQueue;
 
     private static int RC_SIGN_IN = 1;
 
@@ -193,7 +201,6 @@ public class MainActivity extends AppCompatActivity
         drawerEmailTextView.setText(email);
     }
 
-
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
@@ -270,6 +277,27 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    protected RequestQueue getRequestQueue() {
+        return requestQueue;
+    }
+
+    /**
+     * Create the request queue. This is used to connect to the API in the background
+     */
+    protected void instantiateRequestQueue() {
+        // Instantiate the cache
+        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+        // Set up the network to use HttpURLConnection as the HTTP client.
+        Network network = new BasicNetwork(new HurlStack());
+
+        // Instantiate the RequestQueue with the cache and network.
+        requestQueue = new RequestQueue(cache, network);
+
+        // Start the queue
+        requestQueue.start();
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -294,7 +322,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_hotline:
                 newFragment = new PhoneFragment();
                 break;
-
             case R.id.nav_websites:
                 newFragment = new WebsiteFragment();
                 break;

@@ -20,15 +20,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 
@@ -68,8 +63,6 @@ public class NearbyFacilitiesFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    private RequestQueue requestQueue;
 
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
@@ -136,9 +129,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         String url = "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
                 + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
 
-        if(requestQueue == null)
-            instantiateRequestQueue();
-
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -199,7 +189,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        requestQueue.add(stringRequest);
+        getRequestQueue().add(stringRequest);
 
     }
 
@@ -211,9 +201,6 @@ public class NearbyFacilitiesFragment extends Fragment {
     public void loadFacility(final Facility facility, final int numberOfFacilities) {
         String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
                 + facility.getFacilityId() + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
-
-        if(requestQueue == null)
-            instantiateRequestQueue();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -302,7 +289,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         // Start loading the facility in the background
-        requestQueue.add(stringRequest);
+        getRequestQueue().add(stringRequest);
     }
 
     /**
@@ -365,11 +352,8 @@ public class NearbyFacilitiesFragment extends Fragment {
                     }
                 });
 
-        if(requestQueue == null)
-            instantiateRequestQueue();
-
         // Start loading the image in the background
-        requestQueue.add(request);
+        getRequestQueue().add(request);
     }
 
 
@@ -414,11 +398,8 @@ public class NearbyFacilitiesFragment extends Fragment {
                     }
                 });
 
-        if(requestQueue == null)
-            instantiateRequestQueue();
-
         // Start loading the image in the background
-        requestQueue.add(request);
+        getRequestQueue().add(request);
     }
 
     /**
@@ -484,24 +465,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         String fileName = "facilityImage" + facilityId;
         return new File(getActivity().getFilesDir(), fileName);
     }
-
-    /**
-     * Create the request queue. This is used to connect to the API in the background
-     */
-    private void instantiateRequestQueue() {
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getActivity().getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
-    }
-
 
     /**
      * Determine if the response from the Street View API was a valid street view image
@@ -677,6 +640,19 @@ public class NearbyFacilitiesFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
         startActivity(intent);
+    }
+
+    /**
+     * Precondition: NearbyFacilitiesFragment is a member of MainActivity
+     * @return
+     */
+    private RequestQueue getRequestQueue() {
+        RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
+        if(requestQueue == null) {
+            ((MainActivity) getActivity()).instantiateRequestQueue();
+            requestQueue = ((MainActivity) getActivity()).getRequestQueue();
+        }
+        return requestQueue;
     }
 
     /**
