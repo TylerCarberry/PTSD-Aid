@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 
 /**
@@ -91,6 +92,8 @@ public class ManageFragment extends Fragment {
         ageNumberPicker.setWrapSelectorWheel(false);
         */
 
+
+        /*
         EditText nameEditText = (EditText) rootView.findViewById(R.id.name_edittext);
         nameEditText.setText(getSharedPreferenceString(getString(R.string.pref_name_key), ""));
         nameEditText.addTextChangedListener(new TextWatcher() {
@@ -108,22 +111,25 @@ public class ManageFragment extends Fragment {
                 saveSharedPreference(getString(R.string.pref_name_key), name);
             }
         });
+        */
 
         EditText ageEditText = (EditText) rootView.findViewById(R.id.age_edittext);
         ageEditText.setText(""+getSharedPreferenceInt(getString(R.string.pref_age_key), 18));
         ageEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
                 try {
                     int age = Integer.parseInt(s.toString());
                     saveSharedPreference(getString(R.string.pref_age_key), age);
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     // The user has not entered a valid age. Do not save the input.
                     // This also occurs when the EditText is empty ""
                 }
@@ -150,7 +156,7 @@ public class ManageFragment extends Fragment {
         genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    saveSharedPreference(getString(R.string.pref_gender_key), checkedId);
+                saveSharedPreference(getString(R.string.pref_gender_key), checkedId);
             }
         });
 
@@ -197,44 +203,15 @@ public class ManageFragment extends Fragment {
             }
         });
 
+        TextView trustedNameTextview = (TextView) rootView.findViewById(R.id.trusted_contact_name_textview);
+        trustedNameTextview.setText(getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "None"));
 
-        EditText trustedNameEditText = (EditText) rootView.findViewById(R.id.trusted_contact_name_edittext);
-        String trustedName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
-        trustedNameEditText.setText(trustedName);
-        trustedNameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        TextView trustedPhoneTextview = (TextView) rootView.findViewById(R.id.trusted_contact_phone_textview);
+        trustedPhoneTextview.setText(getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "None"));
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                saveSharedPreference(getString(R.string.pref_trusted_name_key), s.toString());
-            }
-        });
 
-        EditText trustedPhoneEditText = (EditText) rootView.findViewById(R.id.trusted_contact_phone_edittext);
-        String trustedPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-        trustedPhoneEditText.setText(trustedPhone);
-        trustedPhoneEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                saveSharedPreference(getString(R.string.pref_trusted_phone_key), s.toString());
-            }
-        });
-
-        Button debugButton = (Button) rootView.findViewById(R.id.debug_button);
+        Button debugButton = (Button) rootView.findViewById(R.id.change_contact_button);
         debugButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -267,12 +244,14 @@ public class ManageFragment extends Fragment {
 
                 String name = getContactName(getActivity(), phoneNumber);
 
-
-                EditText trustedNameEditText = (EditText) getView().findViewById(R.id.trusted_contact_name_edittext);
+                TextView trustedNameEditText = (TextView) getView().findViewById(R.id.trusted_contact_name_textview);
                 trustedNameEditText.setText(name);
 
-                EditText trustedPhoneEditText = (EditText) getView().findViewById(R.id.trusted_contact_phone_edittext);
+                TextView trustedPhoneEditText = (TextView) getView().findViewById(R.id.trusted_contact_phone_textview);
                 trustedPhoneEditText.setText(phoneNumber);
+
+                saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
+                saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
 
                 Log.d(LOG_TAG, "NAME: " + name);
                 Log.d(LOG_TAG, "PHONENUMBER: " + phoneNumber);

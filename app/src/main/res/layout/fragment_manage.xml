@@ -16,23 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:textSize="25sp"
-        android:text="About Me (Optional)" />
-
-    <TextView
-        android:id="@+id/name_prompt_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/manage_title"
-        android:text="Name:"
-        android:textSize="20sp"/>
-
-    <EditText
-        android:id="@+id/name_edittext"
-        android:inputType="text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/name_prompt_textview"
-        android:layout_toRightOf="@id/name_prompt_textview"/>
+        android:text="About Me" />
 
     <TextView
         android:id="@+id/age_prompt_textview"
@@ -41,7 +25,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Age:"
         android:textSize="20sp"
-        android:layout_below="@id/name_prompt_textview"/>
+        android:layout_below="@id/manage_title"/>
 
     <EditText
         android:id="@+id/age_edittext"
@@ -57,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/age_prompt_textview"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Gender:"
+        android:text="Gender"
         android:textSize="20sp"/>
 
     <RadioGroup
@@ -65,10 +49,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignBottom="@id/gender_prompt_textview"
-        android:layout_alignTop="@id/gender_prompt_textview"
+        android:layout_below="@id/gender_prompt_textview"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@id/gender_prompt_textview">
+        android:layout_alignParentLeft="true">
 
         <RadioButton
             android:id="@+id/male_radiobutton"
@@ -93,9 +76,9 @@
         android:id="@+id/branch_prompt_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/gender_prompt_textview"
+        android:layout_below="@id/gender_radiogroup"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Branch of Military:"
+        android:text="Branch of Military"
         android:textSize="20sp"/>
 
     <LinearLayout
@@ -130,6 +113,12 @@
             android:layout_height="wrap_content"
             android:text="Marines"/>
 
+        <CheckBox
+            android:id="@+id/other_branch_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Other"/>
+
     </LinearLayout>
 
     <TextView
@@ -141,42 +130,37 @@
         android:text="Trusted Contact"/>
 
     <TextView
-        android:id="@+id/trusted_contact_name_prompt"
+        android:id="@+id/trusted_contact_name_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/trusted_contact_prompt"
-        android:text="Name: "/>
-
-    <EditText
-        android:id="@+id/trusted_contact_name_edittext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:layout_below="@id/trusted_contact_prompt"
-        android:layout_toRightOf="@id/trusted_contact_name_prompt"/>
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="CONTACT NAME"/>
 
     <TextView
-        android:id="@+id/trusted_contact_phone_prompt"
+        android:id="@+id/trusted_contact_phone_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/trusted_contact_name_edittext"
-        android:text="Phone Number:"/>
-
-    <EditText
-        android:id="@+id/trusted_contact_phone_edittext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/trusted_contact_name_edittext"
-        android:layout_toRightOf="@id/trusted_contact_phone_prompt"
-        android:inputType="phone"/>
-
+        android:layout_toRightOf="@id/trusted_contact_name_textview"
+        android:layout_alignTop="@id/trusted_contact_name_textview"
+        android:layout_alignBottom="@id/trusted_contact_name_textview"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:text="123-456-7890"/>
 
     <Button
-        android:id="@+id/debug_button"
+        android:id="@+id/change_contact_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/trusted_contact_prompt"
         android:layout_toRightOf="@id/trusted_contact_prompt"
-        android:text="LOAD"/>
+        android:text="Change"/>
+
+    <CheckBox
+        android:id="@+id/notifications_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Daily Notifications"/>
 
 </RelativeLayout>
