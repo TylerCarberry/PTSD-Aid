@@ -14,8 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -145,6 +147,11 @@ public class NearbyFacilitiesFragment extends Fragment {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
                     int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
+                    if(numberOfResults == 0) {
+                        errorLoadingResults();
+                        return;
+                    }
+
                     for(int i = 1; i < numberOfResults; i++) {
                         JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
 
@@ -181,6 +188,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, error.toString());
+                errorLoadingResults();
             }
         });
 
@@ -192,6 +200,35 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         getRequestQueue().add(stringRequest);
 
+    }
+
+    private void errorLoadingResults() {
+        View rootView = getView();
+        if(rootView != null) {
+            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
+            if(loadingTextview != null)
+                loadingTextview.setText("Error: The VA facilities cannot be loaded");
+
+            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
+            if(loadingProgressbar != null) {
+                loadingProgressbar.setVisibility(View.INVISIBLE);
+            }
+
+            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
+            if(retryButton != null) {
+                retryButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        v.setVisibility(View.INVISIBLE);
+                        loadingTextview.setText("Loading");
+                        loadingProgressbar.setVisibility(View.VISIBLE);
+
+                        loadPTSDPrograms();
+                    }
+                });
+                retryButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     /**
@@ -226,15 +263,12 @@ public class NearbyFacilitiesFragment extends Fragment {
                     double locationLat = locationJson.getDouble("LATITUDE");
                     double locationLong = locationJson.getDouble("LONGITUDE");
 
-
                     String description = "Desc";
-
 
                     String url = (String) locationJson.get("FANDL_URL");
                     // For some reason the facility urls start with vaww. instead of www.
                     // These cannot be loaded on my phone so use www. instead.
                     url = url.replace("vaww", "www");
-
 
                     double userLocation[] = getGPSLocation();
                     double distance = 0;
@@ -314,7 +348,6 @@ public class NearbyFacilitiesFragment extends Fragment {
      * You should not call this directly. Call loadFacilityImage instead
      * @param imageView The ImageView to place the image into
      * @param facility The facility
-     * @throws UnsupportedEncodingException
      */
     private void loadStreetViewImage(final ImageView imageView, final Facility facility) {
         Log.d(LOG_TAG, "Entering load street view image.");
@@ -370,7 +403,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         final int defaultImageId = R.drawable.nspl;
 
-        String url = null;
+        String url;
         try {
             url = calculateMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
@@ -408,15 +441,22 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private void allFacilitiesHaveLoaded() {
 
+        if(knownFacilities.size() == 0) {
+            errorLoadingResults();
+            return;
+        }
+
         // Remove the loading bar
-        View loadingTextview = getView().findViewById(R.id.facility_loading_textview);
-        if(loadingTextview != null)
-            loadingTextview.setVisibility(View.GONE);
+        View rootView = getView();
+        if(rootView != null) {
+            View loadingTextview = rootView.findViewById(R.id.facility_loading_textview);
+            if (loadingTextview != null)
+                loadingTextview.setVisibility(View.GONE);
 
-
-        View loadingProgressbar = getView().findViewById(R.id.facility_progressbar);
-        if(loadingProgressbar != null)
-            loadingProgressbar.setVisibility(View.GONE);
+            View loadingProgressbar = rootView.findViewById(R.id.facility_progressbar);
+            if (loadingProgressbar != null)
+                loadingProgressbar.setVisibility(View.GONE);
+        }
 
 
         ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
@@ -465,8 +505,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        return bitmap;
+        return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
     }
 
     /**
@@ -656,8 +695,9 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
+     * Get the request queue and create it if necessary
      * Precondition: NearbyFacilitiesFragment is a member of MainActivity
-     * @return
+     * @return The request queue
      */
     private RequestQueue getRequestQueue() {
         RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
