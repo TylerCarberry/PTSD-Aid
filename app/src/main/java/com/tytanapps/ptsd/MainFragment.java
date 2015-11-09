@@ -102,6 +102,15 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if(isUserSignedIn()) {
+            getView().findViewById(R.id.button_sign_in).setVisibility(View.INVISIBLE);
+        }
+    }
+
     /**
      * Sign in to the user's Google Account
      */
@@ -109,6 +118,10 @@ public class MainFragment extends Fragment {
         Activity parentActivity = getActivity();
         if(parentActivity instanceof MainActivity)
             ((MainActivity) getActivity()).signIn();
+    }
+
+    private boolean isUserSignedIn() {
+        return ((MainActivity) getActivity()).isUserSignedIn();
     }
 
     private void emotionOk() {

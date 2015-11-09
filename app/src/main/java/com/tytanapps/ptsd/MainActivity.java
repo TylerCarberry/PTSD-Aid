@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static GoogleApiClient mGoogleApiClient;
+    private boolean isUserSignedIn = false;
 
     private ViewGroup navHeader;
 
@@ -162,6 +163,12 @@ public class MainActivity extends AppCompatActivity
             String email = googleAccount.getEmail();
             Uri profilePicture = googleAccount.getPhotoUrl();
 
+            isUserSignedIn = true;
+
+            View signInButton = findViewById(R.id.button_sign_in);
+            if(signInButton != null)
+                signInButton.setVisibility(View.INVISIBLE);
+
             Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
 
             updateNavigationHeader(name, email, profilePicture);
@@ -199,6 +206,10 @@ public class MainActivity extends AppCompatActivity
             });
         }
         Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+    }
+
+    protected boolean isUserSignedIn() {
+        return isUserSignedIn;
     }
 
     private void updateNavigationHeader(String name, String email, Uri profilePicture) {
