@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -114,6 +116,24 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private String getRecommendations() {
+        String recommendations = "";
+
+        if(!isUserSignedIn())
+            recommendations += "Sign In\n\n";
+
+        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        if(trustedContactPhone.equals(""))
+            recommendations += "Add a trusted contact\n\n";
+
+        return recommendations;
+    }
+
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(prefKey, defaultValue);
+    }
+
     /**
      * Sign in to the user's Google Account
      */
@@ -139,8 +159,11 @@ public class MainFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
 
-        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendations.setText("Take the stress test to determine if you suffer from PTSD");
+        String recommendations = "Take the PTSD test to determine if you suffer from PTSD\n\n";
+        recommendations += getRecommendations();
+
+        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendationsTextView.setText(recommendations);
 
         animateInRecommendations(layout);
     }
@@ -149,8 +172,11 @@ public class MainFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
 
-        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendations.setText("Great! Look at the resources for veterans.");
+        String recommendations = "Great! Look at the resources to learn about possible symptoms of PTSD.\n\n";
+        recommendations += getRecommendations();
+
+        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendationsTextView.setText(recommendations);
 
         animateInRecommendations(layout);
     }
@@ -159,8 +185,11 @@ public class MainFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
 
-        TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendations.setText("Consider calling your trusted contact");
+        String recommendations = "Call your trusted contact\n\n";
+        recommendations += getRecommendations();
+
+        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
+        recommendationsTextView.setText(recommendations);
 
         animateInRecommendations(layout);
     }
