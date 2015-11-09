@@ -116,7 +116,10 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        loadPTSDPrograms();
+
+        // Prevent loading the facilities multiple times
+        if(knownFacilities.size() == 0)
+            loadPTSDPrograms();
     }
 
     /**
@@ -124,8 +127,6 @@ public class NearbyFacilitiesFragment extends Fragment {
      * PTSD programs per facility
      */
     public void loadPTSDPrograms() {
-        Toast.makeText(getActivity(), "LOADING... This may take a while", Toast.LENGTH_LONG).show();
-
         String url = "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
                 + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
 
@@ -174,7 +175,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                     }
                 }
 
-                Toast.makeText(getActivity(), "Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "DEBUG: Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -406,6 +407,12 @@ public class NearbyFacilitiesFragment extends Fragment {
      * When all of the facilities have fully loaded, sort them by distance and display them to the user
      */
     private void allFacilitiesHaveLoaded() {
+
+        // Remove the loading bar
+        getView().findViewById(R.id.facility_loading_textview).setVisibility(View.GONE);
+        getView().findViewById(R.id.facility_progressbar).setVisibility(View.GONE);
+
+
         ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
 
         // Sort the facilities by distance
