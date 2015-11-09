@@ -8,10 +8,10 @@
             android:title="@string/nav_test" />
         <item android:id="@+id/nav_resources" android:icon="@android:drawable/ic_menu_slideshow"
             android:title="@string/Resources" />
-        <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
-            android:title="@string/nav_manage" />
         <item android:id="@+id/nav_nearby" android:icon="@android:drawable/ic_menu_compass"
             android:title="@string/nav_nearby" />
+        <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
+        android:title="@string/nav_manage" />
 
     </group>
 
