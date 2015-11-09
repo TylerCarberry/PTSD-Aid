@@ -101,6 +101,8 @@ public class StressTestFragment extends Fragment {
         }
 
         Button submitButton = new Button(getActivity());
+        submitButton.setText("Submit");
+        submitButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
