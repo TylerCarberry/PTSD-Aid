@@ -3,7 +3,6 @@ package com.tytanapps.ptsd;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -43,8 +41,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-
-import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener{
@@ -169,12 +165,9 @@ public class MainActivity extends AppCompatActivity
             if(signInButton != null)
                 signInButton.setVisibility(View.INVISIBLE);
 
-            Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
 
             updateNavigationHeader(name, email, profilePicture);
-
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            //updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
             //updateUI(false);
@@ -200,8 +193,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onResult(@NonNull GoogleSignInResult result) {
                     handleSignInResult(result);
-                    //updateButtonsAndStatusFromSignInResult(result);
-                    //hideProgressIndicator();
                 }
             });
         }
@@ -212,6 +203,12 @@ public class MainActivity extends AppCompatActivity
         return isUserSignedIn;
     }
 
+    /**
+     * Update the header on the navigation view with the user's information
+     * @param name The name to display on the navigation view
+     * @param email The email subtext to show on the navigation view
+     * @param profilePicture A url of the user's profile picture
+     */
     private void updateNavigationHeader(String name, String email, Uri profilePicture) {
         TextView drawerNameTextView = (TextView) navHeader.findViewById(R.id.drawer_name);
         drawerNameTextView.setText(name);
@@ -229,14 +226,13 @@ public class MainActivity extends AppCompatActivity
      * You should not call this directly. Call loadFacilityImage instead
      * @param imageView The ImageView to place the image into
      * @param profilePictureUri The uri of the image to load
-     * @throws UnsupportedEncodingException
      */
     private void loadProfilePicture(final ImageView imageView, Uri profilePictureUri) {
-        Log.d(LOG_TAG, "Entering load street view image.");
+        //Log.d(LOG_TAG, "Entering load street view image.");
 
         String url = profilePictureUri.toString();
 
-        Log.d(LOG_TAG, url);
+        //Log.d(LOG_TAG, url);
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
@@ -256,9 +252,14 @@ public class MainActivity extends AppCompatActivity
         getRequestQueue().add(request);
     }
 
+    /**
+     * Read a shared preference string from memory
+     * @param prefKey The key of the shared preference
+     * @param defaultValue The value to return if the key does not exist
+     * @return
+     */
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(prefKey, defaultValue);
+        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
     }
 
     /**
@@ -350,7 +351,6 @@ public class MainActivity extends AppCompatActivity
         requestQueue.start();
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.

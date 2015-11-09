@@ -409,8 +409,14 @@ public class NearbyFacilitiesFragment extends Fragment {
     private void allFacilitiesHaveLoaded() {
 
         // Remove the loading bar
-        getView().findViewById(R.id.facility_loading_textview).setVisibility(View.GONE);
-        getView().findViewById(R.id.facility_progressbar).setVisibility(View.GONE);
+        View loadingTextview = getView().findViewById(R.id.facility_loading_textview);
+        if(loadingTextview != null)
+            loadingTextview.setVisibility(View.GONE);
+
+
+        View loadingProgressbar = getView().findViewById(R.id.facility_progressbar);
+        if(loadingProgressbar != null)
+            loadingProgressbar.setVisibility(View.GONE);
 
 
         ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());

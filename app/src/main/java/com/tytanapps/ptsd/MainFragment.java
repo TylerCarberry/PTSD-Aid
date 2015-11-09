@@ -106,8 +106,11 @@ public class MainFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        // Hide the sign in button if the user is already signed in
         if(isUserSignedIn()) {
-            getView().findViewById(R.id.button_sign_in).setVisibility(View.INVISIBLE);
+            View signInButton = getView().findViewById(R.id.button_sign_in);
+            if(signInButton != null)
+                signInButton.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -120,10 +123,18 @@ public class MainFragment extends Fragment {
             ((MainActivity) getActivity()).signIn();
     }
 
+    /**
+     * Determine whether the user is signed in to their Google account
+     * Precondition: MainFragment is a member of MainActivity
+     * @return Whether the user is signed in
+     */
     private boolean isUserSignedIn() {
         return ((MainActivity) getActivity()).isUserSignedIn();
     }
 
+    /**
+     * The user tapped the ok emotion button
+     */
     private void emotionOk() {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
@@ -149,7 +160,7 @@ public class MainFragment extends Fragment {
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
 
         TextView recommendations = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendations.setText("Consider talking with someone");
+        recommendations.setText("Consider calling your trusted contact");
 
         animateInRecommendations(layout);
     }
@@ -177,9 +188,6 @@ public class MainFragment extends Fragment {
                         .alpha(1.0f).setDuration(1000);
             }
         });
-
-
-
 
     }
 
