@@ -1,15 +1,18 @@
 package com.tytanapps.ptsd;
 
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private RequestQueue requestQueue;
 
     private static int RC_SIGN_IN = 1;
+    private static final int PICK_CONTACT_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,11 +97,14 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
 
 
-                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "123-555-0000"); //getString(R.string.phone_suicide_lifeline));
-                openDialer(phoneNumber);
+                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                if(!phoneNumber.equals(""))
+                    openDialer(phoneNumber);
+                else
+                    pickTrustedContact();
 
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
             }
         });
 
@@ -138,6 +145,35 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
+        }
+        else if(requestCode == PICK_CONTACT_REQUEST) {
+            if(resultCode == RESULT_OK) {
+                Uri contactUri = data.getData();
+                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
+
+                Cursor cursor = getContentResolver().query(contactUri, projection, null, null, null);
+                cursor.moveToFirst();
+
+                int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String phoneNumber = cursor.getString(column);
+
+                String name = getContactName(phoneNumber);
+
+                // If manage fragment is active, update the trusted contact TextView
+                TextView trustedNameEditText = (TextView) findViewById(R.id.trusted_contact_name_textview);
+                if(trustedNameEditText != null)
+                    trustedNameEditText.setText(name);
+
+                TextView trustedPhoneEditText = (TextView) findViewById(R.id.trusted_contact_phone_textview);
+                if(trustedPhoneEditText != null)
+                    trustedPhoneEditText.setText(phoneNumber);
+
+                saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
+                saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
+
+                Log.d(LOG_TAG, "NAME: " + name);
+                Log.d(LOG_TAG, "PHONENUMBER: " + phoneNumber);
+            }
         }
     }
 
@@ -271,6 +307,43 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
+    }
+
+    protected void pickTrustedContact() {
+        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+        pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+    }
+
+    /**
+     * Get a contact's name given their phone number
+     * @param phoneNumber The phone number of the contact
+     * @return The contact's name
+     */
+    public String getContactName(String phoneNumber) {
+        ContentResolver cr = getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        String contactName = null;
+        if(cursor.moveToFirst()) {
+            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        }
+
+        if(cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+        return contactName;
+    }
+
+    private void saveSharedPreference(String prefKey, String value) {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(prefKey, value);
+        editor.apply();
     }
 
     @Override

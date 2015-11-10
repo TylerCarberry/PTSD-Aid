@@ -2,17 +2,12 @@ package com.tytanapps.ptsd;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +33,6 @@ public class ManageFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private static final int PICK_CONTACT_REQUEST = 1;
 
     private static final String LOG_TAG = ManageFragment.class.getName();
 
@@ -209,73 +202,21 @@ public class ManageFragment extends Fragment {
         TextView trustedPhoneTextview = (TextView) rootView.findViewById(R.id.trusted_contact_phone_textview);
         trustedPhoneTextview.setText(getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "None"));
 
-
-
         Button debugButton = (Button) rootView.findViewById(R.id.change_contact_button);
         debugButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickContact();
+                pickTrustedContact();
             }
         });
 
         return rootView;
     }
 
-
-    private void pickContact() {
-        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
-        pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == PICK_CONTACT_REQUEST) {
-            if(resultCode == getActivity().RESULT_OK) {
-                Uri contactUri = data.getData();
-                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
-
-                Cursor cursor = getActivity().getContentResolver().query(contactUri, projection, null, null, null);
-                cursor.moveToFirst();
-
-                int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                String phoneNumber = cursor.getString(column);
-
-                String name = getContactName(getActivity(), phoneNumber);
-
-                TextView trustedNameEditText = (TextView) getView().findViewById(R.id.trusted_contact_name_textview);
-                trustedNameEditText.setText(name);
-
-                TextView trustedPhoneEditText = (TextView) getView().findViewById(R.id.trusted_contact_phone_textview);
-                trustedPhoneEditText.setText(phoneNumber);
-
-                saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
-                saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
-
-                Log.d(LOG_TAG, "NAME: " + name);
-                Log.d(LOG_TAG, "PHONENUMBER: " + phoneNumber);
-            }
-        }
-    }
-
-    public String getContactName(Context context, String phoneNumber) {
-        ContentResolver cr = context.getContentResolver();
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-        String contactName = null;
-        if(cursor.moveToFirst()) {
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-        }
-
-        if(cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-
-        return contactName;
+    private void pickTrustedContact() {
+        Activity parentActivity = getActivity();
+        if(parentActivity instanceof MainActivity)
+            ((MainActivity)getActivity()).pickTrustedContact();
     }
 
 
