@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,7 +100,7 @@ public class PTSDTestFragment extends Fragment {
         }
 
         Button submitButton = new Button(getActivity());
-        submitButton.setText("Submit");
+        submitButton.setText(getString(R.string.submit_test));
         submitButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,11 +118,7 @@ public class PTSDTestFragment extends Fragment {
      */
     private void submit() {
         int score = getScore();
-        if(score < 0)
-            Snackbar.make(getView(), getString(R.string.answer_all_questions), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        else
-            showResults(score);
+        showResults(score);
     }
 
     /**
@@ -264,26 +258,27 @@ public class PTSDTestFragment extends Fragment {
      * @return An array of the answers
      */
     private int[] getEachAnswer() {
-        LinearLayout questionsLinearLayout = (LinearLayout) getView().findViewById(R.id.questions_linearlayout);
-
         // TODO The number of questions is hard coded
         int score[] = new int[17];
         int questionCount = 0;
 
-        for(int i = 0; i < questionsLinearLayout.getChildCount();i++) {
-            View childView = questionsLinearLayout.getChildAt(i);
+        View rootView = getView();
+        if(rootView != null) {
+            LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
 
-            if(childView instanceof ViewGroup) {
+            for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
+                View childView = questionsLinearLayout.getChildAt(i);
 
-                SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
-                score[questionCount] = seekBar.getProgress() + 1;
+                if (childView instanceof ViewGroup) {
+                    SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
+                    score[questionCount] = seekBar.getProgress() + 1;
 
-                Log.d(LOG_TAG, seekBar.getProgress() + 1 + "");
+                    //Log.d(LOG_TAG, seekBar.getProgress() + 1 + "");
 
-                questionCount++;
+                    questionCount++;
+                }
             }
         }
-
         return score;
     }
 

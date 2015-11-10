@@ -115,6 +115,8 @@
     <string name="see_professional_medium">You may benefit from seeking help from a professional</string>
     <string name="result_high">Your results are consistant with many of the symptoms of PTSD</string>
     <string name="see_professional_high">You are advised to see your physician or a qualified mental health professional immediately for a complete assessment</string>
+    <string name="va_loading_error">The VA facilities cannot be loaded</string>
+    <string name="submit_test">Submit</string>
 
 
 </resources>

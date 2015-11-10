@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity
         drawerNameTextView.setText(name);
 
         TextView drawerEmailTextView = (TextView) navHeader.findViewById(R.id.drawer_subtext);
+        drawerEmailTextView.setVisibility(View.VISIBLE);
         drawerEmailTextView.setText(email);
 
         ImageView profileImageView = (ImageView) navHeader.findViewById(R.id.drawer_imageview);

@@ -198,7 +198,12 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        getRequestQueue().add(stringRequest);
+        // Start loading the image in the background
+        RequestQueue requestQueue = getRequestQueue();
+        if(requestQueue != null)
+            requestQueue.add(stringRequest);
+        else
+            errorLoadingResults();
 
     }
 
@@ -207,7 +212,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         if(rootView != null) {
             final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
             if(loadingTextview != null)
-                loadingTextview.setText("Error: The VA facilities cannot be loaded");
+                loadingTextview.setText(getString(R.string.va_loading_error));
 
             final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
             if(loadingProgressbar != null) {
@@ -323,8 +328,12 @@ public class NearbyFacilitiesFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        // Start loading the facility in the background
-        getRequestQueue().add(stringRequest);
+        // Start loading the image in the background
+        RequestQueue requestQueue = getRequestQueue();
+        if(requestQueue != null)
+            requestQueue.add(stringRequest);
+        else
+            numberOfLoadedFacilities++;
     }
 
     /**
@@ -387,7 +396,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                 });
 
         // Start loading the image in the background
-        getRequestQueue().add(request);
+        RequestQueue requestQueue = getRequestQueue();
+        if(requestQueue != null)
+            requestQueue.add(request);
     }
 
 
@@ -433,7 +444,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                 });
 
         // Start loading the image in the background
-        getRequestQueue().add(request);
+        RequestQueue requestQueue = getRequestQueue();
+        if(requestQueue != null)
+            requestQueue.add(request);
     }
 
     /**
@@ -700,12 +713,16 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @return The request queue
      */
     private RequestQueue getRequestQueue() {
-        RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
-        if(requestQueue == null) {
-            ((MainActivity) getActivity()).instantiateRequestQueue();
-            requestQueue = ((MainActivity) getActivity()).getRequestQueue();
+        Activity parentActivity = getActivity();
+        if(parentActivity != null && parentActivity instanceof MainActivity) {
+            RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
+            if (requestQueue == null) {
+                ((MainActivity) getActivity()).instantiateRequestQueue();
+                requestQueue = ((MainActivity) getActivity()).getRequestQueue();
+            }
+            return requestQueue;
         }
-        return requestQueue;
+        return null;
     }
 
     /**
