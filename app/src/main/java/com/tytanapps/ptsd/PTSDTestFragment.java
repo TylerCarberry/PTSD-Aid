@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,10 +25,10 @@ import android.widget.TextView;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link StressTestFragment#newInstance} factory method to
+ * Use the {@link PTSDTestFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StressTestFragment extends Fragment {
+public class PTSDTestFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -37,7 +38,7 @@ public class StressTestFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private static final String LOG_TAG = StressTestFragment.class.getSimpleName();
+    private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
 
@@ -47,11 +48,11 @@ public class StressTestFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment StressTestFragment.
+     * @return A new instance of fragment PTSDTestFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static StressTestFragment newInstance(String param1, String param2) {
-        StressTestFragment fragment = new StressTestFragment();
+    public static PTSDTestFragment newInstance(String param1, String param2) {
+        PTSDTestFragment fragment = new PTSDTestFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,7 +60,7 @@ public class StressTestFragment extends Fragment {
         return fragment;
     }
 
-    public StressTestFragment() {
+    public PTSDTestFragment() {
         // Required empty public constructor
     }
 
@@ -75,7 +76,7 @@ public class StressTestFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_stress_test, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
 
         LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
         insertQuestions(questionsLinearLayout);
@@ -131,10 +132,24 @@ public class StressTestFragment extends Fragment {
      * @param score The score that the user received
      */
     private void showResults(int score) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setPositiveButton("Find Professional", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                findProfessional();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Share Results", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                shareResults();
+            }
+        });
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.stress_test_result, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, null, false);
 
         String resultText;
         String nextActions;
@@ -160,23 +175,6 @@ public class StressTestFragment extends Fragment {
 
         TextView nextActionsTextview = (TextView) layout.findViewById(R.id.next_steps_textview);
         nextActionsTextview.setText(nextActions);
-
-        final Button shareResultsButton = (Button) layout.findViewById(R.id.share_results_button);
-        shareResultsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareResults();
-            }
-        });
-
-        final Button findProfessionalButton = (Button) layout.findViewById(R.id.find_professional_button);
-        findProfessionalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findProfessional();
-                alertDialog.dismiss();
-            }
-        });
 
         alertDialog.setView(layout);
         alertDialog.show();

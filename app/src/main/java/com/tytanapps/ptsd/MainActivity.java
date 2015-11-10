@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity
                 newFragment = new MainFragment();
                 break;
             case R.id.nav_test:
-                newFragment = new StressTestFragment();
+                newFragment = new PTSDTestFragment();
                 break;
             case R.id.nav_resources:
                 newFragment = new ResourcesFragment();
