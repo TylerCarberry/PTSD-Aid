@@ -1,8 +1,10 @@
 package com.tytanapps.ptsd;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.Cache;
@@ -101,7 +104,9 @@ public class MainActivity extends AppCompatActivity
                 if(!phoneNumber.equals(""))
                     openDialer(phoneNumber);
                 else
-                    pickTrustedContact();
+                    showTrustedContactDialog();
+
+                    //pickTrustedContact();
 
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
@@ -286,6 +291,35 @@ public class MainActivity extends AppCompatActivity
 
         // Start loading the image in the background
         getRequestQueue().add(request);
+    }
+
+    /**
+     * Display an AlertDialog with the results of the test
+     */
+    private void showTrustedContactDialog() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setPositiveButton("Add Trusted Contact", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                pickTrustedContact();
+                //findProfessional();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //shareResults();
+            }
+        });
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.trusted_contact_layout, null, false);
+
+
+        alertDialog.setView(layout);
+        alertDialog.show();
     }
 
     /**
