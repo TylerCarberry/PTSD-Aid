@@ -101,15 +101,10 @@ public class MainActivity extends AppCompatActivity
 
 
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                if(!phoneNumber.equals(""))
+                if (!phoneNumber.equals(""))
                     openDialer(phoneNumber);
                 else
                     showTrustedContactDialog();
-
-                    //pickTrustedContact();
-
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
             }
         });
 
@@ -297,7 +292,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display an AlertDialog with the results of the test
      */
-    private void showTrustedContactDialog() {
+    protected void showTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton("Add Trusted Contact", new DialogInterface.OnClickListener() {
             @Override
@@ -338,7 +333,7 @@ public class MainActivity extends AppCompatActivity
      * This does not call the number directly, the user needs to press the call button
      * @param phoneNumber The phone number to call
      */
-    private void openDialer(String phoneNumber) {
+    protected void openDialer(String phoneNumber) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
         startActivity(intent);

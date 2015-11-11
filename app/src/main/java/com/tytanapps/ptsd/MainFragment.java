@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +107,11 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    private void openDrawer() {
+        DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        drawer.openDrawer(Gravity.LEFT);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -156,21 +163,55 @@ public class MainFragment extends Fragment {
             case R.id.happy_face:
                 emotionTextView.setText("Look at the resources to learn about possible symptoms of PTSD.");
                 recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openDrawer();
+                    }
+                });
                 break;
             case R.id.ok_face:
                 emotionTextView.setText("Take the PTSD test to determine if you suffer from PTSD");
                 recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                emotionTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openDrawer();
+                    }
+                });
                 break;
             case R.id.sad_face:
-                emotionTextView.setText("Consider calling your trusted contact");
-                recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                // Don't recommend calling a trusted contact if one does not exist
+                String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                if(!trustedContactPhone.equals("")) {
+                    emotionTextView.setText("Consider calling your trusted contact");
+                    recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                    emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                            if(!phoneNumber.equals(""))
+                                ((MainActivity)getActivity()).openDialer(phoneNumber);
+                            else
+                                ((MainActivity)getActivity()).showTrustedContactDialog();
+                        }
+                    });
+                }
                 break;
         }
 
         if(!isUserSignedIn()) {
             RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
             TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
-            signInTextView.setText("Look at the resources to learn about possible symptoms of PTSD.");
+            signInTextView.setText("Sign In");
+
+            signInRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    signIn();
+                }
+            });
+
             recommendationsLinearLayout.addView(signInRecommendationLayout);
         }
 
@@ -178,8 +219,16 @@ public class MainFragment extends Fragment {
         if(trustedContactPhone.equals("")) {
             RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
             TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
-            trustedContactTextView.setText("Create a trusted contact");
+            trustedContactTextView.setText("Add a trusted contact");
+            trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MainActivity)getActivity()).showTrustedContactDialog();
+                }
+            });
+
             recommendationsLinearLayout.addView(trustedContactRecommendationLayout);
+
         }
 
         animateInRecommendations(parentFrameLayout);
