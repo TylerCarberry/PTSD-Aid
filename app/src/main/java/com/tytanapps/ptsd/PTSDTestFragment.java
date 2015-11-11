@@ -108,6 +108,8 @@ public class PTSDTestFragment extends Fragment {
                 submit();
             }
         });
+        submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        submitButton.setTextColor(getResources().getColor(R.color.white));
 
         questionsLinearLayout.addView(submitButton);
     }
