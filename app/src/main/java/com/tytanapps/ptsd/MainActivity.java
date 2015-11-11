@@ -119,6 +119,12 @@ public class MainActivity extends AppCompatActivity
 
         LayoutInflater inflater = LayoutInflater.from(this);
         ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
+        navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
 
         navigationView.addHeaderView(navigationHeader);
         navHeader = navigationHeader;
@@ -255,6 +261,10 @@ public class MainActivity extends AppCompatActivity
 
         ImageView profileImageView = (ImageView) navHeader.findViewById(R.id.drawer_imageview);
         loadProfilePicture(profileImageView, profilePicture);
+
+        View signInButton = navHeader.findViewById(R.id.button_sign_in);
+        if(signInButton != null)
+            signInButton.setVisibility(View.GONE);
     }
 
     /**
