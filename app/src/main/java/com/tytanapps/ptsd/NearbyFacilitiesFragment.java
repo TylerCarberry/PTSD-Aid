@@ -311,6 +311,10 @@ public class NearbyFacilitiesFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     numberOfLoadedFacilities++;
+
+                    // When all facilities have loaded, sort them by distance and show them to the user
+                    if(numberOfLoadedFacilities == numberOfFacilities)
+                        allFacilitiesHaveLoaded();
                 }
 
             }
@@ -319,6 +323,10 @@ public class NearbyFacilitiesFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, error.toString());
                 numberOfLoadedFacilities++;
+
+                // When all facilities have loaded, sort them by distance and show them to the user
+                if(numberOfLoadedFacilities == numberOfFacilities)
+                    allFacilitiesHaveLoaded();
             }
         });
 
