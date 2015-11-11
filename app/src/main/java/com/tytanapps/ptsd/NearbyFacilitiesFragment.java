@@ -75,7 +75,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     private int numberOfLoadedFacilities = 0;
 
     // The number of facilities to display on screen
-    private static final int FACILITIES_TO_SHOW = 20;
+    private static final int FACILITIES_TO_SHOW = 15;
 
     /**
      * Use this factory method to create a new instance of
@@ -420,7 +420,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     private void loadMapImage(final ImageView imageView, final Facility facility) {
         //Log.d(LOG_TAG, "Entering load map image.");
 
-        final int defaultImageId = R.drawable.nspl;
+        final int defaultImageId = R.drawable.default_facility_image;
 
         String url;
         try {
@@ -627,10 +627,8 @@ public class NearbyFacilitiesFragment extends Fragment {
             TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
             nameTextView.setText(facility.getName());
 
-            String description = facility.getDescription();
-
             TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
-            descriptionTextView.setText(description);
+            descriptionTextView.setText(facility.getDescription());
 
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
@@ -642,15 +640,13 @@ public class NearbyFacilitiesFragment extends Fragment {
 
 
             TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-            phoneTextView.setText(facility.getPhoneNumber());
+            phoneTextView.setText(getFirstPhoneNumber(facility.getPhoneNumber()));
             phoneTextView.setOnClickListener(callOnClick);
 
             ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
             phoneIcon.setOnClickListener(callOnClick);
 
-            ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-            loadFacilityImage(facilityImageView, facility);
-            facilityImageView.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener mapOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
@@ -659,7 +655,18 @@ public class NearbyFacilitiesFragment extends Fragment {
                         e.printStackTrace();
                     }
                 }
-            });
+            };
+
+            TextView addressTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_address_textview);
+            addressTextView.setText(facility.getAddress());
+            addressTextView.setOnClickListener(mapOnClick);
+
+            ImageView addressIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_address_icon);
+            addressIcon.setOnClickListener(mapOnClick);
+
+            ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
+            loadFacilityImage(facilityImageView, facility);
+            facilityImageView.setOnClickListener(mapOnClick);
 
             View.OnClickListener websiteOnClick = new View.OnClickListener() {
                 @Override
@@ -669,12 +676,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                 }
             };
 
-            ImageView webIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_website_icon);
-            webIcon.setOnClickListener(websiteOnClick);
-
-            TextView webTextView = (TextView) cardRelativeLayout.findViewById(R.id.website_textview);
-            webTextView.setText(facility.getUrl());
-            webTextView.setOnClickListener(websiteOnClick);
+            Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
+            //moreInfoButton.setText(facility.getUrl());
+            moreInfoButton.setOnClickListener(websiteOnClick);
 
             LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
             parentLinearLayout.addView(cardRelativeLayout);

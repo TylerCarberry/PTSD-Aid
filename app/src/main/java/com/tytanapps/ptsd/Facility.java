@@ -118,6 +118,10 @@ public class Facility implements Comparable<Facility>{
         this.zip = zip;
     }
 
+    public String getAddress() {
+        return streetAddress + " " + city + " " + state;
+    }
+
     public double getLatitude() {
         return latitude;
     }

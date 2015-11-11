@@ -149,6 +149,7 @@
 
     <Button
         android:id="@+id/change_contact_button"
+        android:theme="@style/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/trusted_contact_prompt"
