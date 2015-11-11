@@ -3,10 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
     tools:context="com.tytanapps.ptsd.ResourcesFragment">
 
     <ScrollView
@@ -15,13 +11,18 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="50dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
             <TextView
                 android:id="@+id/symptoms_title_textview"
                 android:theme="@style/LargeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
                 android:text="Symptoms" />
 
             <TextView
@@ -30,6 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/symptoms_title_textview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:text="@string/symptoms"/>
 
             <TextView
@@ -38,6 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/symptoms_textview"
+                android:layout_centerHorizontal="true"
                 android:text="Causes"/>
 
             <TextView
@@ -46,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/causes_title_textview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:text="@string/causes"/>
 
             <TextView
@@ -54,6 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/causes_textview"
+                android:layout_centerHorizontal="true"
                 android:text="Diagnosis"/>
 
             <TextView
@@ -62,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/diagnosis_title_textview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:text="@string/diagnosis"/>
 
             <TextView
@@ -70,6 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/diagnosis_textview"
+                android:layout_centerHorizontal="true"
                 android:text="Treatment"/>
 
             <TextView
@@ -78,31 +85,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/treatment_title_textview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:text="@string/treatment"/>
+
+            <TextView
+                android:id="@+id/counseling_title_textview"
+                android:theme="@style/LargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/treatment_textview"
+                android:layout_centerHorizontal="true"
+                android:text="Counseling"/>
 
             <TextView
                 android:id="@+id/counseling_textview"
                 android:theme="@style/SmallText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/treatment_textview"
+                android:layout_below="@id/counseling_title_textview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:text="@string/counseling"/>
-
-            <TextView
-                android:id="@+id/self_help_title_textview"
-                android:theme="@style/LargeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/counseling_textview"
-                android:text="Self Help"/>
-
-            <TextView
-                android:id="@+id/self_help_textview"
-                android:theme="@style/SmallText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/self_help_title_textview"
-                android:text="@string/self_help"/>
 
         </RelativeLayout>
 
