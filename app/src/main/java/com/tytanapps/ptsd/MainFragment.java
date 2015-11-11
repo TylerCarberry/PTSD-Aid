@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -76,21 +77,21 @@ public class MainFragment extends Fragment {
         rootView.findViewById(R.id.happy_face).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emotionHappy();
+                emotionSelected(v);
             }
         });
 
-        rootView.findViewById(R.id.meh_face).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.ok_face).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emotionOk();
+                emotionSelected(v);
             }
         });
 
         rootView.findViewById(R.id.sad_face).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emotionSad();
+                emotionSelected(v);
             }
         });
 
@@ -116,19 +117,6 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private String getRecommendations() {
-        String recommendations = "";
-
-        if(!isUserSignedIn())
-            recommendations += "Sign In\n\n";
-
-        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-        if(trustedContactPhone.equals(""))
-            recommendations += "Add a trusted contact\n\n";
-
-        return recommendations;
-    }
-
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
@@ -152,62 +140,59 @@ public class MainFragment extends Fragment {
         return ((MainActivity) getActivity()).isUserSignedIn();
     }
 
-    /**
-     * The user tapped the ok emotion button
-     */
-    private void emotionOk() {
+
+
+    private void emotionSelected(View emotionPressed) {
+        FrameLayout parentFrameLayout = (FrameLayout) getView().findViewById(R.id.recommendations_container);
+
+        LinearLayout recommendationsLinearLayout = (LinearLayout) getView().findViewById(R.id.recommendations_linear_layout);
+        recommendationsLinearLayout.removeAllViews();
+
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
 
-        String recommendations = "Take the PTSD test to determine if you suffer from PTSD\n\n";
-        recommendations += getRecommendations();
+        RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+        TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
+        switch (emotionPressed.getId()) {
+            case R.id.happy_face:
+                emotionTextView.setText("Look at the resources to learn about possible symptoms of PTSD.");
+                recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                break;
+            case R.id.ok_face:
+                emotionTextView.setText("Take the PTSD test to determine if you suffer from PTSD");
+                recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                break;
+            case R.id.sad_face:
+                emotionTextView.setText("Consider calling your trusted contact");
+                recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                break;
+        }
 
-        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendationsTextView.setText(recommendations);
+        if(!isUserSignedIn()) {
+            RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+            TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
+            signInTextView.setText("Look at the resources to learn about possible symptoms of PTSD.");
+            recommendationsLinearLayout.addView(signInRecommendationLayout);
+        }
 
-        animateInRecommendations(layout);
-    }
+        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        if(trustedContactPhone.equals("")) {
+            RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+            TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
+            trustedContactTextView.setText("Create a trusted contact");
+            recommendationsLinearLayout.addView(trustedContactRecommendationLayout);
+        }
 
-    private void emotionHappy() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
-
-        String recommendations = "Great! Look at the resources to learn about possible symptoms of PTSD.\n\n";
-        recommendations += getRecommendations();
-
-        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendationsTextView.setText(recommendations);
-
-        animateInRecommendations(layout);
-    }
-
-    private void emotionSad() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.emotion_result, null, false);
-
-        String recommendations = "Call your trusted contact\n\n";
-        recommendations += getRecommendations();
-
-        TextView recommendationsTextView = (TextView) layout.findViewById(R.id.recommendation_textview);
-        recommendationsTextView.setText(recommendations);
-
-        animateInRecommendations(layout);
+        animateInRecommendations(parentFrameLayout);
     }
 
     private void animateInRecommendations(final ViewGroup layout) {
-        FrameLayout recommendationContainer = (FrameLayout) getView().findViewById(R.id.inner_frame);
-        recommendationContainer.removeAllViews();
-
         // Prepare the View for the animation
         layout.setVisibility(View.VISIBLE);
         layout.setAlpha(0.0f);
 
-        recommendationContainer.addView(layout);
-
-
         // Start the animation
         layout.animate()
-                .translationY(500).setDuration(0).setListener(new AnimatorListenerAdapter() {
+                .translationY(700).setDuration(0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);

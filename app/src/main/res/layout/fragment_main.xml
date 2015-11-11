@@ -36,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/prompt_emotion"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:gravity="center">
 
 
@@ -49,7 +50,7 @@
             android:gravity="center" />
 
         <TextView
-            android:id="@+id/meh_face"
+            android:id="@+id/ok_face"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="70sp"
@@ -74,20 +75,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/emotions_linear_layout"
-        android:clipChildren="false"
-        android:clipToPadding="false">
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_below="@+id/emotions_linear_layout">
 
-
-        <FrameLayout
-            android:id="@+id/inner_frame"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+        <LinearLayout
+            android:id="@+id/recommendations_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:clipChildren="false"
             android:clipToPadding="false">
 
-        </FrameLayout>
+        </LinearLayout>
 
     </FrameLayout>
 
