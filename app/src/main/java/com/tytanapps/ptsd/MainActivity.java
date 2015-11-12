@@ -107,6 +107,14 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showChangeTrustedContactDialog();
+                return true;
+            }
+        });
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -320,6 +328,37 @@ public class MainActivity extends AppCompatActivity
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setView(layout);
         alertDialog.show();
+    }
+
+    /**
+     * Display a dialog explaining a trusted contact and allow the user to make one
+     */
+    protected void showChangeTrustedContactDialog() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setPositiveButton("Change Trusted Contact", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                pickTrustedContact();
+            }
+        });
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.change_trusted_contact_layout, null, false);
+
+        TextView currentContactTextView = (TextView) layout.findViewById(R.id.current_contact_textview);
+
+        String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
+        String contactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+
+        if(!contactPhone.equals("")) {
+            currentContactTextView.setText("Your trusted contact is\n" + contactName + "\n" + contactPhone);
+
+            final AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setView(layout);
+            alertDialog.show();
+        }
+        else
+            showCreateTrustedContactDialog();
     }
 
     /**
