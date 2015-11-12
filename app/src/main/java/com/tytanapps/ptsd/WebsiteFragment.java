@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,31 +68,40 @@ public class WebsiteFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_website, container, false);
 
-        /*
-        TextView nimhWebsiteTextview = (TextView) rootView.findViewById(R.id.website_national_health_textview);
-        nimhWebsiteTextview.setOnClickListener(new View.OnClickListener() {
+
+        CardView veteransQuizCard = (CardView) rootView.findViewById(R.id.veterans_quiz_cardview);
+        veteransQuizCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser(getString(R.string.website_nimh));
+                openBrowser("https://www.vetselfcheck.org/Welcome.cfm");
             }
         });
 
-        TextView wikipediaTextview = (TextView) rootView.findViewById(R.id.website_wikipedia_textview);
-        wikipediaTextview.setOnClickListener(new View.OnClickListener() {
+        CardView nimhCard = (CardView) rootView.findViewById(R.id.nimh_cardview);
+        nimhCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser(getString(R.string.website_wikipedia));
+                openBrowser("http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml");
             }
         });
 
-        TextView vaWebsiteTextview = (TextView) rootView.findViewById(R.id.website_va_textview);
-        vaWebsiteTextview.setOnClickListener(new View.OnClickListener() {
+        CardView vaCard = (CardView) rootView.findViewById(R.id.va_cardview);
+        vaCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser(getString(R.string.website_va));
+                openBrowser("http://www.ptsd.va.gov/public/index.asp");
             }
         });
-        */
+
+        CardView ptsdCoachCard = (CardView) rootView.findViewById(R.id.ptsd_coach_cardview);
+        ptsdCoachCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBrowser("http://www.ptsd.va.gov/apps/ptsdcoachonline/default.htm");
+            }
+        });
+
+
 
         return rootView;
     }
