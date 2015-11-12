@@ -172,15 +172,6 @@ public class MainActivity extends AppCompatActivity
 
                 String name = getContactName(phoneNumber);
 
-                // If manage fragment is active, update the trusted contact TextView
-                TextView trustedNameEditText = (TextView) findViewById(R.id.trusted_contact_name_textview);
-                if(trustedNameEditText != null)
-                    trustedNameEditText.setText(name);
-
-                TextView trustedPhoneEditText = (TextView) findViewById(R.id.trusted_contact_phone_textview);
-                if(trustedPhoneEditText != null)
-                    trustedPhoneEditText.setText(phoneNumber);
-
                 saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
                 saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
 
@@ -515,9 +506,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_resources:
                 newFragment = new ResourcesFragment();
-                break;
-            case R.id.nav_manage:
-                newFragment = new ManageFragment();
                 break;
             case R.id.nav_hotline:
                 newFragment = new PhoneFragment();
