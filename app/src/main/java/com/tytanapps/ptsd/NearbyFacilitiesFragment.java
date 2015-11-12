@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
@@ -33,8 +32,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -167,8 +172,9 @@ public class NearbyFacilitiesFragment extends Fragment {
                         // There are multiple programs at the same facility.
                         // Combine them if necessary.
                         Facility facility;
-                        if(knownFacilities.containsKey(facilityID))
+                        if(knownFacilities.containsKey(facilityID)) {
                             facility = knownFacilities.get(facilityID);
+                        }
                         else
                             facility = new Facility(facilityID);
 
@@ -184,11 +190,23 @@ public class NearbyFacilitiesFragment extends Fragment {
                 if(knownFacilities != null && knownFacilities.size() > 0) {
                     for (int facilityId : knownFacilities.keySet()) {
                         Facility facility = knownFacilities.get(facilityId);
-                        loadFacility(facility, knownFacilities.size());
+
+                        Facility cachedFacility = readFacility(facilityId);
+                        if(cachedFacility != null) {
+                            facility = cachedFacility;
+                            knownFacilities.put(facilityId, facility);
+                            numberOfLoadedFacilities++;
+
+                            // When all facilities have loaded, sort them by distance and show them to the user
+                            if(numberOfLoadedFacilities == knownFacilities.size())
+                                allFacilitiesHaveLoaded();
+                        }
+                        else
+                            loadFacility(facility, knownFacilities.size());
                     }
                 }
 
-                Toast.makeText(getActivity(), "DEBUG: Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "DEBUG: Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -211,39 +229,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         else
             errorLoadingResults();
 
-    }
-
-    private void errorLoadingResults() {
-        errorLoadingResults(getString(R.string.va_loading_error));
-    }
-
-    private void errorLoadingResults(String errorMessage) {
-        View rootView = getView();
-        if(rootView != null) {
-            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
-            if(loadingTextview != null)
-                loadingTextview.setText(errorMessage);
-
-            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
-            if(loadingProgressbar != null) {
-                loadingProgressbar.setVisibility(View.INVISIBLE);
-            }
-
-            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
-            if(retryButton != null) {
-                retryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        v.setVisibility(View.INVISIBLE);
-                        loadingTextview.setText("Loading");
-                        loadingProgressbar.setVisibility(View.VISIBLE);
-
-                        loadPTSDPrograms();
-                    }
-                });
-                retryButton.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     /**
@@ -278,11 +263,11 @@ public class NearbyFacilitiesFragment extends Fragment {
                     double locationLat = locationJson.getDouble("LATITUDE");
                     double locationLong = locationJson.getDouble("LONGITUDE");
 
-                    String description = "Desc";
+                    String description = "";
 
-                    String url = (String) locationJson.get("FANDL_URL");
                     // For some reason the facility urls start with vaww. instead of www.
                     // These cannot be loaded on my phone so use www. instead.
+                    String url = (String) locationJson.get("FANDL_URL");
                     url = url.replace("vaww", "www");
 
                     double userLocation[] = getGPSLocation();
@@ -309,6 +294,10 @@ public class NearbyFacilitiesFragment extends Fragment {
                     facility.setState(state);
                     facility.setZip(zip);
                     facility.setDescription(description);
+                    facility.setLatitude(locationLat);
+                    facility.setLongitude(locationLong);
+
+                    cacheFacility(facility);
 
                     numberOfLoadedFacilities++;
 
@@ -500,6 +489,101 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     }
 
+    private void errorLoadingResults() {
+        errorLoadingResults(getString(R.string.va_loading_error));
+    }
+
+    private void errorLoadingResults(String errorMessage) {
+        View rootView = getView();
+        if(rootView != null) {
+            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
+            if(loadingTextview != null)
+                loadingTextview.setText(errorMessage);
+
+            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
+            if(loadingProgressbar != null) {
+                loadingProgressbar.setVisibility(View.INVISIBLE);
+            }
+
+            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
+            if(retryButton != null) {
+                retryButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        v.setVisibility(View.INVISIBLE);
+                        loadingTextview.setText("Loading");
+                        loadingProgressbar.setVisibility(View.VISIBLE);
+
+                        loadPTSDPrograms();
+                    }
+                });
+                retryButton.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void cacheFacility(Facility facility) {
+        File file = getFacilityFile(facility.getFacilityId());
+
+        ObjectOutput out;
+
+        try {
+            out = new ObjectOutputStream(new FileOutputStream(file));
+            out.writeObject(facility);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private Facility readFacility(int facilityId){
+        ObjectInputStream input;
+        File file = getFacilityFile(facilityId);
+
+        Facility facility = null;
+
+        try {
+            input = new ObjectInputStream(new FileInputStream(file));
+            facility = (Facility) input.readObject();
+
+            double userLocation[] = getGPSLocation();
+            double distance = 0;
+
+            String description = "";
+
+            // The description contains the distance and all PTSD programs located there
+            if(userLocation[0] != 0 && userLocation[1] != 0) {
+                distance = Utilities.distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1], "M");
+                facility.setDistance(distance);
+
+                DecimalFormat df = new DecimalFormat("#.##");
+                description = "Distance: " + df.format(distance) + " miles\n\n";
+            }
+
+            Set<String> programs = facility.getPrograms();
+            for(String program : programs)
+                description += program + "\n";
+
+            facility.setDescription(description);
+
+            input.close();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            //e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return facility;
+
+    }
+
     /**
      * Save the Google Maps image of the facility to a file. This file will then be used instead
      * of loading it from Google every time
@@ -537,6 +621,16 @@ public class NearbyFacilitiesFragment extends Fragment {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+    }
+
+    /**
+     * Get the file path of the facility
+     * @param facilityId The id of the facility
+     * @return The file path of the facility
+     */
+    private File getFacilityFile(int facilityId) {
+        String fileName = "facility" + facilityId;
+        return new File(getActivity().getFilesDir(), fileName);
     }
 
     /**

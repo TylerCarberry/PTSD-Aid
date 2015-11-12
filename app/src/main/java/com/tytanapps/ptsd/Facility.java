@@ -1,12 +1,15 @@
 package com.tytanapps.ptsd;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Tyler on 11/5/15.
  */
-public class Facility implements Comparable<Facility>{
+public class Facility implements Comparable<Facility>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final int FACILITY_ID;
     private String name;
