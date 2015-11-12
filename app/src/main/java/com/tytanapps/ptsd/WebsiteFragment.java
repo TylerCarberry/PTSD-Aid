@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 
 /**
@@ -68,6 +67,7 @@ public class WebsiteFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_website, container, false);
 
+        /*
         TextView nimhWebsiteTextview = (TextView) rootView.findViewById(R.id.website_national_health_textview);
         nimhWebsiteTextview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +91,7 @@ public class WebsiteFragment extends Fragment {
                 openBrowser(getString(R.string.website_va));
             }
         });
+        */
 
         return rootView;
     }

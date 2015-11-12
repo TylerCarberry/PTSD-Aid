@@ -1,43 +1,187 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.tytanapps.ptsd.WebsiteFragment"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin">
+    tools:context="com.tytanapps.ptsd.PhoneFragment">
 
-    <TextView
-        android:id="@+id/website_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Website PTSD Support"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/website_national_health_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="National Institute of Mental Health"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-    <TextView
-        android:id="@+id/website_wikipedia_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wikipedia"
-        android:layout_below="@id/website_national_health_textview"
-        android:layout_centerHorizontal="true" />
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <TextView
-        android:id="@+id/website_va_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Veterans Affairs"
-        android:layout_below="@id/website_wikipedia_textview"
-        android:layout_centerHorizontal="true" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/veterans_quiz_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:id="@+id/veteran_quiz_imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/veterans_quiz"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/veteran_quiz_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_quiz_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Veterans Self-Check Quiz"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/veteran_quiz_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_quiz_textview"
+                        android:text="A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential."
+                        android:textSize="20sp"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/nimh_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/veterans_quiz_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:id="@+id/nimh_imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/nimh"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/nimh_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/nimh_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="National Institute of Mental Heath"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/nimh_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/nimh_textview"
+                        android:text="Find more information about Post Traumatic Stress Disorder."
+                        android:textSize="20sp"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/va_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/nimh_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:id="@+id/va_imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/va"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/va_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/va_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Veterans Affairs"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/va_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/va_textview"
+                        android:text="Find more information about PTSD from the Department of Veterans Affairs"
+                        android:textSize="20sp"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/ptsd_coach_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/va_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:id="@+id/ptsd_coach_imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ptsd_coach"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/ptsd_coach_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/ptsd_coach_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="PTSD Coach"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/veterans_foundation_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/ptsd_coach_textview"
+                        android:text="PTSD Coach Online is for anyone who needs help with upsetting feelings. Trauma survivors, their families, or anyone coping with stress can benefit."
+                        android:textSize="20sp"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
 
 </RelativeLayout>
