@@ -52,7 +52,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veteran_support_phone_textview"
-                        android:text="Veterans press 1"/>
+                        android:text="Veterans Press 1"
+                        android:textSize="20sp"/>
 
                 </RelativeLayout>
 
@@ -91,7 +92,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/suicide_lifeline_textview"
-                        android:text="More info about the suicide lifeline goes here"/>
+                        android:text="It is common to feel anxious after incidents of mass violence. You are not alone."
+                        android:textSize="20sp"/>
 
                 </RelativeLayout>
 
@@ -130,7 +132,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/alcoholism_helpline_textview"
-                        android:text="More info about the alcohol hotline goes here"/>
+                        android:text="Addiction is a Disease\nTreatment is Available\nRecovery Brings Joy"
+                        android:textSize="20sp"/>
 
                 </RelativeLayout>
 
@@ -169,7 +172,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veterans_foundation_textview"
-                        android:text="More info about the veteran foundation goes here"/>
+                        android:text="We help veterans and their families who are enduring a crisis or who have a critical need for help. Veterans of any era can call for assistance."
+                        android:textSize="20sp"/>
 
                 </RelativeLayout>
 
