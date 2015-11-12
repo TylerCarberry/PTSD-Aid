@@ -152,6 +152,12 @@ public class NearbyFacilitiesFragment extends Fragment {
                         return;
                     }
 
+                    double userLocation[] = getGPSLocation();
+                    if(userLocation[0] == 0 && userLocation[1] == 0) {
+                        errorLoadingResults("Your GPS location cannot be determined");
+                        return;
+                    }
+
                     for(int i = 1; i < numberOfResults; i++) {
                         JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
 
@@ -208,11 +214,15 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     private void errorLoadingResults() {
+        errorLoadingResults(getString(R.string.va_loading_error));
+    }
+
+    private void errorLoadingResults(String errorMessage) {
         View rootView = getView();
         if(rootView != null) {
             final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
             if(loadingTextview != null)
-                loadingTextview.setText(getString(R.string.va_loading_error));
+                loadingTextview.setText(errorMessage);
 
             final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
             if(loadingProgressbar != null) {

@@ -30,6 +30,7 @@
         android:id="@+id/retry_load_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:theme="@style/button"
         android:layout_below="@id/facility_loading_textview"
         android:layout_centerHorizontal="true"
         android:text="Retry"
