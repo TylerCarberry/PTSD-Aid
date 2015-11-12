@@ -78,44 +78,14 @@ public class ManageFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_manage, container, false);
 
-        /*
-        NumberPicker ageNumberPicker = (NumberPicker) rootView.findViewById(R.id.age_number_picker);
-        ageNumberPicker.setMinValue(0);
-        ageNumberPicker.setMaxValue(120);
-        ageNumberPicker.setWrapSelectorWheel(false);
-        */
-
-
-        /*
-        EditText nameEditText = (EditText) rootView.findViewById(R.id.name_edittext);
-        nameEditText.setText(getSharedPreferenceString(getString(R.string.pref_name_key), ""));
-        nameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String name = s.toString();
-                saveSharedPreference(getString(R.string.pref_name_key), name);
-            }
-        });
-        */
-
         EditText ageEditText = (EditText) rootView.findViewById(R.id.age_edittext);
         ageEditText.setText(""+getSharedPreferenceInt(getString(R.string.pref_age_key), 18));
         ageEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -219,7 +189,6 @@ public class ManageFragment extends Fragment {
             ((MainActivity)getActivity()).pickTrustedContact();
     }
 
-
     private void saveSharedPreference(String prefKey, String value) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -255,9 +224,6 @@ public class ManageFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getBoolean(prefKey, defaultValue);
     }
-
-
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

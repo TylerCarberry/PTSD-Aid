@@ -99,12 +99,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
                     openDialer(phoneNumber);
                 else
-                    showTrustedContactDialog();
+                    showCreateTrustedContactDialog();
             }
         });
 
@@ -191,33 +190,33 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     * When the user has been logged in, update the UI
+     * @param result The result of signing into your account
+     */
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(LOG_TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
+            isUserSignedIn = true;
+
             GoogleSignInAccount googleAccount = result.getSignInAccount();
 
             String name = googleAccount.getDisplayName();
             String email = googleAccount.getEmail();
             Uri profilePicture = googleAccount.getPhotoUrl();
 
-            isUserSignedIn = true;
-
             View signInButton = findViewById(R.id.button_sign_in);
             if(signInButton != null)
                 signInButton.setVisibility(View.INVISIBLE);
 
-            //Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
-
             updateNavigationHeader(name, email, profilePicture);
         } else {
-            // Signed out, show unauthenticated UI.
-            //updateUI(false);
+            // Unable to login. Don't do anything.
         }
     }
 
     /**
      * Sign in to the user's Google Account
+     * If the user previously granted access, sign them in again
      */
     private void silentSignIn() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
@@ -230,7 +229,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             // There's no immediate result ready, displays some progress indicator and waits for the
             // async callback.
-            //showProgressIndicator();
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(@NonNull GoogleSignInResult result) {
@@ -241,6 +239,10 @@ public class MainActivity extends AppCompatActivity
         Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
     }
 
+    /**
+     * Is the user signed in to the app with their Google Account
+     * @return Whether the user is signed in to the app
+     */
     protected boolean isUserSignedIn() {
         return isUserSignedIn;
     }
@@ -275,11 +277,7 @@ public class MainActivity extends AppCompatActivity
      * @param profilePictureUri The uri of the image to load
      */
     private void loadProfilePicture(final ImageView imageView, Uri profilePictureUri) {
-        //Log.d(LOG_TAG, "Entering load street view image.");
-
         String url = profilePictureUri.toString();
-
-        //Log.d(LOG_TAG, url);
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
@@ -300,30 +298,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Display an AlertDialog with the results of the test
+     * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    protected void showTrustedContactDialog() {
+    protected void showCreateTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton("Add Trusted Contact", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 pickTrustedContact();
-                //findProfessional();
             }
         });
         alertDialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //shareResults();
             }
         });
 
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-
         LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.trusted_contact_layout, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, null, false);
 
-
+        final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setView(layout);
         alertDialog.show();
     }
@@ -349,6 +343,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    /**
+     * Open an intent to allow the user to pick one of their contacts
+     */
     protected void pickTrustedContact() {
         Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
         pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
@@ -445,7 +442,6 @@ public class MainActivity extends AppCompatActivity
 
         return requestQueue;
     }
-
 
     /**
      * Create the request queue. This is used to connect to the API in the background

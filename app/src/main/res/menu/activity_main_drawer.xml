@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_simple_test" android:icon="@android:drawable/ic_menu_camera"
+        <item android:id="@+id/nav_simple_test" android:icon="@android:drawable/ic_dialog_info"
             android:title="@string/nav_simple_test" />
         <item android:id="@+id/nav_test" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/nav_test" />

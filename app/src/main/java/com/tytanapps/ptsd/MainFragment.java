@@ -201,7 +201,7 @@ public class MainFragment extends Fragment {
                             if (!phoneNumber.equals(""))
                                 ((MainActivity) getActivity()).openDialer(phoneNumber);
                             else
-                                ((MainActivity) getActivity()).showTrustedContactDialog();
+                                ((MainActivity) getActivity()).showCreateTrustedContactDialog();
                         }
                     });
                 }
@@ -235,7 +235,7 @@ public class MainFragment extends Fragment {
             trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)getActivity()).showTrustedContactDialog();
+                    ((MainActivity)getActivity()).showCreateTrustedContactDialog();
                 }
             });
 
