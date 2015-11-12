@@ -89,8 +89,8 @@ public class PTSDTestFragment extends Fragment {
     private void insertQuestions(LinearLayout questionsLinearLayout) {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
 
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
         for(int i = 0; i < questions.length; i++) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
             LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, null, false);
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
@@ -100,16 +100,31 @@ public class PTSDTestFragment extends Fragment {
         }
 
         Button submitButton = new Button(getActivity());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+
+        params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
+        submitButton.setLayoutParams(params);
+
+        submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
+
+        submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        submitButton.setTextColor(getResources().getColor(R.color.white));
+        submitButton.setTextSize(20);
         submitButton.setText(getString(R.string.submit_test));
-        submitButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 submit();
             }
         });
-        submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        submitButton.setTextColor(getResources().getColor(R.color.white));
 
         questionsLinearLayout.addView(submitButton);
     }
