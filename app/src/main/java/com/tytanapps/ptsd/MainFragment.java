@@ -141,7 +141,6 @@ public class MainFragment extends Fragment {
     }
 
 
-
     private void emotionSelected(View emotionPressed) {
         FrameLayout parentFrameLayout = (FrameLayout) getView().findViewById(R.id.recommendations_container);
 
@@ -152,9 +151,16 @@ public class MainFragment extends Fragment {
 
         RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
         TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
+
+        emotionPressed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {}
+        });
+
         switch (emotionPressed.getId()) {
+
             case R.id.happy_face:
-                emotionTextView.setText("Look at the resources to learn about possible symptoms of PTSD.");
+                emotionTextView.setText("Look at the resources to learn about possible symptoms of PTSD");
                 recommendationsLinearLayout.addView(emotionRecommendationLayout);
                 emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -162,6 +168,11 @@ public class MainFragment extends Fragment {
                         openDrawer();
                     }
                 });
+                getView().findViewById(R.id.sad_face).setVisibility(View.GONE);
+                getView().findViewById(R.id.ok_face).setVisibility(View.GONE);
+
+                animateOutEmotionPrompt();
+
                 break;
             case R.id.ok_face:
                 emotionTextView.setText("Take the PTSD test to determine if you suffer from PTSD");
@@ -172,6 +183,10 @@ public class MainFragment extends Fragment {
                         openDrawer();
                     }
                 });
+                getView().findViewById(R.id.sad_face).setVisibility(View.GONE);
+                getView().findViewById(R.id.happy_face).setVisibility(View.GONE);
+
+                animateOutEmotionPrompt();
                 break;
             case R.id.sad_face:
                 // Don't recommend calling a trusted contact if one does not exist
@@ -183,13 +198,17 @@ public class MainFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                            if(!phoneNumber.equals(""))
-                                ((MainActivity)getActivity()).openDialer(phoneNumber);
+                            if (!phoneNumber.equals(""))
+                                ((MainActivity) getActivity()).openDialer(phoneNumber);
                             else
-                                ((MainActivity)getActivity()).showTrustedContactDialog();
+                                ((MainActivity) getActivity()).showTrustedContactDialog();
                         }
                     });
                 }
+                getView().findViewById(R.id.happy_face).setVisibility(View.GONE);
+                getView().findViewById(R.id.ok_face).setVisibility(View.GONE);
+
+                animateOutEmotionPrompt();
                 break;
         }
 
@@ -227,6 +246,35 @@ public class MainFragment extends Fragment {
         animateInRecommendations(parentFrameLayout);
     }
 
+    private void animateOutEmotionPrompt() {
+        LinearLayout emotionsLinearLayout = (LinearLayout) getView().findViewById(R.id.emotions_linear_layout);
+        RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
+        p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
+        emotionsLinearLayout.setLayoutParams(p);
+
+        View promptEmotionTextview = getView().findViewById(R.id.prompt_emotion);
+        fadeOutAndRemoveView(promptEmotionTextview, 200);
+
+        TextView headerTextView = (TextView) getView().findViewById(R.id.main_header_text_view);
+        headerTextView.setText("Recommendations");
+    }
+
+    private void fadeOutAndRemoveView(final View view, int duration) {
+        // Prepare the View for the animation
+        view.setVisibility(View.VISIBLE);
+        view.setAlpha(1.0f);
+
+        // Start the animation
+        view.animate().alpha(0.0f)
+                .setDuration(duration).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(View.GONE);
+            }
+        });
+    }
+
     private void animateInRecommendations(final ViewGroup layout) {
         // Prepare the View for the animation
         layout.setVisibility(View.VISIBLE);
@@ -234,7 +282,7 @@ public class MainFragment extends Fragment {
 
         // Start the animation
         layout.animate()
-                .translationY(700).setDuration(0).setListener(new AnimatorListenerAdapter() {
+                .translationY(800).setDuration(0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -244,6 +292,8 @@ public class MainFragment extends Fragment {
                         .alpha(1.0f).setDuration(1000);
             }
         });
+
+
 
     }
 

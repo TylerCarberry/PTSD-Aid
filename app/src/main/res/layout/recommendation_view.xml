@@ -4,8 +4,7 @@
     android:id="@+id/recommendation_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginBottom="@dimen/activity_vertical_margin">
+    android:paddingBottom="@dimen/activity_vertical_margin">
 
     <ImageView
         android:id="@+id/bullet_imageview"
@@ -21,6 +20,6 @@
         android:layout_toRightOf="@id/bullet_imageview"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:text="Recommendations placeholder"
-        android:textSize="25sp"/>
+        android:textSize="27sp"/>
 
 </RelativeLayout>
