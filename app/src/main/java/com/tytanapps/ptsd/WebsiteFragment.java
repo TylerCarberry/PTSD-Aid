@@ -69,6 +69,14 @@ public class WebsiteFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_website, container, false);
 
 
+        CardView veteransChatCard = (CardView) rootView.findViewById(R.id.veterans_chat_cardview);
+        veteransChatCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBrowser("https://www.veteranscrisisline.net/ChatTermsOfService.aspx?account=Veterans%20Chat");
+            }
+        });
+
         CardView veteransQuizCard = (CardView) rootView.findViewById(R.id.veterans_quiz_cardview);
         veteransQuizCard.setOnClickListener(new View.OnClickListener() {
             @Override

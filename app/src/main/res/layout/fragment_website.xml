@@ -19,9 +19,8 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin">
 
-
             <android.support.v7.widget.CardView
-                android:id="@+id/veterans_quiz_cardview"
+                android:id="@+id/veterans_chat_cardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_vertical_margin">
@@ -32,38 +31,39 @@
                     android:padding="16dp" >
 
                     <ImageView
-                        android:id="@+id/veteran_quiz_imageview"
+                        android:id="@+id/veteran_chat_imageview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/veterans_quiz"
                         android:adjustViewBounds="true"/>
 
                     <TextView
-                        android:id="@+id/veteran_quiz_textview"
+                        android:id="@+id/veteran_chat_textview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/veteran_quiz_imageview"
+                        android:layout_below="@+id/veteran_chat_imageview"
                         android:gravity="center_horizontal"
-                        android:text="Veterans Self-Check Quiz"
+                        android:text="Veterans Crisis Line - Online Chat"
                         android:textSize="30sp" />
 
                     <TextView
-                        android:id="@+id/veteran_quiz_details"
+                        android:id="@+id/veteran_chat_details"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/veteran_quiz_textview"
-                        android:text="A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential."
+                        android:layout_below="@+id/veteran_chat_textview"
+                        android:text="Responders at the Veterans Crisis Line online chat offer help that can make a difference. It is completely confidential and responders will work with you to help you get through any personal crisis, even if that crisis does not involve thoughts of suicide. Get the support you’ve earned."
                         android:textSize="20sp"/>
 
                 </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 
+
             <android.support.v7.widget.CardView
                 android:id="@+id/nimh_cardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/veterans_quiz_cardview"
+                android:layout_below="@+id/veterans_chat_cardview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin" >
 
                 <RelativeLayout
@@ -140,10 +140,50 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/veterans_quiz_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/va_cardview"
+                android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" >
+
+                    <ImageView
+                        android:id="@+id/veteran_quiz_imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/veterans_quiz"
+                        android:adjustViewBounds="true"/>
+
+                    <TextView
+                        android:id="@+id/veteran_quiz_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_quiz_imageview"
+                        android:gravity="center_horizontal"
+                        android:text="Self-Check Quiz"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/veteran_quiz_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/veteran_quiz_textview"
+                        android:text="A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential."
+                        android:textSize="20sp"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
                 android:id="@+id/ptsd_coach_cardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/va_cardview"
+                android:layout_below="@+id/veterans_quiz_cardview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin">
 
                 <RelativeLayout
