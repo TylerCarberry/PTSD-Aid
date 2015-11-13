@@ -728,64 +728,68 @@ public class NearbyFacilitiesFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
-            TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
-            nameTextView.setText(facility.getName());
+            String name = facility.getName();
+            String description = facility.getDescription();
+            final String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
 
-            TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
-            descriptionTextView.setText(facility.getDescription());
+            if(name != null && description != null && phoneNumber != null) {
+                TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
+                nameTextView.setText(name);
 
-            View.OnClickListener callOnClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
-                    openDialer(phoneNumber);
-                }
-            };
+                TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
+                descriptionTextView.setText(description);
 
-
-            TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-            phoneTextView.setText(getFirstPhoneNumber(facility.getPhoneNumber()));
-            phoneTextView.setOnClickListener(callOnClick);
-
-            ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
-            phoneIcon.setOnClickListener(callOnClick);
-
-            View.OnClickListener mapOnClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        openMapIntent(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                View.OnClickListener callOnClick = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openDialer(phoneNumber);
                     }
-                }
-            };
+                };
 
-            TextView addressTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_address_textview);
-            addressTextView.setText(facility.getAddress());
-            addressTextView.setOnClickListener(mapOnClick);
 
-            ImageView addressIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_address_icon);
-            addressIcon.setOnClickListener(mapOnClick);
+                TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
+                phoneTextView.setText(phoneNumber);
+                phoneTextView.setOnClickListener(callOnClick);
 
-            ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-            loadFacilityImage(facilityImageView, facility);
-            facilityImageView.setOnClickListener(mapOnClick);
+                ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
+                phoneIcon.setOnClickListener(callOnClick);
 
-            View.OnClickListener websiteOnClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String url = getFirstPhoneNumber(facility.getUrl());
-                    openUrl(url);
-                }
-            };
+                View.OnClickListener mapOnClick = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            openMapIntent(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
 
-            Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
-            //moreInfoButton.setText(facility.getUrl());
-            moreInfoButton.setOnClickListener(websiteOnClick);
+                TextView addressTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_address_textview);
+                addressTextView.setText(facility.getAddress());
+                addressTextView.setOnClickListener(mapOnClick);
 
-            LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
-            parentLinearLayout.addView(cardRelativeLayout);
+                ImageView addressIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_address_icon);
+                addressIcon.setOnClickListener(mapOnClick);
+
+                ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
+                loadFacilityImage(facilityImageView, facility);
+                facilityImageView.setOnClickListener(mapOnClick);
+
+                View.OnClickListener websiteOnClick = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String url = getFirstPhoneNumber(facility.getUrl());
+                        openUrl(url);
+                    }
+                };
+
+                Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
+                moreInfoButton.setOnClickListener(websiteOnClick);
+
+                LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
+                parentLinearLayout.addView(cardRelativeLayout);
+            }
         }
     }
 
@@ -848,6 +852,9 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @return The first phone number in the string
      */
     private String getFirstPhoneNumber(String phoneNumbers) {
+        if(phoneNumbers == null)
+            return null;
+
         int orLocation = phoneNumbers.indexOf(" Or");
 
         if(orLocation >= 0)

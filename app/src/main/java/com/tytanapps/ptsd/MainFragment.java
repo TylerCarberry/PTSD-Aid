@@ -259,11 +259,12 @@ public class MainFragment extends Fragment {
         headerTextView.setText("Recommendations");
     }
 
+    /**
+     * Fade a view out and remove it once it has fully vanished
+     * @param view The view to fade out and remove
+     * @param duration The duration of the fade out in milliseconds
+     */
     private void fadeOutAndRemoveView(final View view, int duration) {
-        // Prepare the View for the animation
-        view.setVisibility(View.VISIBLE);
-        view.setAlpha(1.0f);
-
         // Start the animation
         view.animate().alpha(0.0f)
                 .setDuration(duration).setListener(new AnimatorListenerAdapter() {
@@ -275,26 +276,29 @@ public class MainFragment extends Fragment {
         });
     }
 
+    /**
+     * Animate the recommendations into the screen, fading in and sliding up
+     * from the bottom of the screen
+     * @param layout The ViewGroup containing the recommendations
+     */
     private void animateInRecommendations(final ViewGroup layout) {
         // Prepare the View for the animation
         layout.setVisibility(View.VISIBLE);
         layout.setAlpha(0.0f);
 
-        // Start the animation
+        // Make it invisible and move it to the bottom of the screen
         layout.animate()
                 .translationY(800).setDuration(0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
 
+                // Slide the view up and fade in
                 layout.animate()
                         .translationY(0)
                         .alpha(1.0f).setDuration(1000);
             }
         });
-
-
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
