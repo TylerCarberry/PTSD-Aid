@@ -113,109 +113,111 @@ public class MainFragment extends Fragment {
 
 
     private void emotionSelected(View emotionPressed) {
-        FrameLayout parentFrameLayout = (FrameLayout) getView().findViewById(R.id.recommendations_container);
+        View fragmentView = getView();
+        if(fragmentView != null) {
+            FrameLayout parentFrameLayout = (FrameLayout) fragmentView.findViewById(R.id.recommendations_container);
 
-        LinearLayout recommendationsLinearLayout = (LinearLayout) getView().findViewById(R.id.recommendations_linear_layout);
-        recommendationsLinearLayout.removeAllViews();
+            LinearLayout recommendationsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.recommendations_linear_layout);
+            recommendationsLinearLayout.removeAllViews();
 
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-        RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
-        TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
+            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+            TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
 
-        emotionPressed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
+            emotionPressed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            });
 
-        switch (emotionPressed.getId()) {
+            switch (emotionPressed.getId()) {
 
-            case R.id.happy_face:
-                emotionTextView.setText(R.string.recommendation_resources);
-                recommendationsLinearLayout.addView(emotionRecommendationLayout);
-                emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openDrawer();
-                    }
-                });
-                getView().findViewById(R.id.sad_face).setVisibility(View.GONE);
-                getView().findViewById(R.id.ok_face).setVisibility(View.GONE);
-
-                animateOutEmotionPrompt();
-
-                break;
-            case R.id.ok_face:
-                emotionTextView.setText(R.string.recommendation_test);
-                recommendationsLinearLayout.addView(emotionRecommendationLayout);
-                emotionTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openDrawer();
-                    }
-                });
-                getView().findViewById(R.id.sad_face).setVisibility(View.GONE);
-                getView().findViewById(R.id.happy_face).setVisibility(View.GONE);
-
-                animateOutEmotionPrompt();
-                break;
-            case R.id.sad_face:
-                // Don't recommend calling a trusted contact if one does not exist
-                String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                if(!trustedContactPhone.equals("")) {
-                    emotionTextView.setText(R.string.recommendation_call_trusted_contact);
+                case R.id.happy_face:
+                    emotionTextView.setText(R.string.recommendation_resources);
                     recommendationsLinearLayout.addView(emotionRecommendationLayout);
                     emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                            if (!phoneNumber.equals(""))
-                                ((MainActivity) getActivity()).openDialer(phoneNumber);
-                            else
-                                ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+                            openDrawer();
                         }
                     });
-                }
-                getView().findViewById(R.id.happy_face).setVisibility(View.GONE);
-                getView().findViewById(R.id.ok_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
 
-                animateOutEmotionPrompt();
-                break;
+                    animateOutEmotionPrompt();
+
+                    break;
+                case R.id.ok_face:
+                    emotionTextView.setText(R.string.recommendation_test);
+                    recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                    emotionTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            openDrawer();
+                        }
+                    });
+                    fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
+
+                    animateOutEmotionPrompt();
+                    break;
+                case R.id.sad_face:
+                    // Don't recommend calling a trusted contact if one does not exist
+                    String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                    if (!trustedContactPhone.equals("")) {
+                        emotionTextView.setText(R.string.recommendation_call_trusted_contact);
+                        recommendationsLinearLayout.addView(emotionRecommendationLayout);
+                        emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                                if (!phoneNumber.equals(""))
+                                    ((MainActivity) getActivity()).openDialer(phoneNumber);
+                                else
+                                    ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+                            }
+                        });
+                    }
+                    fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
+
+                    animateOutEmotionPrompt();
+                    break;
+            }
+
+            if (!isUserSignedIn()) {
+                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
+                signInTextView.setText(R.string.recommendation_sign_in);
+
+                signInRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        signIn();
+                    }
+                });
+
+                recommendationsLinearLayout.addView(signInRecommendationLayout);
+            }
+
+            String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+            if (trustedContactPhone.equals("")) {
+                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
+                trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
+                trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+                    }
+                });
+
+                recommendationsLinearLayout.addView(trustedContactRecommendationLayout);
+            }
+
+            animateInRecommendations(parentFrameLayout);
         }
-
-        if(!isUserSignedIn()) {
-            RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
-            TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
-            signInTextView.setText(R.string.recommendation_sign_in);
-
-            signInRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    signIn();
-                }
-            });
-
-            recommendationsLinearLayout.addView(signInRecommendationLayout);
-        }
-
-        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-        if(trustedContactPhone.equals("")) {
-            RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
-            TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
-            trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
-            trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((MainActivity)getActivity()).showCreateTrustedContactDialog();
-                }
-            });
-
-            recommendationsLinearLayout.addView(trustedContactRecommendationLayout);
-
-        }
-
-        animateInRecommendations(parentFrameLayout);
     }
 
     /**

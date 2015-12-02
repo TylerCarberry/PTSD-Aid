@@ -78,33 +78,8 @@
         <item>Feeling jumpy or easily startled?</item>
 
     </string-array>
+
     <string name="title_activity_settings">Settings</string>
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="nav_nearby">VA Facilities</string>
@@ -113,7 +88,7 @@
     <string name="see_professional_low">However, you still may wish to consult with a professional</string>
     <string name="result_medium">You have minimal symptoms of PTSD</string>
     <string name="see_professional_medium">You may benefit from seeking help from a professional</string>
-    <string name="result_high">Your results are consistant with many of the symptoms of PTSD</string>
+    <string name="result_high">Your results are consistent with many of the symptoms of PTSD</string>
     <string name="see_professional_high">You are advised to see your physician or a qualified mental health professional immediately for a complete assessment</string>
     <string name="va_loading_error">The VA facilities cannot be loaded</string>
     <string name="submit_test">Submit</string>
@@ -124,7 +99,7 @@
     <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
     <string name="recommendations_title">Recommendations</string>
     <string name="trusted_contact">Trusted Contact</string>
-    <string name="trusted_contact_explaination">Tap the call button anytime in the app to call your trusted contact</string>
+    <string name="trusted_contact_explanation">Tap the call button anytime in the app to call your trusted contact</string>
     <string name="emotion_prompt">How are you feeling right now?</string>
     <string name="loading">Loading</string>
     <string name="retry">Retry</string>
@@ -142,6 +117,9 @@
     <string name="self_quiz">Self-Check Quiz</string>
     <string name="ptsd_coach">PTSD Coach</string>
     <string name="ptsd_coach_details">PTSD Coach Online is for anyone who needs help with upsetting feelings. Trauma survivors, their families, or anyone coping with stress can benefit.</string>
+    <string name="results">Results</string>
+    <string name="add_trusted_contact_prompt">Would you like to add a trusted contact?</string>
+    <string name="main_header">Welcome!</string>
 
 
 </resources>

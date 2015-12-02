@@ -27,7 +27,7 @@
         android:id="@+id/explaination_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/trusted_contact_explaination"
+        android:text="@string/trusted_contact_explanation"
         android:layout_below="@+id/title_textview"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
@@ -45,6 +45,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_below="@id/explaination_textview"
         android:gravity="center_horizontal"
-        android:text="Would you like to add a trusted contact?"
+        android:text="@string/add_trusted_contact_prompt"
         android:textSize="25sp"/>
 </RelativeLayout>

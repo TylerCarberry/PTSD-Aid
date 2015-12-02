@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity
 
                 Cursor cursor = getContentResolver().query(contactUri, projection, null, null, null);
                 cursor.moveToFirst();
+                cursor.close();
 
                 int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 String phoneNumber = cursor.getString(column);

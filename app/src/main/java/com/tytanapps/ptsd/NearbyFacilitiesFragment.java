@@ -511,8 +511,11 @@ public class NearbyFacilitiesFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         v.setVisibility(View.INVISIBLE);
-                        loadingTextview.setText("Loading");
-                        loadingProgressbar.setVisibility(View.VISIBLE);
+
+                        if(loadingTextview != null)
+                            loadingTextview.setText("Loading");
+                        if(loadingProgressbar != null)
+                            loadingProgressbar.setVisibility(View.VISIBLE);
 
                         loadPTSDPrograms();
                     }
