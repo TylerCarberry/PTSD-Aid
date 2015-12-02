@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity
      * @param profilePictureUri The uri of the image to load
      */
     private void loadProfilePicture(final ImageView imageView, Uri profilePictureUri) {
+        if(profilePictureUri == null || imageView == null)
+            return;
+
         String url = profilePictureUri.toString();
 
         // Retrieves an image specified by the URL, displays it in the UI.
