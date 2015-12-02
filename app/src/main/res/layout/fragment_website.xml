@@ -43,7 +43,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veteran_chat_imageview"
                         android:gravity="center_horizontal"
-                        android:text="Veterans Crisis Line - Online Chat"
+                        android:text="@string/veterans_chat_title"
                         android:textSize="30sp" />
 
                     <TextView
@@ -51,7 +51,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veteran_chat_textview"
-                        android:text="Responders at the Veterans Crisis Line online chat offer help that can make a difference. It is completely confidential and responders will work with you to help you get through any personal crisis, even if that crisis does not involve thoughts of suicide. Get the support you’ve earned."
+                        android:text="@string/veterans_chat_details"
                         android:textSize="20sp"/>
 
                 </RelativeLayout>
@@ -84,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/nimh_imageview"
                         android:gravity="center_horizontal"
-                        android:text="National Institute of Mental Heath"
+                        android:text="@string/nimh_title"
                         android:textSize="30sp" />
 
                     <TextView
@@ -92,7 +92,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/nimh_textview"
-                        android:text="Find more information about Post Traumatic Stress Disorder."
+                        android:text="@string/nimh_details"
                         android:textSize="20sp"/>
 
                 </RelativeLayout>
@@ -124,7 +124,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/va_imageview"
                         android:gravity="center_horizontal"
-                        android:text="Veterans Affairs"
+                        android:text="@string/veterans_affairs"
                         android:textSize="30sp" />
 
                     <TextView
@@ -132,7 +132,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/va_textview"
-                        android:text="Find more information about PTSD from the Department of Veterans Affairs"
+                        android:text="@string/veteran_affairs_details"
                         android:textSize="20sp"/>
 
                 </RelativeLayout>
@@ -164,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veteran_quiz_imageview"
                         android:gravity="center_horizontal"
-                        android:text="Self-Check Quiz"
+                        android:text="@string/self_quiz"
                         android:textSize="30sp" />
 
                     <TextView
@@ -172,7 +172,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/veteran_quiz_textview"
-                        android:text="A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential."
+                        android:text="@string/quiz_details"
                         android:textSize="20sp"/>
 
                 </RelativeLayout>
@@ -204,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/ptsd_coach_imageview"
                         android:gravity="center_horizontal"
-                        android:text="PTSD Coach"
+                        android:text="@string/ptsd_coach"
                         android:textSize="30sp" />
 
                     <TextView
@@ -212,7 +212,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/ptsd_coach_textview"
-                        android:text="PTSD Coach Online is for anyone who needs help with upsetting feelings. Trauma survivors, their families, or anyone coping with stress can benefit."
+                        android:text="@string/ptsd_coach_details"
                         android:textSize="20sp"/>
 
                 </RelativeLayout>

@@ -24,7 +24,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="25sp"
-        android:text="Loading"/>
+        android:text="@string/loading"/>
 
     <Button
         android:id="@+id/retry_load_button"
@@ -33,7 +33,7 @@
         android:theme="@style/button"
         android:layout_below="@id/facility_loading_textview"
         android:layout_centerHorizontal="true"
-        android:text="Retry"
+        android:text="@string/retry"
         android:visibility="invisible"/>
 
     <ScrollView

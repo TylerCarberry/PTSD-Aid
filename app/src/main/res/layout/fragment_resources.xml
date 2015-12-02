@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="Symptoms" />
+                android:text="@string/symptoms" />
 
             <TextView
                 android:id="@+id/symptoms_textview"
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/symptoms_textview"
                 android:layout_centerHorizontal="true"
-                android:text="Causes"/>
+                android:text="@string/causes"/>
 
             <TextView
                 android:id="@+id/causes_textview"
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/causes_textview"
                 android:layout_centerHorizontal="true"
-                android:text="Diagnosis"/>
+                android:text="@string/diagnosis"/>
 
             <TextView
                 android:id="@+id/diagnosis_textview"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/diagnosis_textview"
                 android:layout_centerHorizontal="true"
-                android:text="Treatment"/>
+                android:text="@string/treatment"/>
 
             <TextView
                 android:id="@+id/treatment_textview"
@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/treatment_textview"
                 android:layout_centerHorizontal="true"
-                android:text="Counseling"/>
+                android:text="@string/counseling"/>
 
             <TextView
                 android:id="@+id/counseling_textview"

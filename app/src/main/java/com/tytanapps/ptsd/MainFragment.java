@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,38 +25,11 @@ import android.widget.TextView;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MainFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class MainFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MainFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MainFragment newInstance(String param1, String param2) {
-        MainFragment fragment = new MainFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     public MainFragment() {
         // Required empty public constructor
@@ -63,11 +37,8 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -76,26 +47,16 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        rootView.findViewById(R.id.happy_face).setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener emotionSelectedListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 emotionSelected(v);
             }
-        });
+        };
 
-        rootView.findViewById(R.id.ok_face).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emotionSelected(v);
-            }
-        });
-
-        rootView.findViewById(R.id.sad_face).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emotionSelected(v);
-            }
-        });
+        rootView.findViewById(R.id.happy_face).setOnClickListener(emotionSelectedListener);
+        rootView.findViewById(R.id.ok_face).setOnClickListener(emotionSelectedListener);
+        rootView.findViewById(R.id.sad_face).setOnClickListener(emotionSelectedListener);
 
         return rootView;
     }
@@ -111,12 +72,21 @@ public class MainFragment extends Fragment {
 
         // Hide the sign in button if the user is already signed in
         if(isUserSignedIn()) {
-            View signInButton = getView().findViewById(R.id.button_sign_in);
-            if(signInButton != null)
-                signInButton.setVisibility(View.INVISIBLE);
+            View fragmentView = getView();
+            if(fragmentView != null) {
+                View signInButton = fragmentView.findViewById(R.id.button_sign_in);
+                if (signInButton != null)
+                    signInButton.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
+    /**
+     * Get a shared preference String from a saved file
+     * @param prefKey The key of the String
+     * @param defaultValue The default value if no key exists
+     * @return The shared preference String with the given key
+     */
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
@@ -126,6 +96,7 @@ public class MainFragment extends Fragment {
      * Sign in to the user's Google Account
      */
     private void signIn() {
+        Log.d(LOG_TAG, "signIn() called with: " + "");
         Activity parentActivity = getActivity();
         if(parentActivity instanceof MainActivity)
             ((MainActivity) getActivity()).signIn();
@@ -154,13 +125,14 @@ public class MainFragment extends Fragment {
 
         emotionPressed.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+            }
         });
 
         switch (emotionPressed.getId()) {
 
             case R.id.happy_face:
-                emotionTextView.setText("Look at the resources to learn about possible symptoms of PTSD");
+                emotionTextView.setText(R.string.recommendation_resources);
                 recommendationsLinearLayout.addView(emotionRecommendationLayout);
                 emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -175,7 +147,7 @@ public class MainFragment extends Fragment {
 
                 break;
             case R.id.ok_face:
-                emotionTextView.setText("Take the PTSD test to determine if you suffer from PTSD");
+                emotionTextView.setText(R.string.recommendation_test);
                 recommendationsLinearLayout.addView(emotionRecommendationLayout);
                 emotionTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -192,7 +164,7 @@ public class MainFragment extends Fragment {
                 // Don't recommend calling a trusted contact if one does not exist
                 String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if(!trustedContactPhone.equals("")) {
-                    emotionTextView.setText("Consider calling your trusted contact");
+                    emotionTextView.setText(R.string.recommendation_call_trusted_contact);
                     recommendationsLinearLayout.addView(emotionRecommendationLayout);
                     emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -215,7 +187,7 @@ public class MainFragment extends Fragment {
         if(!isUserSignedIn()) {
             RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
             TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
-            signInTextView.setText("Sign In");
+            signInTextView.setText(R.string.recommendation_sign_in);
 
             signInRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -231,7 +203,7 @@ public class MainFragment extends Fragment {
         if(trustedContactPhone.equals("")) {
             RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
             TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
-            trustedContactTextView.setText("Add a trusted contact");
+            trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
             trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -246,17 +218,24 @@ public class MainFragment extends Fragment {
         animateInRecommendations(parentFrameLayout);
     }
 
+    /**
+     * Fade out the view asking the user how they are feeling
+     */
     private void animateOutEmotionPrompt() {
-        LinearLayout emotionsLinearLayout = (LinearLayout) getView().findViewById(R.id.emotions_linear_layout);
-        RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
-        p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
-        emotionsLinearLayout.setLayoutParams(p);
+        View fragmentView = getView();
+        if(fragmentView != null) {
 
-        View promptEmotionTextview = getView().findViewById(R.id.prompt_emotion);
-        fadeOutAndRemoveView(promptEmotionTextview, 200);
+            LinearLayout emotionsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.emotions_linear_layout);
+            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
+            p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
+            emotionsLinearLayout.setLayoutParams(p);
 
-        TextView headerTextView = (TextView) getView().findViewById(R.id.main_header_text_view);
-        headerTextView.setText("Recommendations");
+            View promptEmotionTextView = fragmentView.findViewById(R.id.prompt_emotion);
+            fadeOutAndRemoveView(promptEmotionTextView, 200);
+
+            TextView headerTextView = (TextView) fragmentView.findViewById(R.id.main_header_text_view);
+            headerTextView.setText(R.string.recommendations_title);
+        }
     }
 
     /**
@@ -301,7 +280,6 @@ public class MainFragment extends Fragment {
         });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

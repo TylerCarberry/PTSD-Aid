@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -359,7 +358,7 @@ public class MainActivity extends AppCompatActivity
      * Read a shared preference string from memory
      * @param prefKey The key of the shared preference
      * @param defaultValue The value to return if the key does not exist
-     * @return
+     * @return The shared preference with the given key
      */
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
@@ -391,6 +390,8 @@ public class MainActivity extends AppCompatActivity
      * @return The contact's name
      */
     public String getContactName(String phoneNumber) {
+        Log.d(LOG_TAG, "getContactName() called with: " + "phoneNumber = [" + phoneNumber + "]");
+
         ContentResolver cr = getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
@@ -406,6 +407,7 @@ public class MainActivity extends AppCompatActivity
             cursor.close();
         }
 
+        Log.d(LOG_TAG, "getContactName() returned: " + contactName);
         return contactName;
     }
 
@@ -418,7 +420,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onStart() {
-        //Log.d(LOG_TAG, "onStart");
+        Log.d(LOG_TAG, "onStart() called with: " + "");
 
         super.onStart();
 
@@ -434,7 +436,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onStop() {
-        //Log.d(LOG_TAG, "onStop");
+        Log.d(LOG_TAG, "onStop() called with: " + "");
 
         AlarmService alarmService = new AlarmService(getBaseContext());
         alarmService.startAlarm(24);
@@ -453,13 +455,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -469,6 +464,10 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Get the request queue. Creates it if it has not yet been instantiated
+     * @return The request queue for connecting with an API
+     */
     protected RequestQueue getRequestQueue() {
         if(requestQueue == null)
             instantiateRequestQueue();
@@ -493,13 +492,14 @@ public class MainActivity extends AppCompatActivity
         requestQueue.start();
     }
 
+    /**
+     * Switch the fragment when a navigation item in the navigation pane is selected
+     */
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
         Fragment newFragment = null;
 
+        int id = item.getItemId();
         switch(id) {
             case R.id.nav_simple_test:
                 newFragment = new MainFragment();
