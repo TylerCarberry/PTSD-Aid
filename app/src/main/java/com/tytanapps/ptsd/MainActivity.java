@@ -164,19 +164,22 @@ public class MainActivity extends AppCompatActivity
                 String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
 
                 Cursor cursor = getContentResolver().query(contactUri, projection, null, null, null);
-                cursor.moveToFirst();
-                cursor.close();
+                if (cursor != null) {
+                    cursor.moveToFirst();
 
-                int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                String phoneNumber = cursor.getString(column);
+                    int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                    String phoneNumber = cursor.getString(column);
 
-                String name = getContactName(phoneNumber);
+                    cursor.close();
 
-                saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
-                saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
+                    String name = getContactName(phoneNumber);
 
-                Log.d(LOG_TAG, "NAME: " + name);
-                Log.d(LOG_TAG, "PHONENUMBER: " + phoneNumber);
+                    saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
+                    saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
+
+                    Log.d(LOG_TAG, "Requested contact changed: NAME: " + name + " PHONENUMBER: " + phoneNumber);
+
+                }
             }
         }
     }
