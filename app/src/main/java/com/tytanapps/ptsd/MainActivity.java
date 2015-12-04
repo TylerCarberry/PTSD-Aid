@@ -541,6 +541,16 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Purposely crash the app to test debugging
+     */
+    /*
+    private void crashApp() {
+        int[] numbers = {1,2,3};
+        int crash = numbers[5];
+    }
+    */
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
