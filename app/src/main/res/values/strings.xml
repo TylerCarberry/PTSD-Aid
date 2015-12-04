@@ -48,12 +48,12 @@
 
 
 
-    <string name="symptoms">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoing situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
-    <string name="causes">Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
-    <string name="diagnosis">This app is for reference only. For a complete diagnosis, please visit a mental health professional.</string>
-    <string name="treatment">There are two main types of treatment, psychotherapy and medication.\n\n1.  Psychotherapy (or counseling) includes Cognitive Behavioral Therapy (CBT). Some of the types of CBT are Cognitive Processing Therapy (CPT) where you learn skills to understand how the trauma changed your thoughts and thinking, then change the negative thoguht patters. There is also Prolonged Exposure Therapy (PE) which is the repeated imgainal and real-world exposure to the trauma until it is no longer upsetting.\n\n2. Medications, Selective Serotonin Reuptake Inhibitor (SSRI) is showing to be effective for PTSD. Some people seek treatments that do not involve medications because of the side effects.</string>
-    <string name="counseling">The Vet Centers provides bereavement, miulitary sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center visit http://www.vetcenter.va.gov/index.asp.</string>
-    <string name="self_help">The National Center for PTSD-Veterans Affairs offers additional information on PTSD,  treatment options and self-help for coping with PTSD.  http://www.ptsd.va.gov/public/index.asp Make the Connection.net is the Department of Veteran Affairs\' public awareness capaign that  provides testimonials on the signs, treatment and steps to take if you have PTSD. http://maketheconnection.net/conditions/ptsd</string>
+    <string name="symptoms_detail">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
+    <string name="causes_detail">Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
+    <string name="diagnosis_detail">This app is for reference only. For a complete diagnosis, please visit a mental health professional.</string>
+    <string name="treatment_detail">There are two main types of treatment, psychotherapy and medication.\n\n1.  Psychotherapy (or counseling) includes Cognitive Behavioral Therapy (CBT). Some of the types of CBT are Cognitive Processing Therapy (CPT) where you learn skills to understand how the trauma changed your thoughts and thinking, then change the negative thought patters. There is also Prolonged Exposure Therapy (PE) which is the repeated imaginal and real-world exposure to the trauma until it is no longer upsetting.\n\n2. Medications, Selective Serotonin Reuptake Inhibitor (SSRI) is also effective for PTSD. Some people seek treatments that do not involve medications because of the side effects.</string>
+    <string name="counseling_detail">The Vet Centers provides bereavement, military sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center use the VA Facilities tab</string>
+    <string name="self_help_detail">The National Center for PTSD-Veterans Affairs offers additional information on PTSD,  treatment options and self-help for coping with PTSD.  http://www.ptsd.va.gov/public/index.asp Make the Connection.net is the Department of Veteran Affairs\' public awareness campaign that  provides testimonials on the signs, treatment and steps to take if you have PTSD. http://maketheconnection.net/conditions/ptsd</string>
 
     <string name="alarm_service_label">Alarm Service Label</string>
 
@@ -120,6 +120,11 @@
     <string name="results">Results</string>
     <string name="add_trusted_contact_prompt">Would you like to add a trusted contact?</string>
     <string name="main_header">Welcome!</string>
+    <string name="symptoms">Symptoms</string>
+    <string name="causes">Causes</string>
+    <string name="diagnosis">Diagnosis</string>
+    <string name="treatment">Treatment</string>
+    <string name="counseling">Counseling</string>
 
 
 </resources>

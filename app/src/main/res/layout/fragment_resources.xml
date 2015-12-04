@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/symptoms_title_textview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="@string/symptoms"/>
+                android:text="@string/symptoms_detail"/>
 
             <TextView
                 android:id="@+id/causes_title_textview"
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/causes_title_textview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="@string/causes"/>
+                android:text="@string/causes_detail"/>
 
             <TextView
                 android:id="@+id/diagnosis_title_textview"
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/diagnosis_title_textview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="@string/diagnosis"/>
+                android:text="@string/diagnosis_detail"/>
 
             <TextView
                 android:id="@+id/treatment_title_textview"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/treatment_title_textview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="@string/treatment"/>
+                android:text="@string/treatment_detail"/>
 
             <TextView
                 android:id="@+id/counseling_title_textview"
@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/counseling_title_textview"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="@string/counseling"/>
+                android:text="@string/counseling_detail"/>
 
         </RelativeLayout>
 
