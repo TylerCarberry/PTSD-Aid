@@ -544,12 +544,9 @@ public class MainActivity extends AppCompatActivity
     /**
      * Purposely crash the app to test debugging
      */
-    /*
     private void crashApp() {
-        int[] numbers = {1,2,3};
-        int crash = numbers[5];
+        throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
-    */
 
     @Override
     public void onFragmentInteraction(Uri uri) {
