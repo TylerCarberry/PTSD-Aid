@@ -30,7 +30,7 @@ public class WebsiteFragment extends Fragment {
         veteransChatCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser("https://www.veteranscrisisline.net/ChatTermsOfService.aspx?account=Veterans%20Chat");
+                openBrowser(getString(R.string.website_chat));
             }
         });
 
@@ -38,7 +38,7 @@ public class WebsiteFragment extends Fragment {
         veteransQuizCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser("https://www.vetselfcheck.org/Welcome.cfm");
+                openBrowser(getString(R.string.website_self_check));
             }
         });
 
@@ -46,7 +46,7 @@ public class WebsiteFragment extends Fragment {
         nimhCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser("http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml");
+                openBrowser(getString(R.string.website_nimh));
             }
         });
 
@@ -54,7 +54,7 @@ public class WebsiteFragment extends Fragment {
         vaCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser("http://www.ptsd.va.gov/public/index.asp");
+                openBrowser(getString(R.string.website_va));
             }
         });
 
@@ -62,7 +62,7 @@ public class WebsiteFragment extends Fragment {
         ptsdCoachCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser("http://www.ptsd.va.gov/apps/ptsdcoachonline/default.htm");
+                openBrowser(getString(R.string.website_coach));
             }
         });
 

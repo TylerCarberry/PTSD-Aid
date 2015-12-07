@@ -102,13 +102,13 @@ public class PTSDTestFragment extends Fragment {
      */
     private void showResults(int score) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setPositiveButton("Find Professional", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.find_professional, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 findProfessional();
             }
         });
-        alertDialogBuilder.setNegativeButton("Share Results", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton(R.string.share_results, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 shareResults();
