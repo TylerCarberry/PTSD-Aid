@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by Tyler on 11/7/15.
+ * A collection of methods that do not apply to a specific fragment
  */
 public class Utilities {
 

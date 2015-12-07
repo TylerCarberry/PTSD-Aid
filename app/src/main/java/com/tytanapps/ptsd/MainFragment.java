@@ -20,7 +20,8 @@ import android.widget.TextView;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * The main fragment displayed when you launch the app. Prompts the user for their emotion
+ * and gives them recommendations based on their answer.
  */
 public class MainFragment extends Fragment {
 

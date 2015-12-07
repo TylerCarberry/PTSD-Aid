@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Tyler on 11/5/15.
+ * A facility is a VA facility that offers PTSD programs
  */
 public class Facility implements Comparable<Facility>, Serializable {
 
@@ -157,6 +157,12 @@ public class Facility implements Comparable<Facility>, Serializable {
         return programs;
     }
 
+    /**
+     * Compare two facilities by distance to the user
+     * @param another The other facility to compare to
+     * @return A positive number is the facility is closer than the parameter.
+     *         Negative if it is farther away. 0 if they have the same distance
+     */
     @Override
     public int compareTo(Facility another) {
         if(getDistance() < another.getDistance())

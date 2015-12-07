@@ -17,7 +17,9 @@ import android.widget.TextView;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A short multiple choice quiz to determine if you suffer from PTSD. Based on the results, gives
+ * you recommendations on what to do next. Find a professional is always a recommendation even if
+ * the user shows no signs of PTSD.
  */
 public class PTSDTestFragment extends Fragment {
 

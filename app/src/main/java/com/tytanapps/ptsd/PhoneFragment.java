@@ -11,7 +11,8 @@ import android.view.ViewGroup;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
+ * the phone number to call. Tapping on the hotline calls them.
  */
 public class PhoneFragment extends Fragment {
 

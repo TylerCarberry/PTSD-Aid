@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Shows information about PTSD. Gives symptoms, causes, and treatment for PTSD.
  */
 public class ResourcesFragment extends Fragment {
 

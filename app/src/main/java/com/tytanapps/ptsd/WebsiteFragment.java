@@ -11,7 +11,8 @@ import android.view.ViewGroup;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays a list of websites to find more information about PTSD. Shows a brief description for
+ * each website. Tapping on the card opens the website.
  */
 public class WebsiteFragment extends Fragment {
 

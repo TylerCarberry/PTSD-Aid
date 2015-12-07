@@ -10,7 +10,7 @@ import java.io.Writer;
 import java.util.Collection;
 
 /**
- * Created by Tyler on 12/4/15.
+ * Used by Google Analytics to submit the full stack trace with any crashes
  */
 public class AnalyticsExceptionParser extends StandardExceptionParser {
 

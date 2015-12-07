@@ -45,7 +45,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Loads a list of nearby VA facilities that offer PTSD programs.
+ * Displays the address, phone number, programs, and an image for each facility.
+ * You can call them, get directions, or load the website for each VA facility.
  */
 public class NearbyFacilitiesFragment extends Fragment {
 

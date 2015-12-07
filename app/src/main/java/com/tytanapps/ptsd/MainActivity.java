@@ -47,6 +47,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
+/**
+ * The only activity in the app. Each screen of the app is a fragment. The user can switch
+ * between them using the navigation view.
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener{
 
@@ -55,8 +59,7 @@ public class MainActivity extends AppCompatActivity
     private static GoogleApiClient mGoogleApiClient;
     private boolean isUserSignedIn = false;
 
-    // The header image on top of the navigation view containing the user's information.
-    // You cannot modify
+    // The header image on top of the navigation view containing the user's information
     private ViewGroup navHeader;
 
     // The request queue used to connect with APIs in the background
