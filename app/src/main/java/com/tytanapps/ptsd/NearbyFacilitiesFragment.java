@@ -54,22 +54,10 @@ import java.util.Set;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NearbyFacilitiesFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class NearbyFacilitiesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     private static final String LOG_TAG = NearbyFacilitiesFragment.class.getSimpleName();
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
 
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
@@ -80,46 +68,21 @@ public class NearbyFacilitiesFragment extends Fragment {
     private int numberOfLoadedFacilities = 0;
 
     // The number of facilities to display on screen
-    private static final int FACILITIES_TO_SHOW = 15;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NearbyFacilitiesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NearbyFacilitiesFragment newInstance(String param1, String param2) {
-        NearbyFacilitiesFragment fragment = new NearbyFacilitiesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private static final int FACILITIES_TO_DISPLAY = 15;
 
     public NearbyFacilitiesFragment() {
 
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
     }
 
+    /**
+     * When the fragment becomes visible, start loading the VA facilities
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -130,12 +93,12 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
-     * Load all PTSD programs and the facility id where they are located. There are multiple
-     * PTSD programs per facility
+     * Load all PTSD programs and the facility id where they are located.
+     * There are multiple PTSD programs per VA facility.
      */
-    public void loadPTSDPrograms() {
-        String url = "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
-                + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
+    private void loadPTSDPrograms() {
+
+        String url = calculateVaAPIUrl();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -172,9 +135,8 @@ public class NearbyFacilitiesFragment extends Fragment {
                         // There are multiple programs at the same facility.
                         // Combine them if necessary.
                         Facility facility;
-                        if(knownFacilities.containsKey(facilityID)) {
+                        if(knownFacilities.containsKey(facilityID))
                             facility = knownFacilities.get(facilityID);
-                        }
                         else
                             facility = new Facility(facilityID);
 
@@ -191,7 +153,8 @@ public class NearbyFacilitiesFragment extends Fragment {
                     for (int facilityId : knownFacilities.keySet()) {
                         Facility facility = knownFacilities.get(facilityId);
 
-                        Facility cachedFacility = readFacility(facilityId);
+                        // Try to load the facility from cache
+                        Facility cachedFacility = readCachedFacility(facilityId);
                         if(cachedFacility != null) {
                             facility = cachedFacility;
                             knownFacilities.put(facilityId, facility);
@@ -201,12 +164,11 @@ public class NearbyFacilitiesFragment extends Fragment {
                             if(numberOfLoadedFacilities == knownFacilities.size())
                                 allFacilitiesHaveLoaded();
                         }
+                        // Load the facility using the api
                         else
                             loadFacility(facility, knownFacilities.size());
                     }
                 }
-
-                //Toast.makeText(getActivity(), "DEBUG: Known facilities: " + knownFacilities.size(), Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -228,7 +190,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             requestQueue.add(stringRequest);
         else
             errorLoadingResults();
-
     }
 
     /**
@@ -236,7 +197,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility to load, must contain an id. The results of the load are placed into it
      * @param numberOfFacilities The number of facilities that are being loaded
      */
-    public void loadFacility(final Facility facility, final int numberOfFacilities) {
+    private void loadFacility(final Facility facility, final int numberOfFacilities) {
         String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
                 + facility.getFacilityId() + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
 
@@ -301,7 +262,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
                     numberOfLoadedFacilities++;
 
-                    Log.d(LOG_TAG, "Progress: " + numberOfLoadedFacilities + " / " + numberOfFacilities);
+                    //Log.d(LOG_TAG, "Progress: " + numberOfLoadedFacilities + " / " + numberOfFacilities);
 
                     // When all facilities have loaded, sort them by distance and show them to the user
                     if(numberOfLoadedFacilities == numberOfFacilities)
@@ -372,7 +333,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
         // If the street view url cannot be created, load the map view instead
         try {
-            url = calculateStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
+            url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
             loadMapImage(imageView, facility);
             return;
@@ -408,7 +369,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             requestQueue.add(request);
     }
 
-
     /**
      * Load the Google Maps imagery for the given address.
      * If there is no map imagery, it uses the default image instead.
@@ -417,13 +377,13 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility
      */
     private void loadMapImage(final ImageView imageView, final Facility facility) {
-        //Log.d(LOG_TAG, "Entering load map image.");
+        //Log.d(LOG_TAG, "loadMapImage() called with: " + "imageView = [" + imageView + "], facility = [" + facility + "]");
 
         final int defaultImageId = R.drawable.default_facility_image;
 
         String url;
         try {
-            url = calculateMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
+            url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             imageView.setImageResource(defaultImageId);
@@ -437,15 +397,13 @@ public class NearbyFacilitiesFragment extends Fragment {
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
-                        //Log.d(LOG_TAG, "IMAGE onResponse");
-
                         imageView.setImageBitmap(bitmap);
                         saveFacilityImage(bitmap, facility.getFacilityId());
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        Log.d(LOG_TAG, "IMAGE errorListener");
+                        Log.d(LOG_TAG, "IMAGE errorListener " + error.toString());
                         imageView.setImageResource(defaultImageId);
                     }
                 });
@@ -460,39 +418,33 @@ public class NearbyFacilitiesFragment extends Fragment {
      * When all of the facilities have fully loaded, sort them by distance and display them to the user
      */
     private void allFacilitiesHaveLoaded() {
-
         if(knownFacilities.size() == 0) {
             errorLoadingResults();
             return;
         }
 
-        // Remove the loading bar
-        View rootView = getView();
-        if(rootView != null) {
-            View loadingTextview = rootView.findViewById(R.id.facility_loading_textview);
-            if (loadingTextview != null)
-                loadingTextview.setVisibility(View.GONE);
-
-            View loadingProgressbar = rootView.findViewById(R.id.facility_progressbar);
-            if (loadingProgressbar != null)
-                loadingProgressbar.setVisibility(View.GONE);
-        }
-
-
-        ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
+        hideLoadingBar();
 
         // Sort the facilities by distance
+        ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
         Collections.sort(facilities);
 
-        for(int i = 0; i < FACILITIES_TO_SHOW; i++)
+        // Display the facilities
+        for(int i = 0; i < FACILITIES_TO_DISPLAY; i++)
             addFacilityCard(facilities.get(i));
-
     }
 
+    /**
+     * There was an error loading the VA facilities. Display the default error message
+     */
     private void errorLoadingResults() {
         errorLoadingResults(getString(R.string.va_loading_error));
     }
 
+    /**
+     * There was an error loading the VA facilities. Display a message and a retry button.
+     * @param errorMessage The message to show to the user
+     */
     private void errorLoadingResults(String errorMessage) {
         View rootView = getView();
         if(rootView != null) {
@@ -513,7 +465,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         v.setVisibility(View.INVISIBLE);
 
                         if(loadingTextview != null)
-                            loadingTextview.setText("Loading");
+                            loadingTextview.setText(R.string.loading);
                         if(loadingProgressbar != null)
                             loadingProgressbar.setVisibility(View.VISIBLE);
 
@@ -525,9 +477,28 @@ public class NearbyFacilitiesFragment extends Fragment {
         }
     }
 
+    /**
+     * Remove the loading progress bar and TextView
+     */
+    private void hideLoadingBar() {
+        View rootView = getView();
+        if(rootView != null) {
+            View loadingTextview = rootView.findViewById(R.id.facility_loading_textview);
+            if (loadingTextview != null)
+                loadingTextview.setVisibility(View.GONE);
+
+            View loadingProgressbar = rootView.findViewById(R.id.facility_progressbar);
+            if (loadingProgressbar != null)
+                loadingProgressbar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Save the facility to a file instead of loading every time
+     * @param facility The facility to cache
+     */
     private void cacheFacility(Facility facility) {
         File file = getFacilityFile(facility.getFacilityId());
-
         ObjectOutput out;
 
         try {
@@ -539,10 +510,14 @@ public class NearbyFacilitiesFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    private Facility readFacility(int facilityId){
+    /**
+     * Load the facility from the saved file
+     * @param facilityId The id of the facility
+     * @return The facility with the given id. Null if the facility is not saved
+     */
+    private Facility readCachedFacility(int facilityId) {
         ObjectInputStream input;
         File file = getFacilityFile(facilityId);
 
@@ -573,10 +548,11 @@ public class NearbyFacilitiesFragment extends Fragment {
             facility.setDescription(description);
 
             input.close();
+        } catch (FileNotFoundException e) {
+            // If the file was not found, nothing is wrong.
+            // It just means that the facility has not yet been cached.
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            //e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -584,7 +560,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         }
 
         return facility;
-
     }
 
     /**
@@ -673,14 +648,14 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateStreetViewUrl(String address, String town, String state) throws UnsupportedEncodingException {
-        String url = "https://maps.googleapis.com/maps/api/streetview?size="+MAP_IMAGEVIEW_WIDTH+"x"+MAP_IMAGEVIEW_HEIGHT+"&location=";
+    private String calculateStreetViewAPIUrl(String address, String town, String state) throws UnsupportedEncodingException {
+        String url = "https://maps.googleapis.com/maps/api/streetview?size=" +
+                MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT + "&location=";
 
         // Encode the address
         String params = address + ", " + town + ", " + state;
         return url + URLEncoder.encode(params, "UTF-8");
     }
-
 
     /**
      * Get the url for the Google Maps Api
@@ -690,7 +665,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateMapUrl(String address, String town, String state) throws UnsupportedEncodingException {
+    private String calculateMapAPIUrl(String address, String town, String state) throws UnsupportedEncodingException {
         String url = "http://maps.google.com/maps/api/staticmap?center=";
 
         // Encode the address
@@ -702,6 +677,15 @@ public class NearbyFacilitiesFragment extends Fragment {
                 + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
 
         return url;
+    }
+
+    /**
+     * Get the url for the PTSD Programs API
+     * @return The url for the PTSD Programs API
+     */
+    private String calculateVaAPIUrl() {
+        return "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
+                + getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
     }
 
     /**
@@ -731,10 +715,12 @@ public class NearbyFacilitiesFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
 
+            // Get the information from the facility
             String name = facility.getName();
             String description = facility.getDescription();
             final String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
 
+            // If the facility does not have all of its information, do not show it
             if(name != null && description != null && phoneNumber != null) {
                 TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
                 nameTextView.setText(name);
@@ -748,7 +734,6 @@ public class NearbyFacilitiesFragment extends Fragment {
                         openDialer(phoneNumber);
                     }
                 };
-
 
                 TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
                 phoneTextView.setText(phoneNumber);
@@ -779,17 +764,17 @@ public class NearbyFacilitiesFragment extends Fragment {
                 loadFacilityImage(facilityImageView, facility);
                 facilityImageView.setOnClickListener(mapOnClick);
 
-                View.OnClickListener websiteOnClick = new View.OnClickListener() {
+                // Tapping the more info button opens the website
+                Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
+                moreInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         String url = getFirstPhoneNumber(facility.getUrl());
                         openUrl(url);
                     }
-                };
+                });
 
-                Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
-                moreInfoButton.setOnClickListener(websiteOnClick);
-
+                // Add the facility card to the list
                 LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
                 parentLinearLayout.addView(cardRelativeLayout);
             }
@@ -800,7 +785,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * Open the maps app to a specified location
      * @param geoLocation The uri of the location to open
      */
-    public void openMapIntent(Uri geoLocation) {
+    private void openMapIntent(Uri geoLocation) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -872,19 +857,20 @@ public class NearbyFacilitiesFragment extends Fragment {
     private double[] getGPSLocation() {
         double[] gps = new double[2];
 
-        LocationManager lm = (LocationManager) getActivity().getSystemService(
-                Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         List<String> providers = lm.getProviders(true);
 
         Location l = null;
 
-        for (int i = providers.size()-1; i >= 0; i--) {
+        // Try getting the location from each of the location providers
+        for (int i = providers.size() - 1; i >= 0; i--) {
             try {
                 l = lm.getLastKnownLocation(providers.get(i));
             } catch (SecurityException e) {
                 // The user has blocked location
             }
-            if (l != null) break;
+            if (l != null)
+                break;
         }
 
         if (l != null) {
@@ -892,30 +878,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             gps[1] = l.getLongitude();
         }
         return gps;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
 }
