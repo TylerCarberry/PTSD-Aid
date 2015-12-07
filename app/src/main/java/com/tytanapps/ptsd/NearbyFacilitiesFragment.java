@@ -2,12 +2,8 @@ package com.tytanapps.ptsd;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,7 +42,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -120,7 +115,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         return;
                     }
 
-                    double userLocation[] = getGPSLocation();
+                    double userLocation[] = Utilities.getGPSLocation(getActivity());
                     if(userLocation[0] == 0 && userLocation[1] == 0) {
                         errorLoadingResults("Your GPS location cannot be determined");
                         return;
@@ -231,7 +226,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                     String url = (String) locationJson.get("FANDL_URL");
                     url = url.replace("vaww", "www");
 
-                    double userLocation[] = getGPSLocation();
+                    double userLocation[] = Utilities.getGPSLocation(getActivity());
                     double distance = 0;
 
                     // The description contains the distance and all PTSD programs located there
@@ -527,7 +522,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             input = new ObjectInputStream(new FileInputStream(file));
             facility = (Facility) input.readObject();
 
-            double userLocation[] = getGPSLocation();
+            double userLocation[] = Utilities.getGPSLocation(getActivity());
             double distance = 0;
 
             String description = "";
@@ -570,22 +565,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private void saveFacilityImage(Bitmap bitmap, int facilityId) {
         File file = getFacilityImageFile(facilityId);
-
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Utilities.saveBitmapToFile(file, bitmap);
     }
 
     /**
@@ -595,10 +575,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private Bitmap loadCacheFacilityImage(int facilityId) {
         File file = getFacilityImageFile(facilityId);
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        return Utilities.loadBitmapFromFile(file);
     }
 
     /**
@@ -718,7 +695,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             // Get the information from the facility
             String name = facility.getName();
             String description = facility.getDescription();
-            final String phoneNumber = getFirstPhoneNumber(facility.getPhoneNumber());
+            final String phoneNumber = Utilities.getFirstPhoneNumber(facility.getPhoneNumber());
 
             // If the facility does not have all of its information, do not show it
             if(name != null && description != null && phoneNumber != null) {
@@ -769,7 +746,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 moreInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = getFirstPhoneNumber(facility.getUrl());
+                        String url = Utilities.getFirstPhoneNumber(facility.getUrl());
                         openUrl(url);
                     }
                 });
@@ -831,53 +808,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             return requestQueue;
         }
         return null;
-    }
-
-    /**
-     * Determine the first phone number in the String
-     * The Facility API returns multiple phone numbers with an or between them
-     * @param phoneNumbers A string of one or more phone numbers
-     * @return The first phone number in the string
-     */
-    private String getFirstPhoneNumber(String phoneNumbers) {
-        if(phoneNumbers == null)
-            return null;
-
-        int orLocation = phoneNumbers.indexOf(" Or");
-
-        if(orLocation >= 0)
-            return phoneNumbers.substring(0, orLocation);
-        return phoneNumbers;
-    }
-
-    /**
-     * Get the user's GPS location
-     * @return The GPS coordinates: latitude, longitude
-     */
-    private double[] getGPSLocation() {
-        double[] gps = new double[2];
-
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        List<String> providers = lm.getProviders(true);
-
-        Location l = null;
-
-        // Try getting the location from each of the location providers
-        for (int i = providers.size() - 1; i >= 0; i--) {
-            try {
-                l = lm.getLastKnownLocation(providers.get(i));
-            } catch (SecurityException e) {
-                // The user has blocked location
-            }
-            if (l != null)
-                break;
-        }
-
-        if (l != null) {
-            gps[0] = l.getLatitude();
-            gps[1] = l.getLongitude();
-        }
-        return gps;
     }
 
 }
