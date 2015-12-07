@@ -8,8 +8,8 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.0.1"
+        versionCode 8
+        versionName "1.0.2"
     }
     buildTypes {
         release {
@@ -29,4 +29,5 @@ dependencies {
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
     apply plugin: 'com.google.gms.google-services'
     compile 'com.google.android.gms:play-services-auth:8.3.0'
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
 }

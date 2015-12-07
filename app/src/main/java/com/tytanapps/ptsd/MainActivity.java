@@ -541,6 +541,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Purposely crash the app to test debugging
+     */
+    private void crashApp() {
+        throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
+    }
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
