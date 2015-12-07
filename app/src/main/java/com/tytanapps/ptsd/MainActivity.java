@@ -55,8 +55,11 @@ public class MainActivity extends AppCompatActivity
     private static GoogleApiClient mGoogleApiClient;
     private boolean isUserSignedIn = false;
 
+    // The header image on top of the navigation view containing the user's information.
+    // You cannot modify
     private ViewGroup navHeader;
 
+    // The request queue used to connect with APIs in the background
     private RequestQueue requestQueue;
 
     private static int RC_SIGN_IN = 1;
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.d(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -90,63 +93,53 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Set up the side drawer layout containing the user's information and navigation items
+        setupDrawerLayout();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        // Set up the trusted contact button
+        setupFAB();
 
-                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                if (!phoneNumber.equals(""))
-                    openDialer(phoneNumber);
-                else
-                    showCreateTrustedContactDialog();
-            }
-        });
+        // Set up the connection to the Google API Client. This does not sign in the user.
+        setupGoogleSignIn();
+    }
 
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                showChangeTrustedContactDialog();
-                return true;
-            }
-        });
+    @Override
+    public void onStart() {
+        Log.d(LOG_TAG, "onStart() called with: " + "");
 
+        super.onStart();
+
+        AlarmService alarmService = new AlarmService(getBaseContext());
+        alarmService.cancelAlarm();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Attempt to sign the user in automatically
+        silentSignIn();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(LOG_TAG, "onStop() called with: " + "");
+
+        AlarmService alarmService = new AlarmService(getBaseContext());
+        alarmService.startAlarm(24);
+
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Close the drawer layout if it is open
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
-        navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        });
-
-        navigationView.addHeaderView(navigationHeader);
-        navHeader = navigationHeader;
-
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -185,6 +178,86 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Set up the floating action button in the bottom of the app
+     * When pressed, call the trusted contact if it exists. If not, show the create contact dialog
+     */
+    private void setupFAB() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        if(fab != null) {
+            // Call the trusted contact if it exists, otherwise show the create contact dialog
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                    if (!phoneNumber.equals(""))
+                        openDialer(phoneNumber);
+                    else
+                        showCreateTrustedContactDialog();
+                }
+            });
+
+            // If you press and hold on the button, change the trusted contact
+            fab.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showChangeTrustedContactDialog();
+                    return true;
+                }
+            });
+        }
+    }
+
+    /**
+     * Create the client to connect with the Google sign in API
+     */
+    private void setupGoogleSignIn() {
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
+    /**
+     * Set up the side drawer layout and populate it with the header and navigation items
+     */
+    private void setupDrawerLayout() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        // The navigation view is contained within the drawer layout
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // Add the header view containing the user's information
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
+        navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+
+        navigationView.addHeaderView(navigationHeader);
+        navHeader = navigationHeader;
+    }
+
+    /**
      * Sign in to the user's Google Account
      */
     public void signIn() {
@@ -217,12 +290,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Sign in to the user's Google Account
-     * If the user previously granted access, sign them in again
+     * Sign in to the user's Google Account in the background
+     * Only signs the user in if they have previously granted access
      */
     private void silentSignIn() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
-            Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
         if (pendingResult.isDone()) {
             // There's immediate result available.
@@ -256,16 +329,20 @@ public class MainActivity extends AppCompatActivity
      * @param profilePicture A url of the user's profile picture
      */
     private void updateNavigationHeader(String name, String email, Uri profilePicture) {
+        // Update the name
         TextView drawerNameTextView = (TextView) navHeader.findViewById(R.id.drawer_name);
         drawerNameTextView.setText(name);
 
+        // Update the email address
         TextView drawerEmailTextView = (TextView) navHeader.findViewById(R.id.drawer_subtext);
         drawerEmailTextView.setVisibility(View.VISIBLE);
         drawerEmailTextView.setText(email);
 
+        // Show the profile picture. If the user doesn't have one, use the app logo instead
         ImageView profileImageView = (ImageView) navHeader.findViewById(R.id.drawer_imageview);
         loadProfilePicture(profileImageView, profilePicture);
 
+        // Hide the sign in button
         View signInButton = navHeader.findViewById(R.id.button_sign_in);
         if(signInButton != null)
             signInButton.setVisibility(View.GONE);
@@ -307,7 +384,7 @@ public class MainActivity extends AppCompatActivity
      */
     protected void showCreateTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setPositiveButton("Add Trusted Contact", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.add_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 pickTrustedContact();
@@ -332,7 +409,7 @@ public class MainActivity extends AppCompatActivity
      */
     protected void showChangeTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setPositiveButton("Change Trusted Contact", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.change_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 pickTrustedContact();
@@ -399,6 +476,7 @@ public class MainActivity extends AppCompatActivity
         ContentResolver cr = getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+
         if (cursor == null) {
             return null;
         }
@@ -420,52 +498,6 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(prefKey, value);
         editor.apply();
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(LOG_TAG, "onStart() called with: " + "");
-
-        super.onStart();
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.cancelAlarm();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        silentSignIn();
-    }
-
-    @Override
-    public void onStop() {
-        Log.d(LOG_TAG, "onStop() called with: " + "");
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.startAlarm(24);
-
-        super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -503,6 +535,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment newFragment = null;
 
+        // Switch to the appropriate fragment
         int id = item.getItemId();
         switch(id) {
             case R.id.nav_simple_test:
@@ -536,6 +569,7 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
         }
 
+        // Close the drawer layout
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -545,16 +579,13 @@ public class MainActivity extends AppCompatActivity
      * Purposely crash the app to test debugging
      */
     private void crashApp() {
+        Log.wtf(LOG_TAG, "The crash app method has been called.");
         throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
+    public void onFragmentInteraction(Uri uri) {}
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
 }

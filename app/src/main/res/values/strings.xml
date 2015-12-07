@@ -125,6 +125,8 @@
     <string name="diagnosis">Diagnosis</string>
     <string name="treatment">Treatment</string>
     <string name="counseling">Counseling</string>
+    <string name="change_trusted_contact">Change Trusted Contact</string>
+    <string name="add_trusted_contact">Add Trusted Contact</string>
 
 
 </resources>
