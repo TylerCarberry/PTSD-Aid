@@ -56,6 +56,20 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
+     * Open the navigation drawer
+     */
     private void openDrawer() {
         DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         drawer.openDrawer(Gravity.LEFT);
@@ -117,7 +131,7 @@ public class MainFragment extends Fragment {
 
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
             TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
 
             emotionPressed.setOnClickListener(new View.OnClickListener() {
@@ -182,7 +196,7 @@ public class MainFragment extends Fragment {
             }
 
             if (!isUserSignedIn()) {
-                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
                 TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
                 signInTextView.setText(R.string.recommendation_sign_in);
 
@@ -198,7 +212,7 @@ public class MainFragment extends Fragment {
 
             String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
             if (trustedContactPhone.equals("")) {
-                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
                 TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
                 trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
                 trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {

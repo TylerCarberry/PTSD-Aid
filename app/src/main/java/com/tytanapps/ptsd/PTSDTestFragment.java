@@ -41,6 +41,17 @@ public class PTSDTestFragment extends Fragment {
     }
 
     /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
      * Add the questions to the linear layout
      * @param questionsLinearLayout The linear layout to add the questions to
      */
@@ -48,15 +59,23 @@ public class PTSDTestFragment extends Fragment {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        for(int i = 0; i < questions.length; i++) {
-            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, null, false);
+        for(String question : questions) {
+            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getViewGroup(), false);
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
-            questionTextView.setText(questions[i]);
+            questionTextView.setText(question);
 
             questionsLinearLayout.addView(layout);
         }
 
+        addSubmitButton(questionsLinearLayout);
+    }
+
+    /**
+     * Add the submit button after the list of questions
+     * @param questionsLinearLayout The layout to add the submit button to
+     */
+    private void addSubmitButton(LinearLayout questionsLinearLayout) {
         Button submitButton = new Button(getActivity());
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -66,12 +85,10 @@ public class PTSDTestFragment extends Fragment {
 
         int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
         int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
-
         params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setLayoutParams(params);
 
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
-
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));
         submitButton.setTextSize(20);
@@ -118,7 +135,7 @@ public class PTSDTestFragment extends Fragment {
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getViewGroup(), false);
 
         String resultText;
         String nextActions;
@@ -142,8 +159,8 @@ public class PTSDTestFragment extends Fragment {
         TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
         resultTextView.setText(resultText);
 
-        TextView nextActionsTextview = (TextView) layout.findViewById(R.id.next_steps_textview);
-        nextActionsTextview.setText(nextActions);
+        TextView nextActionsTextView = (TextView) layout.findViewById(R.id.next_steps_textview);
+        nextActionsTextView.setText(nextActions);
 
         alertDialog.setView(layout);
         alertDialog.show();

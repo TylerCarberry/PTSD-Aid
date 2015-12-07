@@ -52,7 +52,7 @@ import com.google.android.gms.common.api.ResultCallback;
  * between them using the navigation view.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
     // The request queue used to connect with APIs in the background
     private RequestQueue requestQueue;
 
-    private static int RC_SIGN_IN = 1;
+    private static final int RC_SIGN_IN = 1;
     private static final int PICK_CONTACT_REQUEST = 2;
 
     @Override
@@ -111,8 +111,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onStart() {
-        Log.d(LOG_TAG, "onStart() called with: " + "");
-
+        //Log.d(LOG_TAG, "onStart() called with: " + "");
         super.onStart();
 
         AlarmService alarmService = new AlarmService(getBaseContext());
@@ -588,9 +587,6 @@ public class MainActivity extends AppCompatActivity
         Log.wtf(LOG_TAG, "The crash app method has been called.");
         throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {}
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {}

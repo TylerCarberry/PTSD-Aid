@@ -36,8 +36,8 @@
                     android:background="@color/colorPrimary"
                     android:textColor="@color/white"/>
 
-
             </LinearLayout>
+
         </FrameLayout>
 
     </ScrollView>

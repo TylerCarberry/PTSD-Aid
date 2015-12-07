@@ -51,7 +51,6 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:animateLayoutChanges="true">
 
-
             </LinearLayout>
 
         </ScrollView>

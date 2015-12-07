@@ -19,6 +19,9 @@
     <string name="recommendation_call_trusted_contact">Consider calling your trusted contact</string>
     <string name="recommendation_sign_in">Sign In</string>
     <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
+    <string name="sad_face_content_description">Sad Face</string>
+    <string name="ok_face_content_description">Ok Face</string>
+    <string name="happy_face_content_description">Happy Face</string>
 
     <!-- PTSD Test -->
     <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
@@ -117,5 +120,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="alarm_service_label">Alarm Service Label</string>
+
 
 </resources>

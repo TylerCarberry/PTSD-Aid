@@ -54,8 +54,8 @@ public class NearbyFacilitiesFragment extends Fragment {
     private static final String LOG_TAG = NearbyFacilitiesFragment.class.getSimpleName();
 
     // Dimensions for the Google Maps ImageView
-    private static final int MAP_IMAGEVIEW_WIDTH = 640; // You cannot exceed 640 in the free tier
-    private static final int MAP_IMAGEVIEW_HEIGHT = 400;
+    private static final int MAP_IMAGE_WIDTH = 640; // You cannot exceed 640 in the free tier
+    private static final int MAP_IMAGE_HEIGHT = 400;
 
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
@@ -72,6 +72,17 @@ public class NearbyFacilitiesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
+    }
+
+    /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
     }
 
     /**
@@ -626,7 +637,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private String calculateStreetViewAPIUrl(String address, String town, String state) throws UnsupportedEncodingException {
         String url = "https://maps.googleapis.com/maps/api/streetview?size=" +
-                MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT + "&location=";
+                MAP_IMAGE_WIDTH + "x" + MAP_IMAGE_HEIGHT + "&location=";
 
         // Encode the address
         String params = address + ", " + town + ", " + state;
@@ -649,7 +660,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
 
         // Place a red marker over the location
-        url += paramLocation + "&zoom=16&size=" + MAP_IMAGEVIEW_WIDTH + "x" + MAP_IMAGEVIEW_HEIGHT
+        url += paramLocation + "&zoom=16&size=" + MAP_IMAGE_WIDTH + "x" + MAP_IMAGE_HEIGHT
                 + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
 
         return url;
@@ -689,7 +700,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         View fragmentView = getView();
         if(fragmentView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
-            RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, null, false);
+            RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, getViewGroup(), false);
 
             // Get the information from the facility
             String name = facility.getName();
