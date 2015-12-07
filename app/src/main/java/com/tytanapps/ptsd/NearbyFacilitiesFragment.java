@@ -730,7 +730,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 };
 
                 TextView addressTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_address_textview);
-                addressTextView.setText(facility.getAddress());
+                addressTextView.setText(facility.getFullAddress());
                 addressTextView.setOnClickListener(mapOnClick);
 
                 ImageView addressIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_address_icon);

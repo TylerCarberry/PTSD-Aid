@@ -52,11 +52,14 @@ import com.google.android.gms.common.api.ResultCallback;
  * between them using the navigation view.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
+    // The connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
+
+    // Whether the user is signed in to the app with their Google Account
     private boolean isUserSignedIn = false;
 
     // The header image on top of the navigation view containing the user's information
