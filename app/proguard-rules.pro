@@ -17,3 +17,6 @@
 #}
 
 -keep class android.support.v7.widget.LinearLayoutManager { *; }
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+-printmapping out.map
