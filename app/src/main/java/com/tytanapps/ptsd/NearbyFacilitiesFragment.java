@@ -46,9 +46,6 @@ import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
  */
 public class NearbyFacilitiesFragment extends Fragment {
 
