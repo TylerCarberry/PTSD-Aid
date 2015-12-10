@@ -88,6 +88,7 @@ public class PTSDTestFragment extends Fragment {
         params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setLayoutParams(params);
 
+        // Set the appearance of the button
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));

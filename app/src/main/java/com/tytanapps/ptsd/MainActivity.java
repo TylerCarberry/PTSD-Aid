@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onStop() {
-        Log.d(LOG_TAG, "onStop() called with: " + "");
+        //Log.d(LOG_TAG, "onStop() called with: " + "");
 
         AlarmService alarmService = new AlarmService(getBaseContext());
         alarmService.startAlarm(24);
@@ -136,6 +136,9 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
     }
 
+    /**
+     * When the back button is pressed, close the layout drawer or exit the app
+     */
     @Override
     public void onBackPressed() {
         // Close the drawer layout if it is open
@@ -156,28 +159,11 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
+        // Result returned when launching the pick trusted contact request
         else if(requestCode == PICK_CONTACT_REQUEST) {
             if(resultCode == RESULT_OK) {
                 Uri contactUri = data.getData();
-                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
-
-                Cursor cursor = getContentResolver().query(contactUri, projection, null, null, null);
-                if (cursor != null) {
-                    cursor.moveToFirst();
-
-                    int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                    String phoneNumber = cursor.getString(column);
-
-                    cursor.close();
-
-                    String name = getContactName(phoneNumber);
-
-                    saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
-                    saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
-
-                    Log.d(LOG_TAG, "Requested contact changed: NAME: " + name + " PHONENUMBER: " + phoneNumber);
-
-                }
+                handlePickContractRequest(contactUri);
             }
         }
     }
@@ -314,7 +300,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-        Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
     }
 
     /**
@@ -466,6 +451,30 @@ public class MainActivity extends AppCompatActivity
         Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
         pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
         startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+    }
+
+    /**
+     * Handle the result of choosing a trusted contact
+     * @param trustedContactUri The response from the contact picker activity
+     */
+    private void handlePickContractRequest(Uri trustedContactUri) {
+        String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
+
+        Cursor cursor = getContentResolver().query(trustedContactUri, projection, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            String phoneNumber = cursor.getString(column);
+            cursor.close();
+
+            String name = getContactName(phoneNumber);
+
+            saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
+            saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
+
+            Log.d(LOG_TAG, "Trusted contact changed: NAME: " + name + " PHONENUMBER: " + phoneNumber);
+        }
     }
 
     /**
