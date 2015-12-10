@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity
      * @param result The result of signing into your account
      */
     private void handleSignInResult(GoogleSignInResult result) {
-        if (result.isSuccess()) {
+        if (result != null && result.isSuccess()) {
             isUserSignedIn = true;
 
             GoogleSignInAccount googleAccount = result.getSignInAccount();
@@ -289,8 +289,6 @@ public class MainActivity extends AppCompatActivity
                 signInButton.setVisibility(View.INVISIBLE);
 
             updateNavigationHeader(name, email, profilePicture);
-        } else {
-            // Unable to login. Don't do anything.
         }
     }
 
@@ -498,6 +496,11 @@ public class MainActivity extends AppCompatActivity
         return contactName;
     }
 
+    /**
+     * Save a String to a SharedPreference
+     * @param prefKey The key of the shared preference
+     * @param value The value to save in the shared preference
+     */
     private void saveSharedPreference(String prefKey, String value) {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -584,7 +587,7 @@ public class MainActivity extends AppCompatActivity
      * Purposely crash the app to test debugging
      */
     private void crashApp() {
-        Log.wtf(LOG_TAG, "The crash app method has been called.");
+        Log.e(LOG_TAG, "The crash app method has been called.");
         throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
 

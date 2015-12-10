@@ -57,13 +57,18 @@ public class NearbyFacilitiesFragment extends Fragment {
     private static final int MAP_IMAGE_WIDTH = 640; // You cannot exceed 640 in the free tier
     private static final int MAP_IMAGE_HEIGHT = 400;
 
+    // Stores the facilities that have already loaded
+    // Key: VA Id, Value: The facility with the given id
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
+    // The number of VA facilities that have already loaded, either by API or from cache
+    // This number is still incremented when the API load fails
     private int numberOfLoadedFacilities = 0;
 
     // The number of facilities to display on screen
     private static final int FACILITIES_TO_DISPLAY = 15;
 
+    // Required default constructor
     public NearbyFacilitiesFragment() {
 
     }
@@ -76,7 +81,9 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     /**
      * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
+     * This is needed when inflating views
+     * @return The root view of the fragment as a ViewGroup,
+     *         Null if the root view is null or not a ViewGroup
      */
     private ViewGroup getViewGroup() {
         View rootView = getView();
@@ -102,16 +109,13 @@ public class NearbyFacilitiesFragment extends Fragment {
      * There are multiple PTSD programs per VA facility.
      */
     private void loadPTSDPrograms() {
-
         String url = calculateVaAPIUrl();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(LOG_TAG, response);
-
                 // The JSON that the sever responds starts with //
-                // I am cropping the first two characters to create valid JSON.
+                // Trim the first two characters to create valid JSON.
                 response = response.substring(2);
 
                 // Load the initial JSON request. This this is a program name and the
@@ -126,11 +130,13 @@ public class NearbyFacilitiesFragment extends Fragment {
                     }
 
                     double userLocation[] = Utilities.getGPSLocation(getActivity());
+                    // If the user's GPS location cannot be found
                     if(userLocation[0] == 0 && userLocation[1] == 0) {
                         errorLoadingResults("Your GPS location cannot be determined");
                         return;
                     }
 
+                    // Add each PTSD program to the correct VA facility
                     for(int i = 1; i < numberOfResults; i++) {
                         JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
 
@@ -155,7 +161,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 // We only have the id of each facility. Load the rest of the information
                 // about that location such as phone number and address.
                 if(knownFacilities != null && knownFacilities.size() > 0) {
-                    for (int facilityId : knownFacilities.keySet()) {
+                    for(int facilityId : knownFacilities.keySet()) {
                         Facility facility = knownFacilities.get(facilityId);
 
                         // Try to load the facility from cache
@@ -169,7 +175,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                             if(numberOfLoadedFacilities == knownFacilities.size())
                                 allFacilitiesHaveLoaded();
                         }
-                        // Load the facility using the api
+                        // Load the facility using the api. Display them after they all load
                         else
                             loadFacility(facility, knownFacilities.size());
                     }
@@ -183,13 +189,12 @@ public class NearbyFacilitiesFragment extends Fragment {
             }
         });
 
-        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        // Volley does retry for you if you have specified the policy.
+        // Set a longer Volley timeout policy
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        // Start loading the image in the background
+        // Start loading the PTSD programs in the background
         RequestQueue requestQueue = getRequestQueue();
         if(requestQueue != null)
             requestQueue.add(stringRequest);
@@ -203,8 +208,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param numberOfFacilities The number of facilities that are being loaded
      */
     private void loadFacility(final Facility facility, final int numberOfFacilities) {
-        String url = "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
-                + facility.getFacilityId() + "&license=" + getString(R.string.api_key_va_facilities) + "&ReturnFormat=JSON";
+        String url = calculateFacilityAPIURL(facility.getFacilityId(), getString(R.string.api_key_va_facilities));
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -263,11 +267,10 @@ public class NearbyFacilitiesFragment extends Fragment {
                     facility.setLatitude(locationLat);
                     facility.setLongitude(locationLong);
 
+                    // Save the facility to a file so it doesn't need to be loaded next time
                     cacheFacility(facility);
 
                     numberOfLoadedFacilities++;
-
-                    //Log.d(LOG_TAG, "Progress: " + numberOfLoadedFacilities + " / " + numberOfFacilities);
 
                     // When all facilities have loaded, sort them by distance and show them to the user
                     if(numberOfLoadedFacilities == numberOfFacilities)
@@ -488,9 +491,9 @@ public class NearbyFacilitiesFragment extends Fragment {
     private void hideLoadingBar() {
         View rootView = getView();
         if(rootView != null) {
-            View loadingTextview = rootView.findViewById(R.id.facility_loading_textview);
-            if (loadingTextview != null)
-                loadingTextview.setVisibility(View.GONE);
+            View loadingTextView = rootView.findViewById(R.id.facility_loading_textview);
+            if (loadingTextView != null)
+                loadingTextView.setVisibility(View.GONE);
 
             View loadingProgressbar = rootView.findViewById(R.id.facility_progressbar);
             if (loadingProgressbar != null)
@@ -611,7 +614,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     /**
      * Determine if the response from the Street View API was a valid street view image
      *
-     * If there is no street view imagery for the address, Google returns an image
+     * If there is no street view imagery for the address, Google returns a static image
      * stating that there is no imagery. I then load a map of the address instead.
      *
      * I cannot find a way to check if the street view exists properly. However, since the image
@@ -676,6 +679,17 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
+     * Get the url for the VA facility API
+     * @param facilityId The id of the facility to load
+     * @param licenceKey The API licence key
+     * @return The url for the VA facility API
+     */
+    private String calculateFacilityAPIURL(int facilityId, String licenceKey) {
+        return "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
+                + facilityId + "&license=" + licenceKey + "&ReturnFormat=JSON";
+    }
+
+    /**
      * Get the url for the Google Maps Api
      * @param name The street address
      * @param town The town
@@ -684,7 +698,6 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
     private Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
-
         // Encode the address
         String location = name + ", " + town + ", " + state;
         location = URLEncoder.encode(location, "UTF-8");
