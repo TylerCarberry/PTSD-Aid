@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -21,14 +20,11 @@ import android.widget.TextView;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
+ * The main fragment displayed when you launch the app. Prompts the user for their emotion
+ * and gives them recommendations based on their answer.
  */
 public class MainFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     public MainFragment() {
@@ -42,8 +38,7 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -61,6 +56,20 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
+     * Open the navigation drawer
+     */
     private void openDrawer() {
         DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         drawer.openDrawer(Gravity.LEFT);
@@ -122,7 +131,7 @@ public class MainFragment extends Fragment {
 
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
             TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
 
             emotionPressed.setOnClickListener(new View.OnClickListener() {
@@ -187,7 +196,7 @@ public class MainFragment extends Fragment {
             }
 
             if (!isUserSignedIn()) {
-                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
                 TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
                 signInTextView.setText(R.string.recommendation_sign_in);
 
@@ -203,7 +212,7 @@ public class MainFragment extends Fragment {
 
             String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
             if (trustedContactPhone.equals("")) {
-                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, null, false);
+                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
                 TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
                 trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
                 trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
@@ -280,29 +289,6 @@ public class MainFragment extends Fragment {
                         .alpha(1.0f).setDuration(1000);
             }
         });
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
 }

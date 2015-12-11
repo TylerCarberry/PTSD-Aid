@@ -1,62 +1,30 @@
 <resources>
     <string name="app_name">PTSD Aid</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
+    <!-- Navigation Items in the Drawer Layout -->
     <string name="nav_simple_test">Home</string>
+    <string name="nav_test">PTSD Test</string>
+    <string name="Resources">Resources</string>
+    <string name="nav_nearby">VA Facilities</string>
     <string name="nav_support">Support</string>
     <string name="nav_call">Call</string>
     <string name="nav_website">Website</string>
-    <string name="Resources">Resources</string>
-    <string name="nav_manage">Manage</string>
-    <string name="nav_test">PTSD Test</string>
 
-    <string name="phone_veterans_crisis_line">1-800-273-8255</string>
-    <string name="phone_suicide_lifeline">1-800-273-8255</string>
-    <string name="phone_veterans_foundation_hotline">1-888-777-4443</string>
-    <string name="phone_alcoholism">1-800-622-2255</string>
-    <string name="phone_gulf_war_hotline">1-800-796-9699</string>
+    <!-- Main Fragment -->
+    <string name="main_header">Welcome!</string>
+    <string name="emotion_prompt">How are you feeling right now?</string>
+    <string name="recommendations_title">Recommendations</string>
+    <string name="recommendation_resources">Look at the resources to learn about possible symptoms of PTSD</string>
+    <string name="recommendation_test">Take the PTSD test to determine if you suffer from PTSD</string>
+    <string name="recommendation_call_trusted_contact">Consider calling your trusted contact</string>
+    <string name="recommendation_sign_in">Sign In</string>
+    <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
+    <string name="sad_face_content_description">Sad Face</string>
+    <string name="ok_face_content_description">Ok Face</string>
+    <string name="happy_face_content_description">Happy Face</string>
 
-    <string name="website_nimh">http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml</string>
-    <string name="website_wikipedia">https://en.wikipedia.org/wiki/Posttraumatic_stress_disorder</string>
-    <string name="website_va">http://www.ptsd.va.gov/</string>
-
-    <string name="not_at_all">Not at all</string>
-    <string name="little_bit">A little bit</string>
-    <string name="moderately">Moderately</string>
-    <string name="quite_a_bit">Quite a bit</string>
-    <string name="extremely">Extremely</string>
+    <!-- PTSD Test -->
     <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
-
-    <string name="pref_name_key">name_key</string>
-    <string name="pref_age_key">age_key</string>
-    <string name="pref_gender_key">gender_key</string>
-    <string name="pref_army_key">army_key</string>
-    <string name="pref_navy_key">navy_key</string>
-    <string name="pref_air_key">air_key</string>
-    <string name="pref_marines_key">marines_key</string>
-    <string name="pref_trusted_name_key">trusted_name_key</string>
-    <string name="pref_trusted_phone_key">trusted_phone_key</string>
-
-
-    <string name="male_id">male</string>
-    <string name="female_id">female</string>
-    <string name="other_gender_id">other</string>
-    <string name="unknown_gender_id">unknown</string>
-
-
-
-    <string name="symptoms_detail">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
-    <string name="causes_detail">Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
-    <string name="diagnosis_detail">This app is for reference only. For a complete diagnosis, please visit a mental health professional.</string>
-    <string name="treatment_detail">There are two main types of treatment, psychotherapy and medication.\n\n1.  Psychotherapy (or counseling) includes Cognitive Behavioral Therapy (CBT). Some of the types of CBT are Cognitive Processing Therapy (CPT) where you learn skills to understand how the trauma changed your thoughts and thinking, then change the negative thought patters. There is also Prolonged Exposure Therapy (PE) which is the repeated imaginal and real-world exposure to the trauma until it is no longer upsetting.\n\n2. Medications, Selective Serotonin Reuptake Inhibitor (SSRI) is also effective for PTSD. Some people seek treatments that do not involve medications because of the side effects.</string>
-    <string name="counseling_detail">The Vet Centers provides bereavement, military sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center use the VA Facilities tab</string>
-    <string name="self_help_detail">The National Center for PTSD-Veterans Affairs offers additional information on PTSD,  treatment options and self-help for coping with PTSD.  http://www.ptsd.va.gov/public/index.asp Make the Connection.net is the Department of Veteran Affairs\' public awareness campaign that  provides testimonials on the signs, treatment and steps to take if you have PTSD. http://maketheconnection.net/conditions/ptsd</string>
-
-    <string name="alarm_service_label">Alarm Service Label</string>
-
     <string-array
         name="stress_questions">
         <item>Repeated, disturbing memories, thoughts, or images of a stressful military experience?</item>
@@ -74,57 +42,85 @@
         <item>Trouble falling or staying asleep?</item>
         <item>Feeling irritable or having angry outbursts?</item>
         <item>Having difficulty concentrating?</item>
-        <item>Being "superalert" or watchful or on guard?</item>
+        <item>Being "super alert" or watchful or on guard?</item>
         <item>Feeling jumpy or easily startled?</item>
-
     </string-array>
-
-    <string name="title_activity_settings">Settings</string>
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="nav_nearby">VA Facilities</string>
-    <string name="answer_all_questions">Please answer all of the questions</string>
-    <string name="result_minimal">You have few or no symptoms of PTSD</string>
-    <string name="see_professional_low">However, you still may wish to consult with a professional</string>
-    <string name="result_medium">You have minimal symptoms of PTSD</string>
-    <string name="see_professional_medium">You may benefit from seeking help from a professional</string>
-    <string name="result_high">Your results are consistent with many of the symptoms of PTSD</string>
-    <string name="see_professional_high">You are advised to see your physician or a qualified mental health professional immediately for a complete assessment</string>
-    <string name="va_loading_error">The VA facilities cannot be loaded</string>
+    <string name="not_at_all">Not at all</string>
+    <string name="little_bit">A little bit</string>
+    <string name="moderately">Moderately</string>
+    <string name="quite_a_bit">Quite a bit</string>
+    <string name="extremely">Extremely</string>
     <string name="submit_test">Submit</string>
-    <string name="recommendation_resources">Look at the resources to learn about possible symptoms of PTSD</string>
-    <string name="recommendation_test">Take the PTSD test to determine if you suffer from PTSD</string>
-    <string name="recommendation_call_trusted_contact">Consider calling your trusted contact</string>
-    <string name="recommendation_sign_in">Sign In</string>
-    <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
-    <string name="recommendations_title">Recommendations</string>
-    <string name="trusted_contact">Trusted Contact</string>
-    <string name="trusted_contact_explanation">Tap the call button anytime in the app to call your trusted contact</string>
-    <string name="emotion_prompt">How are you feeling right now?</string>
+    <string name="results">Results</string>
+    <string name="result_minimal">You have few or no symptoms of PTSD</string>
+    <string name="result_medium">You have minimal symptoms of PTSD</string>
+    <string name="result_high">Your results are consistent with many of the symptoms of PTSD</string>
+    <string name="see_professional_low">However, you still may wish to consult with a professional</string>
+    <string name="see_professional_medium">You may benefit from seeking help from a professional</string>
+    <string name="see_professional_high">You are advised to see your physician or a qualified mental health professional immediately for a complete assessment</string>
+    <string name="find_professional">Find Professional</string>
+    <string name="share_results">Share Results</string>
+
+    <!-- Resources -->
+    <string name="symptoms">Symptoms</string>
+    <string name="symptoms_detail">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
+    <string name="causes">Causes</string>
+    <string name="causes_detail">Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
+    <string name="diagnosis">Diagnosis</string>
+    <string name="diagnosis_detail">This app is for reference only. For a complete diagnosis, please visit a mental health professional.</string>
+    <string name="treatment">Treatment</string>
+    <string name="treatment_detail">There are two main types of treatment, psychotherapy and medication.\n\n1.  Psychotherapy (or counseling) includes Cognitive Behavioral Therapy (CBT). Some of the types of CBT are Cognitive Processing Therapy (CPT) where you learn skills to understand how the trauma changed your thoughts and thinking, then change the negative thought patters. There is also Prolonged Exposure Therapy (PE) which is the repeated imaginal and real-world exposure to the trauma until it is no longer upsetting.\n\n2. Medications, Selective Serotonin Reuptake Inhibitor (SSRI) is also effective for PTSD. Some people seek treatments that do not involve medications because of the side effects.</string>
+    <string name="counseling">Counseling</string>
+    <string name="counseling_detail">The Vet Centers provides bereavement, military sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center use the VA Facilities tab</string>
+
+    <!-- VA Facilities -->
     <string name="loading">Loading</string>
+    <string name="va_loading_error">The VA facilities cannot be loaded</string>
     <string name="retry">Retry</string>
+
+    <!-- Call -->
+    <string name="phone_veterans_crisis_line">1-800-273-8255</string>
     <string name="veterans_support_phone_details">Veterans Press 1</string>
+    <string name="phone_suicide_lifeline">1-800-273-8255</string>
     <string name="suicide_lifeline_phone_details">It is common to feel anxious after incidents of mass violence. You are not alone.</string>
-    <string name="alcohol_phone_details">Addiction is a Disease\nTreatment is Available\nRecovery Brings Joy</string>
+    <string name="phone_veterans_foundation_hotline">1-888-777-4443</string>
     <string name="veterans_foundation_phone_details">We help veterans and their families who are enduring a crisis or who have a critical need for help. Veterans of any era can call for assistance.</string>
+    <string name="phone_alcoholism">1-800-622-2255</string>
+    <string name="alcohol_phone_details">Addiction is a Disease\nTreatment is Available\nRecovery Brings Joy</string>
+
+    <!-- Websites -->
     <string name="veterans_chat_title">Veterans Crisis Line - Online Chat</string>
     <string name="veterans_chat_details">Responders at the Veterans Crisis Line online chat offer help that can make a difference. It is completely confidential and responders will work with you to help you get through any personal crisis, even if that crisis does not involve thoughts of suicide. Get the support you’ve earned.</string>
+    <string name="website_chat">https://www.veteranscrisisline.net/ChatTermsOfService.aspx?account=Veterans%20Chat</string>
     <string name="nimh_title">National Institute of Mental Heath</string>
     <string name="nimh_details">Find more information about Post Traumatic Stress Disorder.</string>
+    <string name="website_nimh">http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml</string>
     <string name="veterans_affairs">Veterans Affairs</string>
     <string name="veteran_affairs_details">Find more information about PTSD from the Department of Veterans Affairs</string>
-    <string name="quiz_details">A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential.</string>
+    <string name="website_va">http://www.ptsd.va.gov/public/index.asp/</string>
     <string name="self_quiz">Self-Check Quiz</string>
+    <string name="quiz_details">A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential.</string>
+    <string name="website_self_check">https://www.vetselfcheck.org/Welcome.cfm</string>
     <string name="ptsd_coach">PTSD Coach</string>
     <string name="ptsd_coach_details">PTSD Coach Online is for anyone who needs help with upsetting feelings. Trauma survivors, their families, or anyone coping with stress can benefit.</string>
-    <string name="results">Results</string>
+    <string name="website_coach">http://www.ptsd.va.gov/apps/ptsdcoachonline/default.htm</string>
+
+    <!-- Trusted Contact -->
+    <string name="trusted_contact">Trusted Contact</string>
+    <string name="trusted_contact_explanation">Tap the call button anytime in the app to call your trusted contact</string>
     <string name="add_trusted_contact_prompt">Would you like to add a trusted contact?</string>
-    <string name="main_header">Welcome!</string>
-    <string name="symptoms">Symptoms</string>
-    <string name="causes">Causes</string>
-    <string name="diagnosis">Diagnosis</string>
-    <string name="treatment">Treatment</string>
-    <string name="counseling">Counseling</string>
+    <string name="change_trusted_contact">Change Trusted Contact</string>
+    <string name="add_trusted_contact">Add Trusted Contact</string>
+
+    <!-- Saved preference keys -->
+    <string name="pref_trusted_name_key">trusted_name_key</string>
+    <string name="pref_trusted_phone_key">trusted_phone_key</string>
+
+    <!-- Other -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="alarm_service_label">Alarm Service Label</string>
+    <string name="profile_picture_content_description">Profile Picture</string>
 
 
 </resources>

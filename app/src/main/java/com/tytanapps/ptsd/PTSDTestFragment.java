@@ -1,12 +1,10 @@
 package com.tytanapps.ptsd;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,56 +17,16 @@ import android.widget.TextView;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PTSDTestFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A short multiple choice quiz to determine if you suffer from PTSD. Based on the results, gives
+ * you recommendations on what to do next. Find a professional is always a recommendation even if
+ * the user shows no signs of PTSD.
  */
 public class PTSDTestFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
 
-    private OnFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PTSDTestFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PTSDTestFragment newInstance(String param1, String param2) {
-        PTSDTestFragment fragment = new PTSDTestFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public PTSDTestFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -83,6 +41,17 @@ public class PTSDTestFragment extends Fragment {
     }
 
     /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
      * Add the questions to the linear layout
      * @param questionsLinearLayout The linear layout to add the questions to
      */
@@ -90,15 +59,23 @@ public class PTSDTestFragment extends Fragment {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        for(int i = 0; i < questions.length; i++) {
-            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, null, false);
+        for(String question : questions) {
+            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getViewGroup(), false);
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
-            questionTextView.setText(questions[i]);
+            questionTextView.setText(question);
 
             questionsLinearLayout.addView(layout);
         }
 
+        addSubmitButton(questionsLinearLayout);
+    }
+
+    /**
+     * Add the submit button after the list of questions
+     * @param questionsLinearLayout The layout to add the submit button to
+     */
+    private void addSubmitButton(LinearLayout questionsLinearLayout) {
         Button submitButton = new Button(getActivity());
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -108,12 +85,11 @@ public class PTSDTestFragment extends Fragment {
 
         int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
         int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
-
         params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setLayoutParams(params);
 
+        // Set the appearance of the button
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
-
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));
         submitButton.setTextSize(20);
@@ -144,13 +120,13 @@ public class PTSDTestFragment extends Fragment {
      */
     private void showResults(int score) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setPositiveButton("Find Professional", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.find_professional, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 findProfessional();
             }
         });
-        alertDialogBuilder.setNegativeButton("Share Results", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton(R.string.share_results, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 shareResults();
@@ -160,7 +136,7 @@ public class PTSDTestFragment extends Fragment {
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getViewGroup(), false);
 
         String resultText;
         String nextActions;
@@ -184,8 +160,8 @@ public class PTSDTestFragment extends Fragment {
         TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
         resultTextView.setText(resultText);
 
-        TextView nextActionsTextview = (TextView) layout.findViewById(R.id.next_steps_textview);
-        nextActionsTextview.setText(nextActions);
+        TextView nextActionsTextView = (TextView) layout.findViewById(R.id.next_steps_textview);
+        nextActionsTextView.setText(nextActions);
 
         alertDialog.setView(layout);
         alertDialog.show();
@@ -290,8 +266,6 @@ public class PTSDTestFragment extends Fragment {
                     SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
                     score[questionCount] = seekBar.getProgress() + 1;
 
-                    //Log.d(LOG_TAG, seekBar.getProgress() + 1 + "");
-
                     questionCount++;
                 }
             }
@@ -319,30 +293,6 @@ public class PTSDTestFragment extends Fragment {
         }
 
         return score;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
 }

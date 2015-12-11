@@ -58,7 +58,6 @@
 
             </android.support.v7.widget.CardView>
 
-
             <android.support.v7.widget.CardView
                 android:id="@+id/nimh_cardview"
                 android:layout_width="match_parent"
@@ -222,6 +221,5 @@
         </RelativeLayout>
 
     </ScrollView>
-
 
 </RelativeLayout>

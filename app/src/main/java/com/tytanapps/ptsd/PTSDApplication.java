@@ -8,6 +8,9 @@ import com.google.android.gms.analytics.Tracker;
 
 import java.util.ArrayList;
 
+/**
+ * The PTSD application. Used to connect the app with Google Analytics
+ */
 public class PTSDApplication extends Application {
     private Tracker mTracker;
 
