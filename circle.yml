@@ -1,6 +1,12 @@
+machine:
+  environment:
+    ADB_INSTALL_TIMEOUT: 10 # minutes (2 minutes by default)
+
 test:
   override:
   
+    # The two files containing API keys are not tracked in git
+    # Write them from enviroment variables
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
@@ -10,6 +16,9 @@ test:
         parallel: true
     # wait for it to have booted
     - circle-android wait-for-boot
+    
+    # Remove the lockscreen
+    - adb shell input keyevent 82
     
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
