@@ -76,7 +76,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void tapHappy() {
         onView(withId(R.id.happy_face)).perform(click()).check(matches(isDisplayed()));
 
-        assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
+        assertNotSame(View.INVISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.ok_face).getVisibility());
     }
 
