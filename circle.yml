@@ -11,7 +11,7 @@ test:
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
     # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    - emulator -avd circleci-android22:
         background: true
         parallel: true
     # wait for it to have booted
@@ -26,6 +26,6 @@ test:
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
-    # - cp -r my-project/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r PTSD/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    # - cp -r my-project/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - cp -r PTSD/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
