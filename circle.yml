@@ -29,16 +29,25 @@ test:
     - adb shell input keyevent 82
     
     # Take screenshot and copy it to file on host computer
-    - adb shell screencap -p /sdcard/screenshot/screen.png
-    - adb pull /sdcard/screen.png
-    - adb shell rm /sdcard/screen.png
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
     
     # Run tests against the emulator.
+    - ./gradlew installDebug
+    
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot2.png
+    
+    - adb shell am start -n com.tytanapps.ptsd/com.tytanapps.ptsd.MainActivity
+    
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
+    
+    
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
-    - cp screen.png $CIRCLE_ARTIFACTS
+    - cp screenshot.png $CIRCLE_ARTIFACTS
+    - cp screenshot2.png $CIRCLE_ARTIFACTS
+    - cp screenshot3.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
     - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
