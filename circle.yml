@@ -17,6 +17,8 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     
+    - sleep 60
+    
     # Remove the lockscreen
     - adb shell input keyevent 82
     
