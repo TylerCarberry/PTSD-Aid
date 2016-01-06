@@ -17,15 +17,20 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     
-    - sleep 60
+    - sleep 30
     
     # Remove the lockscreen
     - adb shell input keyevent 82
+    
+    # Take screenshot
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
     
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
     - cp -r PTSD/build/outputs $CIRCLE_ARTIFACTS
+    - cp screenshot.png $CIRCLE_ARTIFACTS
+    
     # copy the test results to the test results directory.
     - cp -r PTSD/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
