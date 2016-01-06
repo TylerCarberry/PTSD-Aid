@@ -1,9 +1,11 @@
-machine:
-  environment:
-    ADB_INSTALL_TIMEOUT: 10 # minutes (2 minutes by default)
+general:
+artifacts:
+    - /home/ubuntu/TestApp/app/build/outputs/apk/
 
 test:
   override:
+    - ADB_INSTALL_TIMEOUT=10 ./gradlew connectedAndroidTest
+        timeout: 360
   
     # The two files containing API keys are not tracked in git
     # Write them from enviroment variables
@@ -33,4 +35,5 @@ test:
     - cp screenshot.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
+    - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
     # - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
