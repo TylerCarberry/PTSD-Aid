@@ -39,6 +39,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         mainActivity = getActivity();
+
+        Thread.sleep(5000);
     }
 
     /**
