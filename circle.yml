@@ -1,11 +1,13 @@
 general:
 artifacts:
-    - /home/ubuntu/TestApp/app/build/outputs/apk/
+    - /home/ubuntu/PTSD/app/build/outputs/apk/
+
+machine:
+  environment:
+    ADB_INSTALL_TIMEOUT: 60 # minutes (2 minutes by default)
 
 test:
   override:
-    - ADB_INSTALL_TIMEOUT=60 ./gradlew connectedAndroidTest
-        timeout: 360
   
     # The two files containing API keys are not tracked in git
     # Write them from enviroment variables
