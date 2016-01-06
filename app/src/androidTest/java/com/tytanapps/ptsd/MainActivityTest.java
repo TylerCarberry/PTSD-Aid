@@ -60,6 +60,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.ok_face)).check(matches(isDisplayed()));
     }
 
+    @Test
+    public void testAlwaysFails() {
+        assertTrue(false);
+    }
+
     /**
      * Tapping on the happy face should hide the other two faces and keep the happy face visible
      */
