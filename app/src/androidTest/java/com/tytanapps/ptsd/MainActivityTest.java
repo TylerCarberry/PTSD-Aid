@@ -40,14 +40,14 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         mainActivity = getActivity();
 
         // Wait 1 second between tests for any animations to stop
-        Thread.sleep(1000);
+        Thread.sleep(5000);
     }
 
     /**
      * This test will always pass. If it does not, there is a problem with Android
      */
     @Test
-    public void alwaysPasses() {
+    public void testAlwaysPasses() {
         assertTrue(true);
     }
 
@@ -55,7 +55,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * Verify that all of the emotions are visible when you start the app
      */
     @Test
-    public void allEmotionsVisible() {
+    public void testAllEmotionsVisible() {
         onView(withId(R.id.happy_face)).check(matches(isDisplayed()));
         onView(withId(R.id.sad_face)).check(matches(isDisplayed()));
         onView(withId(R.id.ok_face)).check(matches(isDisplayed()));
@@ -65,7 +65,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * Tapping on the happy face should hide the other two faces and keep the happy face visible
      */
     @Test
-    public void tapHappy() {
+    public void testTapHappy() {
         onView(withId(R.id.happy_face)).perform(click()).check(matches(isDisplayed()));
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.ok_face).getVisibility());
@@ -75,7 +75,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * Tapping on the ok face should hide the other two faces and keep the ok face visible
      */
     @Test
-    public void tapOk() {
+    public void testTapOk() {
         onView(withId(R.id.ok_face)).perform(click()).check(matches(isDisplayed()));
 
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
@@ -86,7 +86,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * Tapping on the sad face should hide the other two faces and keep the sad face visible
      */
     @Test
-    public void tapSad() {
+    public void testTapSad() {
         onView(withId(R.id.sad_face)).perform(click()).check(matches(isDisplayed()));
 
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.happy_face).getVisibility());
@@ -97,7 +97,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * Tapping on the trusted contact button should prompt the creation of a contact if none exists
      */
     @Test
-    public void createTrustedContact() {
+    public void testCreateTrustedContact() {
         removeSharedPreference(mainActivity.getString(R.string.pref_trusted_name_key));
         removeSharedPreference(mainActivity.getString(R.string.pref_trusted_phone_key));
 
@@ -110,7 +110,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * creation of a trusted contact if none exists
      */
     @Test
-    public void longPressTrustedContact() {
+    public void testLongPressTrustedContact() {
         removeSharedPreference(mainActivity.getString(R.string.pref_trusted_name_key));
         removeSharedPreference(mainActivity.getString(R.string.pref_trusted_phone_key));
 
@@ -123,7 +123,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * if a trusted contact already exists
      */
     @Test
-    public void changeTrustedContact() {
+    public void testChangeTrustedContact() {
         putStringSharedPreference(mainActivity.getString(R.string.pref_trusted_name_key), "Tyler");
         putStringSharedPreference(mainActivity.getString(R.string.pref_trusted_phone_key), "234-555-7890");
 
