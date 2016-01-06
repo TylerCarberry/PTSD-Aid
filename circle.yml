@@ -29,8 +29,8 @@ test:
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
-    - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
+    # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
     - cp screenshot.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
-    - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    # - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
