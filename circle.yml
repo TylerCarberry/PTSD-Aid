@@ -1,5 +1,9 @@
 test:
   override:
+  
+    - echo $google_services_censored
+    - echo $google_services_censored > app/google-services.json
+    - echo $ids_xml > app/src/main/res/values/ids.xml
     
     # start the emulator
     - emulator -avd circleci-android22 -no-audio -no-window:
@@ -7,9 +11,6 @@ test:
         parallel: true
     # wait for it to have booted
     - circle-android wait-for-boot
-    
-    - echo $google_services_json2 > app/google-services.json
-    - echo $ids_xml > app/src/main/res/values/ids.xml
     
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
