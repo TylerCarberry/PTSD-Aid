@@ -40,7 +40,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         mainActivity = getActivity();
 
-        Thread.sleep(5000);
+        Thread.sleep(3000);
     }
 
     /**
@@ -62,10 +62,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.ok_face)).check(matches(isDisplayed()));
     }
 
+    /*
     @Test
     public void testAlwaysFails() {
         assertTrue(false);
     }
+    */
 
     /**
      * Tapping on the happy face should hide the other two faces and keep the happy face visible
