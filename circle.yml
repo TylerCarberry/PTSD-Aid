@@ -4,7 +4,7 @@ artifacts:
 
 test:
   override:
-    - ADB_INSTALL_TIMEOUT=10 ./gradlew connectedAndroidTest
+    - ADB_INSTALL_TIMEOUT=60 ./gradlew connectedAndroidTest
         timeout: 360
   
     # The two files containing API keys are not tracked in git
