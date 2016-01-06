@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity
         String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
         String contactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
 
-        if(contactPhone.equals("")) {
+        if(!contactPhone.equals("")) {
             currentContactTextView.setText("Your trusted contact is\n" + contactName + "\n" + contactPhone);
 
             final AlertDialog alertDialog = alertDialogBuilder.create();
