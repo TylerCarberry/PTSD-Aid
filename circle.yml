@@ -1,6 +1,6 @@
 general:
   artifacts:
-    - /home/ubuntu/PTSD/app/build/outputs/apk/
+    - /home/ubuntu/PTSD/app/build/outputs/
 
 machine:
   environment:
@@ -29,14 +29,16 @@ test:
     - adb shell input keyevent 82
     
     # Take screenshot and copy it to file on host computer
-    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
+    - adb shell screencap -p /sdcard/screenshot/screen.png
+    - adb pull /sdcard/screen.png
+    - adb shell rm /sdcard/screen.png
     
     # Run tests against the emulator.
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
-    - cp screenshot.png $CIRCLE_ARTIFACTS
+    - cp screen.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
     - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
