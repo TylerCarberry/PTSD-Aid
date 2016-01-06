@@ -29,7 +29,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     MainActivity mainActivity;
 
-
     public MainActivityTest() {
         super(MainActivity.class);
     }
@@ -40,7 +39,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         mainActivity = getActivity();
 
-        Thread.sleep(3000);
+        // Wait 1 second between tests for any animations to stop
+        Thread.sleep(1000);
     }
 
     /**
@@ -48,8 +48,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      */
     @Test
     public void alwaysPasses() {
-        int foo = 5;
-        assertEquals(5, foo);
+        assertTrue(true);
     }
 
     /**
@@ -62,21 +61,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.ok_face)).check(matches(isDisplayed()));
     }
 
-    /*
-    @Test
-    public void testAlwaysFails() {
-        assertTrue(false);
-    }
-    */
-
     /**
      * Tapping on the happy face should hide the other two faces and keep the happy face visible
      */
     @Test
     public void tapHappy() {
         onView(withId(R.id.happy_face)).perform(click()).check(matches(isDisplayed()));
-
-        assertNotSame(View.INVISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
+        assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.ok_face).getVisibility());
     }
 
@@ -140,7 +131,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withText("Change Trusted Contact")).check(matches(isDisplayed()));
     }
 
-
     private void removeSharedPreference(String prefKey) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -154,7 +144,5 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         editor.putString(prefKey, value);
         editor.apply();
     }
-
-
 
 }

@@ -4,13 +4,14 @@ general:
 
 machine:
   environment:
+    # Use a longer timeout to prevent timeout errors
     ADB_INSTALL_TIMEOUT: 60 # minutes (2 minutes by default)
 
 test:
   override:
   
-    # The two files containing API keys are not tracked in git
-    # Write them from enviroment variables
+    # The files containing API keys are not tracked in git
+    # Write them from environment variables
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
@@ -21,15 +22,16 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     
-    - sleep 30
+    # Keep waiting to make sure it has fully loaded
+    - sleep 30 # seconds
     
     # Remove the lockscreen
     - adb shell input keyevent 82
     
-    # Take screenshot
+    # Take screenshot and copy it to file on host computer
     - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
     
-    # run tests  against the emulator.
+    # Run tests against the emulator.
     - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
