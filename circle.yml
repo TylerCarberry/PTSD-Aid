@@ -1,5 +1,5 @@
 general:
-artifacts:
+  artifacts:
     - /home/ubuntu/PTSD/app/build/outputs/apk/
 
 machine:
