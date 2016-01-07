@@ -5,7 +5,7 @@ general:
 machine:
   environment:
     # Use a longer timeout to prevent timeout errors
-    ADB_INSTALL_TIMEOUT: 60 # minutes (2 minutes by default)
+    ADB_INSTALL_TIMEOUT: "60" # minutes (2 minutes by default)
 
 test:
   override:
@@ -44,7 +44,7 @@ test:
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
     
     
-    - ./gradlew connectedAndroidTest
+    - ./gradlew connectedAndroidTest -PdisablePreDex
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
