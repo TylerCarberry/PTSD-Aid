@@ -16,7 +16,7 @@ test:
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
     # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    - emulator -avd sys-img-armeabi-v7a-addon-google_apis-google-22 -no-audio -no-window:
         background: true
         parallel: true
     # wait for it to have booted
