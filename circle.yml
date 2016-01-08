@@ -15,15 +15,9 @@ test:
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    - emulator -avd sys-img-armeabi-v7a-android-22 -no-audio -no-window:
+    - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
         parallel: true
-        
-    # Download google play services
-    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
-    
-    # Rename
-    - mv download.php\?id\=49240 google-play-services.apk
     
     # Wait for the emulator to start
     - circle-android wait-for-boot
@@ -33,6 +27,12 @@ test:
     
     # Remove the lockscreen
     - adb shell input keyevent 82
+    
+     # Download google play services
+    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
+    
+    # Rename
+    - mv download.php\?id\=49240 google-play-services.apk
     
     # Install google play services
     - ./abd install google-play-services.apk 
