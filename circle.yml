@@ -30,7 +30,7 @@ test:
     - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49188
     
     # Rename
-    - mv download.php\?id\=44032 google-play-services.apk
+    - mv download.php\?id\=49188 google-play-services.apk
     
     # Wait for the emulator to start
     - circle-android wait-for-boot
