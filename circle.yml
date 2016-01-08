@@ -16,7 +16,10 @@ test:
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
     
-    - emulator -avd sys-img-armeabi-v7a-android-22 -no-audio -no-window:
+    # "sys-img-armeabi-v7a-addon-google_apis-google-23"
+    
+    
+    - emulator -avd circleci-android23 -no-audio -no-window:
         background: true
         parallel: true
         
@@ -24,10 +27,10 @@ test:
     
     
     # Download google play services
-    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
+    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49188
     
     # Rename
-    - mv download.php\?id\=49240 google-play-services.apk
+    - mv download.php\?id\=49188 google-play-services.apk
     
     # Wait for the emulator to start
     - circle-android wait-for-boot
