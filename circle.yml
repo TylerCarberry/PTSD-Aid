@@ -15,16 +15,24 @@ test:
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    # start the emulator    
-    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-22, sys-img-armeabi-v7a-addon-google_apis-google-22"
-    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
-    - emulator -avd test -no-audio -no-window:
+    
+    # "sys-img-armeabi-v7a-addon-google_apis-google-23"
+    
+    
+    - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
         parallel: true
         
     - ./gradlew assembleDebug
     
-    # wait for it to have booted
+    
+    # Download google play services
+    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49188
+    
+    # Rename
+    - mv download.php\?id\=44032 google-play-services.apk
+    
+    # Wait for the emulator to start
     - circle-android wait-for-boot
     
     # Keep waiting to make sure it has fully loaded
@@ -32,6 +40,9 @@ test:
     
     # Remove the lockscreen
     - adb shell input keyevent 82
+    
+    # Install google play services
+    - ./abd install google-play-services.apk 
     
     # Take screenshot and copy it to file on host computer
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
@@ -41,8 +52,7 @@ test:
     #- adb shell am start -n com.tytanapps.ptsd/com.tytanapps.ptsd.MainActivity
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
     
-    
-    - ./gradlew connectedAndroidTest -PdisablePreDex
+    - ./gradlew connectedAndroidTest
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
