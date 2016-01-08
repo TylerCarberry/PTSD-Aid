@@ -35,7 +35,7 @@ test:
     - mv download.php\?id\=49240 google-play-services.apk
     
     # Install google play services
-    - ./abd install google-play-services.apk 
+    - adb install google-play-services.apk 
     
     # Take screenshot and copy it to file on host computer
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
