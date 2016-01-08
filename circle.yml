@@ -19,7 +19,7 @@ test:
     # "sys-img-armeabi-v7a-addon-google_apis-google-23"
     
     
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    - emulator -avd circleci-android23 -no-audio -no-window:
         background: true
         parallel: true
         
