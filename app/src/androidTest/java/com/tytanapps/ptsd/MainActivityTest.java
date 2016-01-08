@@ -8,6 +8,9 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -129,6 +132,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         onView(withId(R.id.fab)).perform(longClick());
         onView(withText("Change Trusted Contact")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testGooglePlayServicesInstalled() {
+        // Query for the status of Google Play services on the device
+        int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mainActivity);
+        assertTrue((statusCode == ConnectionResult.SUCCESS) && (GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE >= 0));
     }
 
     private void removeSharedPreference(String prefKey) {
