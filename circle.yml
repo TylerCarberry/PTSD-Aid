@@ -19,9 +19,9 @@ test:
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
     
-    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-22, sys-img-x86-addon-google_apis-google-22"
+    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-22, sys-img-x86_64-addon-google_apis-google-22"
     
-    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --tag google_apis --abi google_apis/x86
+    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --tag google_apis --abi google_apis/x86_64
     - emulator -avd test -no-audio -no-window:
         background: true
         parallel: true
