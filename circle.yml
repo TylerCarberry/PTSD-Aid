@@ -18,6 +18,9 @@ test:
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
+    
+    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-22, sys-img-x86-addon-google_apis-google-22"
+    
     - android create avd --force -n test -t "Google Inc.:Google APIs:22" --tag google_apis --abi google_apis/x86
     - emulator -avd test -no-audio -no-window:
         background: true
