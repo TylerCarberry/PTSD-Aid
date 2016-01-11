@@ -23,7 +23,7 @@ test:
     
     # - android create avd --force -n test -t "Google Inc.:Google APIs:23" --tag google_apis --abi google_apis/armeabi-v7a
     
-    - echo | android create avd --force -n test -t android-23 --abi default/armeabi-v7a
+    - echo | android create avd --force -n test -t android-22 --abi default/armeabi-v7a
     
     
     - emulator -avd test -no-audio -no-window:
