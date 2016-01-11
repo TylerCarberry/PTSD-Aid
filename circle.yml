@@ -25,8 +25,7 @@ test:
     
     - echo | android create avd --force -n test -t android-22 --abi default/armeabi-v7a
     
-    
-    - emulator -avd test -no-audio -no-window:
+    - emulator -avd test -no-audio:
         background: true
         parallel: true
     
@@ -36,8 +35,13 @@ test:
     # Keep waiting to make sure it has fully loaded
     - sleep 60 # seconds
     
+    # Take screenshot and copy it to file on host computer
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
+    
     # Remove the lockscreen
     - adb shell input keyevent 82
+    
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot2.png
     
      # Download google play services
     - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
@@ -45,11 +49,14 @@ test:
     # Rename
     - mv download.php\?id\=49240 google-play-services.apk
     
-    # Install google play services
-    - adb install google-play-services.apk 
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
     
-    # Take screenshot and copy it to file on host computer
-    #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
+    # Install google play services
+    - adb install google-play-services.apk
+    
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot4.png
+    
+    
     # Run tests against the emulator.
     #- ./gradlew installDebug
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot2.png
@@ -60,9 +67,10 @@ test:
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
-    #- cp screenshot.png $CIRCLE_ARTIFACTS
-    #- cp screenshot2.png $CIRCLE_ARTIFACTS
-    #- cp screenshot3.png $CIRCLE_ARTIFACTS
+    - cp screenshot.png $CIRCLE_ARTIFACTS
+    - cp screenshot2.png $CIRCLE_ARTIFACTS
+    - cp screenshot3.png $CIRCLE_ARTIFACTS
+    - cp screenshot4.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
     - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
