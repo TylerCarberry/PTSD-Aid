@@ -21,7 +21,11 @@ test:
     
     - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-22, sys-img-x86_64-addon-google_apis-google-22"
     
-    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --tag google_apis --abi google_apis/x86_64
+    #- android create avd --force -n test -t "Google Inc.:Google APIs:23" --tag google_apis --abi google_apis/armeabi-v7a
+    
+    echo | ./android create avd --force -n test -t android-23 --abi default/armeabi-v7a
+    
+    
     - emulator -avd test -no-audio -no-window:
         background: true
         parallel: true
@@ -36,10 +40,10 @@ test:
     - adb shell input keyevent 82
     
      # Download google play services
-    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
+    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49188
     
     # Rename
-    - mv download.php\?id\=49240 google-play-services.apk
+    - mv download.php\?id\=49188 google-play-services.apk
     
     # Install google play services
     - adb install google-play-services.apk 
