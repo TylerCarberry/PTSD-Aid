@@ -52,7 +52,7 @@ test:
     - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
     
     # Install google play services
-    - adb install google-play-services.apk
+    # - adb install google-play-services.apk
     
     - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot4.png
     
