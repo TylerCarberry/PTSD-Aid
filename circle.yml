@@ -32,10 +32,10 @@ test:
     - adb shell input keyevent 82
     
      # Download google play services
-    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49188
+    - wget https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=49240
     
     # Rename
-    - mv download.php\?id\=49188 google-play-services.apk
+    - mv download.php\?id\=49240 google-play-services.apk
     
     # Install google play services
     - adb install google-play-services.apk
