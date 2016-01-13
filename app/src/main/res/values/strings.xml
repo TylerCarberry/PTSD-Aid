@@ -121,6 +121,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="alarm_service_label">Alarm Service Label</string>
     <string name="profile_picture_content_description">Profile Picture</string>
+    <string name="error_open_dialer">Unable to open the dialer</string>
 
 
 </resources>
