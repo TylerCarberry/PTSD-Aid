@@ -8,8 +8,8 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 8
-        versionName "1.0.2"
+        versionCode 9
+        versionName "1.0.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +37,4 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
-    // Set this dependency if you want to use Hamcrest matching
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
 }
