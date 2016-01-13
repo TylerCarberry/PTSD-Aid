@@ -113,9 +113,6 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         //Log.d(LOG_TAG, "onStart() called with: " + "");
         super.onStart();
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.cancelAlarm();
     }
 
     @Override
@@ -129,10 +126,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop() {
         //Log.d(LOG_TAG, "onStop() called with: " + "");
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.startAlarm(24);
-
         super.onStop();
     }
 
