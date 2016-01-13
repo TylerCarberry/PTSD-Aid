@@ -21,16 +21,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
- * Created by Tyler on 12/10/15.
+ * Test the main fragment containing the emotions and recommendations
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     MainActivity mainActivity;
 
 
-    public MainActivityTest() {
+    public MainFragmentTest() {
         super(MainActivity.class);
     }
 
@@ -46,8 +46,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      */
     @Test
     public void testAlwaysPasses() {
-        int foo = 5;
-        assertEquals(5, foo);
+        assertTrue(true);
     }
 
     /**
@@ -130,7 +129,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.fab)).perform(longClick());
         onView(withText("Change Trusted Contact")).check(matches(isDisplayed()));
     }
-
 
     private void removeSharedPreference(String prefKey) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);

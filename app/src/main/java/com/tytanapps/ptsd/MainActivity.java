@@ -569,7 +569,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(newFragment != null) {
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            switchFragment(newFragment);
+        }
+
+        // Close the drawer layout
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    /**
+     * Switch to a new fragment
+     * Precondition: newFragment is not null
+     * @param newFragment The fragment to switch to
+     */
+    public void switchFragment(Fragment newFragment) {
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment
             transaction.replace(R.id.fragment_container, newFragment);
@@ -577,12 +592,6 @@ public class MainActivity extends AppCompatActivity
 
             // Commit the transaction
             transaction.commit();
-        }
-
-        // Close the drawer layout
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     /**
