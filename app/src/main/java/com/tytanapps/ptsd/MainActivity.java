@@ -447,9 +447,13 @@ public class MainActivity extends AppCompatActivity
      * Open an intent to allow the user to pick one of their contacts
      */
     protected void pickTrustedContact() {
-        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
-        pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+        try {
+            Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+            pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+            startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
