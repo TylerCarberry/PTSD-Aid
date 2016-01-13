@@ -1,5 +1,5 @@
 # PTSD Aid ![app_icon_small](https://cloud.githubusercontent.com/assets/6628497/11610977/0247594c-9b84-11e5-9390-8c0a283b4959.png)
-
+#### Finalist in the [2015 AT&T Civic App Challenge](http://njcivicapp.com/)
 
 Learn more about Post Traumatic Stress Disorder (PTSD) and determine if you or a loved one suffers from it. Also get daily recommendations about managing your stress.
 You can also find PTSD programs offered free of charge at local VA facilities. Quickly find programs, call and make an appointment, and get directions all within the app.
