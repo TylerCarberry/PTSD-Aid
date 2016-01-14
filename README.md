@@ -1,4 +1,4 @@
-# PTSD Aid   [![Available on Google Play](https://cloud.githubusercontent.com/assets/6628497/12286240/7102d86e-b990-11e5-92fa-8448e9c76fa2.png)](https://play.google.com/store/apps/details?id=com.tytanapps.ptsd)
+# PTSD Aid   [![Available on Google Play](https://cloud.githubusercontent.com/assets/6628497/12313130/db2133a6-ba32-11e5-883f-636fac12c0cb.png)](https://play.google.com/store/apps/details?id=com.tytanapps.ptsd)
 
 #### Finalist in the [2015 AT&T Civic App Challenge](http://njcivicapp.com/)
 
