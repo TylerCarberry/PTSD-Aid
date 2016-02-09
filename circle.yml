@@ -15,33 +15,35 @@ test:
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    # start the emulator
-    - emulator -avd sys-img-armeabi-v7a-addon-google_apis-google-21 -no-audio -no-window:
+    # start the emulator    
+    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-21, sys-img-armeabi-v7a-addon-google_apis-google-21"
+    - android create avd --force -n test -t "Google Inc.:Google APIs:21" --abi armeabi-v7a --tag google_apis
+    - emulator -avd test -no-audio -no-window:
         background: true
         parallel: true
+        
+    - ./gradlew assembleDebug
+    
     # wait for it to have booted
     - circle-android wait-for-boot
     
     # Keep waiting to make sure it has fully loaded
-    - sleep 30 # seconds
+    - sleep 60 # seconds
     
     # Remove the lockscreen
     - adb shell input keyevent 82
     
     # Take screenshot and copy it to file on host computer
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
-    
     # Run tests against the emulator.
     #- ./gradlew installDebug
-    
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot2.png
-    
     #- adb shell am start -n com.tytanapps.ptsd/com.tytanapps.ptsd.MainActivity
-    
     #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
     
     
     - ./gradlew connectedAndroidTest
+    #-PdisablePreDex
     
     # copy the build outputs to artifacts
     # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
@@ -50,4 +52,5 @@ test:
     #- cp screenshot3.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
-    - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
+    # - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
