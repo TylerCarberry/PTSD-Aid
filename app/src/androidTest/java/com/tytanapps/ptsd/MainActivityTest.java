@@ -131,11 +131,15 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withText("Change Trusted Contact")).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test whether an updated version of Google Play Services is available on the device
+     * The app needs at least version 8.3
+     */
     @Test
     public void testGooglePlayServicesInstalled() {
         // Query for the status of Google Play services on the device
         int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mainActivity);
-        assertTrue((statusCode == ConnectionResult.SUCCESS) && (GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE >= 0));
+        assertTrue((statusCode == ConnectionResult.SUCCESS) && (GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE >= 8487000));
     }
 
     private void removeSharedPreference(String prefKey) {
