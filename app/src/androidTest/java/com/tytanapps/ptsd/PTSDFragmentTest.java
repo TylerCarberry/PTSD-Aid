@@ -48,7 +48,7 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         // Switch to the PTSD test fragment
         mainActivity.switchFragment(new PTSDTestFragment());
     }
-
+    
     /**
      * Test that answering none for every question results in minimal symptoms
      */
