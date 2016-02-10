@@ -1,11 +1,12 @@
 general:
   artifacts:
-    - /home/ubuntu/PTSD/app/build/
+    - app/build/
 
 machine:
   environment:
     # Use a longer timeout to prevent timeout errors
-    ADB_INSTALL_TIMEOUT: 60 # minutes (2 minutes by default)
+    # See https://code.google.com/p/android/issues/detail?id=189764
+    ADB_INSTALL_TIMEOUT: 30 # minutes (2 minutes by default)
 
 test:
   override:
@@ -15,42 +16,31 @@ test:
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    # start the emulator    
+    # Update the avd
     - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-21, sys-img-armeabi-v7a-addon-google_apis-google-21"
+    
+    # Create an avd using Android 21 with Google APIs
+    # The other versions of Android have an outdated version of Google Play Services, use Android API 21 (5.0 Lollipop)
+    # CircleCi can only run arm based avds, even though they are slower
     - android create avd --force -n test -t "Google Inc.:Google APIs:21" --abi armeabi-v7a --tag google_apis
+    
+    # Start the emulator
     - emulator -avd test -no-audio -no-window:
         background: true
         parallel: true
-        
+    
+    # Start compiling the app
     - ./gradlew assembleDebug
     
-    # wait for it to have booted
+    # Wait for the emulator to have booted
     - circle-android wait-for-boot
     
     # Keep waiting to make sure it has fully loaded
-    - sleep 60 # seconds
+    - sleep 30 # seconds
     
     # Remove the lockscreen
+    # This may not be needed, do it just in case
     - adb shell input keyevent 82
     
-    # Take screenshot and copy it to file on host computer
-    #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot.png
-    # Run tests against the emulator.
-    #- ./gradlew installDebug
-    #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot2.png
-    #- adb shell am start -n com.tytanapps.ptsd/com.tytanapps.ptsd.MainActivity
-    #- adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > screenshot3.png
-    
-    
+    # Run all of the tests on the emulator
     - ./gradlew connectedAndroidTest
-    #-PdisablePreDex
-    
-    # copy the build outputs to artifacts
-    # - cp -r home/ubuntu/PTSD/app/build/outputs $CIRCLE_ARTIFACTS
-    #- cp screenshot.png $CIRCLE_ARTIFACTS
-    #- cp screenshot2.png $CIRCLE_ARTIFACTS
-    #- cp screenshot3.png $CIRCLE_ARTIFACTS
-    
-    # copy the test results to the test results directory.
-    # - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
-    # - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
