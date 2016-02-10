@@ -10,8 +10,8 @@ machine:
     
 dependencies:
   override:
-    export TERM="dumb"
-    if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
+    - export TERM="dumb"
+    - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
 
 test:
   override:
