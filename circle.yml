@@ -5,7 +5,7 @@ general:
 machine:
   environment:
     # Use a longer timeout to prevent timeout errors
-    ADB_INSTALL_TIMEOUT: "60" # minutes (2 minutes by default)
+    ADB_INSTALL_TIMEOUT: 60 # minutes (2 minutes by default)
 
 test:
   override:
