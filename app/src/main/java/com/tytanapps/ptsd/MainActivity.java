@@ -2,6 +2,7 @@ package com.tytanapps.ptsd;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -113,9 +115,6 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         //Log.d(LOG_TAG, "onStart() called with: " + "");
         super.onStart();
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.cancelAlarm();
     }
 
     @Override
@@ -129,10 +128,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop() {
         //Log.d(LOG_TAG, "onStop() called with: " + "");
-
-        AlarmService alarmService = new AlarmService(getBaseContext());
-        alarmService.startAlarm(24);
-
         super.onStop();
     }
 
@@ -439,18 +434,26 @@ public class MainActivity extends AppCompatActivity
      * @param phoneNumber The phone number to call
      */
     protected void openDialer(String phoneNumber) {
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:" + phoneNumber));
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(getBaseContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
      * Open an intent to allow the user to pick one of their contacts
      */
     protected void pickTrustedContact() {
-        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
-        pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+        try {
+            Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+            pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+            startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -576,7 +579,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(newFragment != null) {
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            switchFragment(newFragment);
+        }
+
+        // Close the drawer layout
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    /**
+     * Switch to a new fragment
+     * Precondition: newFragment is not null
+     * @param newFragment The fragment to switch to
+     */
+    public void switchFragment(Fragment newFragment) {
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment
             transaction.replace(R.id.fragment_container, newFragment);
@@ -584,12 +602,6 @@ public class MainActivity extends AppCompatActivity
 
             // Commit the transaction
             transaction.commit();
-        }
-
-        // Close the drawer layout
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     /**

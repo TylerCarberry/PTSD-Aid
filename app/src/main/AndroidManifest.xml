@@ -26,10 +26,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".AlarmReceiver"
-            android:process=":remote" />
-
         <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver"
             android:enabled="true">
             <intent-filter>
