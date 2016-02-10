@@ -54,6 +54,15 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(true);
     }
 
+
+    /**
+     * This test will always fail. If it does not, there is a problem with Android
+     */
+    @Test
+    public void testAlwaysFails() {
+        assertTrue(false);
+    }
+
     /**
      * Verify that all of the emotions are visible when you start the app
      */
