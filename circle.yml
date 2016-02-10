@@ -34,9 +34,6 @@ test:
         background: true
         parallel: true
     
-    # Start compiling the app
-    #- ./gradlew assembleDebug 
-    
     # Wait for the emulator to have booted
     - circle-android wait-for-boot
     
