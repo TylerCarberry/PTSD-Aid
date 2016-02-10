@@ -1,6 +1,6 @@
 general:
   artifacts:
-    - /home/ubuntu/PTSD/app/build/outputs/
+    - /home/ubuntu/PTSD/app/build/
 
 machine:
   environment:
@@ -52,5 +52,5 @@ test:
     #- cp screenshot3.png $CIRCLE_ARTIFACTS
     
     # copy the test results to the test results directory.
-    - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
+    # - cp /home/ubuntu/PTSD/app/build/reports/androidTests/connected/index.html $CIRCLE_TEST_REPORTS
     # - cp -r home/ubuntu/PTSD/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
