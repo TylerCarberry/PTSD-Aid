@@ -7,6 +7,11 @@ machine:
     # Use a longer timeout to prevent timeout errors
     # See https://code.google.com/p/android/issues/detail?id=189764
     ADB_INSTALL_TIMEOUT: 60
+    
+dependencies:
+  override:
+    export TERM="dumb"
+    if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
 
 test:
   override:
