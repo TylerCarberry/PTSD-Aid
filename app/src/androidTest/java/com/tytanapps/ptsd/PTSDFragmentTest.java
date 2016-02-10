@@ -35,7 +35,6 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
 
     MainActivity mainActivity;
 
-
     public PTSDFragmentTest() {
         super(MainActivity.class);
     }
