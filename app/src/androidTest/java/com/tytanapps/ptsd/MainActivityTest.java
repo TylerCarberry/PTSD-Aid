@@ -44,7 +44,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     /**
-     * This test will always pass. If it does not, there is a problem with Android
+     * This test will always pass. If it does not, there is a problem with Espresso
      */
     @Test
     public void testAlwaysPasses() {
@@ -142,6 +142,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue((statusCode == ConnectionResult.SUCCESS) && (GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE >= 8487000));
     }
 
+    /**
+     * Remove a shared preference
+     * @param prefKey The preference to remove
+     */
     private void removeSharedPreference(String prefKey) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -149,6 +153,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         editor.apply();
     }
 
+    /**
+     * Put a string into a shared preference
+     * @param prefKey The key of the preference
+     * @param value The value to save
+     */
     private void putStringSharedPreference(String prefKey, String value) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
