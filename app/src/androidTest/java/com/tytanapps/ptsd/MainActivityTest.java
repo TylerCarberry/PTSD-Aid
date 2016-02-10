@@ -41,9 +41,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         mainActivity = getActivity();
-
-        // Wait 1 second between tests for any animations to stop
-        Thread.sleep(1000);
     }
 
     /**
@@ -52,15 +49,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     @Test
     public void testAlwaysPasses() {
         assertTrue(true);
-    }
-
-
-    /**
-     * This test will always fail. If it does not, there is a problem with Android
-     */
-    @Test
-    public void testAlwaysFails() {
-        assertTrue(false);
     }
 
     /**
