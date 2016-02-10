@@ -43,7 +43,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         mainActivity = getActivity();
 
         // Wait 1 second between tests for any animations to stop
-        Thread.sleep(5000);
+        Thread.sleep(1000);
     }
 
     /**
