@@ -108,7 +108,7 @@ public class Utilities {
                     // The user has blocked location
                 }
                 if (l != null) {
-                    gps[0] = l.getLatitude()
+                    gps[0] = l.getLatitude();
                     gps[1] = l.getLongitude();
                     break;
                 }
