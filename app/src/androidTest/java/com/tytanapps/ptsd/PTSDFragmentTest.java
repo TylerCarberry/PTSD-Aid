@@ -35,7 +35,6 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
 
     MainActivity mainActivity;
 
-
     public PTSDFragmentTest() {
         super(MainActivity.class);
     }
@@ -49,7 +48,7 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         // Switch to the PTSD test fragment
         mainActivity.switchFragment(new PTSDTestFragment());
     }
-
+    
     /**
      * Test that answering none for every question results in minimal symptoms
      */
@@ -91,16 +90,6 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withText(is(mainActivity.getString(R.string.result_medium)))).check(matches(isDisplayed()));
         onView(withText(is(mainActivity.getString(R.string.share_results)))).check(matches(isDisplayed()));
         onView(withText(is(mainActivity.getString(R.string.find_professional)))).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Test that tapping on find professional switches to the nearby facilities fragment
-     */
-    @Test
-    public void testFindProfessional() {
-        onView(withText(is(mainActivity.getString(R.string.submit_test)))).perform(scrollTo(), click());
-        onView(withText(is(mainActivity.getString(R.string.find_professional)))).perform(click());
-        onView(withId(R.id.nearby_facilities_container)).check(matches(isDisplayed()));
     }
 
     /**

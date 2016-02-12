@@ -8,6 +8,9 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +30,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @LargeTest
 public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
+    /**
+     * The activity that will be tested
+     */
     MainActivity mainActivity;
-
 
     public MainFragmentTest() {
         super(MainActivity.class);
@@ -42,7 +47,7 @@ public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     /**
-     * This test will always pass. If it does not, there is a problem with Android
+     * This test will always pass. If it does not, there is a problem with Espresso
      */
     @Test
     public void testAlwaysPasses() {
@@ -65,7 +70,6 @@ public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
     @Test
     public void testTapHappy() {
         onView(withId(R.id.happy_face)).perform(click()).check(matches(isDisplayed()));
-
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.sad_face).getVisibility());
         assertNotSame(View.VISIBLE, mainActivity.findViewById(R.id.ok_face).getVisibility());
     }
@@ -129,7 +133,23 @@ public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.fab)).perform(longClick());
         onView(withText("Change Trusted Contact")).check(matches(isDisplayed()));
     }
+    
+    /**
+     * Test whether any version of Google Play Services is available on the device
+     * The app needs at least version 8.3 but this test will pass even if an outdated version is present
+     */
+    @Test
+    public void testGooglePlayServicesInstalled() {
+        // Query for the status of Google Play services on the device
+        int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mainActivity);
+        assertTrue(statusCode == ConnectionResult.SUCCESS);
+        assertTrue(GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE >= 0);
+    }
 
+    /**
+     * Remove a shared preference
+     * @param prefKey The preference to remove
+     */
     private void removeSharedPreference(String prefKey) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -137,13 +157,16 @@ public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         editor.apply();
     }
 
+    /**
+     * Put a string into a shared preference
+     * @param prefKey The key of the preference
+     * @param value The value to save
+     */
     private void putStringSharedPreference(String prefKey, String value) {
         SharedPreferences sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(prefKey, value);
         editor.apply();
     }
-
-
 
 }

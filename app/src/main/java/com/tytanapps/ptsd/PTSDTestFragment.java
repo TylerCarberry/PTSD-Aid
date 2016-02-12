@@ -281,10 +281,8 @@ public class PTSDTestFragment extends Fragment {
      */
     private int getScore() {
         int score = 0;
-        int[] eachAnswer = getEachAnswer();
-
-        for(int num : eachAnswer) {
-
+        
+        for(int num : getEachAnswer()) {
             if(num > 0)
                 score += num;
             // If a question has not been answered

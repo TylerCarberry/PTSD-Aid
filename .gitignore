@@ -14,3 +14,7 @@ app/google-services.json
 app/app.iml
 
 .idea/dictionaries/Tyler.xml
+
+.idea/encodings.xml
+
+.idea/gradle.xml
