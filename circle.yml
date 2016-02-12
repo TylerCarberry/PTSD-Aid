@@ -1,7 +1,7 @@
 general:
   artifacts:
     - app/build/
-
+ 
 machine:
   environment:
     # Use a longer timeout to prevent timeout errors
