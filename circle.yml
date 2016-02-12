@@ -38,7 +38,7 @@ test:
     - circle-android wait-for-boot
     
     # Keep waiting to make sure it has fully loaded
-    - sleep 60 # seconds
+    - sleep 120 # seconds
     
     # Remove the lockscreen
     # This may not be needed, do it just in case
