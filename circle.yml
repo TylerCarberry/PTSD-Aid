@@ -1,7 +1,7 @@
 general:
   artifacts:
     - app/build/outputs
-    - app/build/reports 
+    - app/build/reports
 
 machine:
   environment:
