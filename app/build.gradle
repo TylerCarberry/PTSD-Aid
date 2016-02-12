@@ -21,7 +21,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     adbOptions {
         // The default timeout is 5 seconds.
         // This is too slow when running on CircleCi, so set a longer timeout
