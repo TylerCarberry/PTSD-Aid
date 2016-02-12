@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-    com.android.ddmlib.DdmPreferences.setTimeOut(30000)
+    com.android.ddmlib.DdmPreferences.setTimeOut(300000)
 
     defaultConfig {
         applicationId "com.tytanapps.ptsd"
@@ -23,7 +23,7 @@ android {
     adbOptions {
         // The default timeout is 5 seconds
         // This is too slow when running on CircleCi, so set a longer timeout
-        timeOutInMs 5 * 60 * 1000 // 5 minutes
+        timeOutInMs 15 * 60 * 1000 // 15 minutes
     }
 }
 
