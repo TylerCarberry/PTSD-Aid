@@ -30,6 +30,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @LargeTest
 public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
+    /**
+     * The activity that will be tested
+     */
     MainActivity mainActivity;
 
     public MainFragmentTest() {
