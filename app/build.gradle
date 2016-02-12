@@ -3,7 +3,10 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-    //com.android.ddmlib.DdmPreferences.setTimeOut(300000) 
+
+    // Increase the timeout when installing the apk
+    // Without it, CircleCi gets a com.android.ddmlib.InstallException
+    com.android.ddmlib.DdmPreferences.setTimeOut(30 * 1000)
 
     defaultConfig {
         applicationId "com.tytanapps.ptsd"
