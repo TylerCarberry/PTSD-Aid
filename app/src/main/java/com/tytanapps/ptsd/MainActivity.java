@@ -187,7 +187,8 @@ public class MainActivity extends AppCompatActivity
             fab.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    showChangeTrustedContactDialog();
+                    showCreateTrustedContactDialog();
+                    //showChangeTrustedContactDialog();
                     return true;
                 }
             });
