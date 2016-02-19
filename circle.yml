@@ -47,3 +47,7 @@ test:
     
     # Run all of the tests on the emulator
     - ./gradlew connectedAndroidTest
+  
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/app/build/outputs/androidTest-results/connected/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
