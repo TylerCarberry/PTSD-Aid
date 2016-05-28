@@ -12,7 +12,7 @@ machine:
 dependencies:
   pre:
     # Update the avd
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
+    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui
   override:
     - export TERM="dumb"
     - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
