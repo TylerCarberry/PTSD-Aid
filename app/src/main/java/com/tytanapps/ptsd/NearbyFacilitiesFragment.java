@@ -1,12 +1,17 @@
 package com.tytanapps.ptsd;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +63,8 @@ public class NearbyFacilitiesFragment extends Fragment {
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGE_WIDTH = 640; // You cannot exceed 640 in the free tier
     private static final int MAP_IMAGE_HEIGHT = 400;
+
+    private static final int PERMISSION_LOCATION_REQUEST = 3;
 
     // Stores the facilities that have already loaded
     // Key: VA Id, Value: The facility with the given id
@@ -111,6 +118,13 @@ public class NearbyFacilitiesFragment extends Fragment {
      * There are multiple PTSD programs per VA facility.
      */
     private void loadPTSDPrograms() {
+        // Request the location permission if it has not been granted
+        if(!locationPermissionGranted()) {
+            requestLocationPermission();
+            return;
+        }
+
+
         String url = calculateVaAPIUrl();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
@@ -442,6 +456,48 @@ public class NearbyFacilitiesFragment extends Fragment {
         // Display the facilities
         for(int i = 0; i < FACILITIES_TO_DISPLAY; i++)
             addFacilityCard(facilities.get(i));
+    }
+
+    private boolean locationPermissionGranted() {
+        // Assume thisActivity is the current activity
+        return ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestLocationPermission() {
+        if (!locationPermissionGranted()) {
+            requestPermissions(
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_LOCATION_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        switch (requestCode) {
+            case PERMISSION_LOCATION_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    loadPTSDPrograms();
+
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    errorLoadingResults(getString(R.string.error_location_permission));
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     /**
@@ -839,5 +895,5 @@ public class NearbyFacilitiesFragment extends Fragment {
         }
         return null;
     }
-
+    
 }
