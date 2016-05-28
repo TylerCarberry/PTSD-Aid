@@ -12,7 +12,7 @@ machine:
 dependencies:
   pre:
     # Update the avd
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui
+    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
   override:
     - export TERM="dumb"
     - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
@@ -28,7 +28,7 @@ test:
     # Create an avd using Android 21 with Google APIs
     # The other versions of Android have an outdated version of Google Play Services, use Android API 21 (5.0 Lollipop)
     # CircleCi can only run arm based avds, even though they are slower
-    - android create avd --force -n test -t "Google Inc.:Google APIs:23" --abi armeabi-v7a --tag google_apis --all
+    - android create avd --force -n test -t "Google Inc.:Google APIs:23" --abi armeabi-v7a --tag google_apis
     
     # Start the emulator
     - emulator -avd test -no-audio -no-window:
