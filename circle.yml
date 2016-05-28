@@ -10,6 +10,12 @@ machine:
     ADB_INSTALL_TIMEOUT: 6000
     
 dependencies:
+  pre:
+    # Update the avd
+    - echo y | android update sdk --no-ui --all --filter tool, extra-android-m2repository, extra-android-support, extra-google-google_play_services, extra-google-m2repository, android-23
+    - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
+    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-21, sys-img-armeabi-v7a-addon-google_apis-google-21"
+
   override:
     - export TERM="dumb"
     - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
@@ -21,12 +27,7 @@ test:
     # Write them from environment variables
     - echo $google_services_json3 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
-    
-    # Update the avd
-    - echo y | android update sdk --no-ui --all --filter tool, extra-android-m2repository, extra-android-support, extra-google-google_play_services, extra-google-m2repository, android-23
-    - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
-    - echo y | android update sdk --no-ui --all --filter "addon-google_apis-google-21, sys-img-armeabi-v7a-addon-google_apis-google-21"
-    
+
     # Create an avd using Android 21 with Google APIs
     # The other versions of Android have an outdated version of Google Play Services, use Android API 21 (5.0 Lollipop)
     # CircleCi can only run arm based avds, even though they are slower
