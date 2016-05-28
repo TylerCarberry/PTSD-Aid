@@ -28,7 +28,7 @@ test:
     # Create an avd using Android 21 with Google APIs
     # The other versions of Android have an outdated version of Google Play Services, use Android API 21 (5.0 Lollipop)
     # CircleCi can only run arm based avds, even though they are slower
-    - android create avd --force -n test -t "Google Inc.:Google APIs:21" --abi armeabi-v7a --tag google_apis
+    - android create avd --force -n test -t "Google Inc.:Google APIs:23" --abi armeabi-v7a --tag google_apis
     
     # Start the emulator
     - emulator -avd test -no-audio -no-window:
