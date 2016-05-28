@@ -48,13 +48,17 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
  * between them using the navigation view.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -72,6 +76,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RC_SIGN_IN = 1;
     private static final int PICK_CONTACT_REQUEST = 2;
+
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +115,41 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the connection to the Google API Client. This does not sign in the user.
         setupGoogleSignIn();
+
+        setupRemoteConfig();
+    }
+
+    private void setupRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+
+        mFirebaseRemoteConfig.fetch(24 * 60 * 60) // cache for 24 hours
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(LOG_TAG, "Fetch Succeeded");
+                        // Once the config is successfully fetched it must be activated before newly fetched
+                        // values are returned.
+                        mFirebaseRemoteConfig.activateFetched();
+                        //displayPrice();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d(LOG_TAG, "Fetch failed");
+                        //mPriceTextView.setText(mFirebaseRemoteConfig.getString(PRICE_PREFIX_CONFIG_KEY) +
+                        //        mFirebaseRemoteConfig.getLong(PRICE_CONFIG_KEY));
+                    }
+                });
+    }
+
+    public FirebaseRemoteConfig getRemoteConfig() {
+        return mFirebaseRemoteConfig;
     }
 
     @Override
