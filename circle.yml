@@ -22,7 +22,7 @@ test:
   
     # The files containing API keys are not tracked in git
     # Write them from environment variables
-    - echo $google_services_json3 > app/google-services.json
+    - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
 
     # Create an avd using Android 21 with Google APIs
