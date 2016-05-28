@@ -123,6 +123,7 @@
     <string name="profile_picture_content_description">Profile Picture</string>
     <string name="error_open_dialer">Unable to open the dialer</string>
     <string name="error_choose_contact">Unable to choose a trusted contact</string>
+    <string name="error_location_permission">Cannot load the VA facilities. Please grant the location permission</string>
 
 
 </resources>
