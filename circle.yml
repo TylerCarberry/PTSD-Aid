@@ -48,7 +48,7 @@ test:
     # Run all of the tests on the emulator
     #- ./gradlew connectedAndroidTest
 
-    ./gradlew build
+    - ./gradlew build
   
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
