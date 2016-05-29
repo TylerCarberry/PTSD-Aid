@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 
 /**
@@ -19,7 +22,25 @@ public class ResourcesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_resources, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_resources, container, false);
+
+        if(getActivity() instanceof RemoteConfigurable) {
+            FirebaseRemoteConfig remoteConfig = ((RemoteConfigurable)getActivity()).getRemoteConfig();
+
+            updateRemoteText(remoteConfig, (TextView) rootView.findViewById(R.id.symptoms_textview), "symptoms_text");
+            updateRemoteText(remoteConfig, (TextView) rootView.findViewById(R.id.causes_textview), "causes_text");
+            updateRemoteText(remoteConfig, (TextView) rootView.findViewById(R.id.diagnosis_textview), "diagnosis_text");
+            updateRemoteText(remoteConfig, (TextView) rootView.findViewById(R.id.treatment_textview), "treatment_text");
+            updateRemoteText(remoteConfig, (TextView) rootView.findViewById(R.id.counseling_textview), "counseling_text");
+        }
+
+        return rootView;
+    }
+
+    private void updateRemoteText(FirebaseRemoteConfig remoteConfig, TextView textView, String key) {
+        String text = remoteConfig.getString(key);
+        text = text.replaceAll("%", "\n");
+        textView.setText(text);
     }
 
 }
