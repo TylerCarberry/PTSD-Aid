@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity
             // we could end up with overlapping fragments.
             if (savedInstanceState == null) {
                 // Create a new Fragment to be placed in the activity layout
-                MainFragment firstFragment = new MainFragment();
+                MainFragment firstFragment = new MainFragment()
 
                 // In case this activity was started with special instructions from an
                 // Intent, pass the Intent's extras to the fragment as arguments
