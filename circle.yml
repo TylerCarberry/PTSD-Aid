@@ -1,6 +1,6 @@
 general:
   artifacts:
-    - PTSD-Aid
+    - PTSD
 
 machine:
   environment:
