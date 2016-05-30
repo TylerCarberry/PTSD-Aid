@@ -22,85 +22,100 @@
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"/>
 
-            <TextView
-                android:id="@+id/facility_name_textview"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/facility_imageview"
-                android:text="Placeholder Name"
-                android:gravity="center"
-                android:background="@color/transparent_white"
-                android:textSize="25sp"/>
-
-            <ImageButton
-                android:id="@+id/facility_phone_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/facility_name_textview"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:layout_alignParentLeft="true"
-                android:background="@android:color/transparent"
-                android:src="@drawable/call_icon"/>
-
-            <TextView
-                android:id="@+id/facility_phone_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/facility_phone_icon"
-                android:layout_toRightOf="@id/facility_phone_icon"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:text="Phone Placeholder"
-                android:textSize="25sp" />
-
-            <ImageButton
-                android:id="@+id/facility_address_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/facility_phone_textview"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:layout_alignParentLeft="true"
-                android:background="@android:color/transparent"
-                android:src="@drawable/map_icon"/>
-
-            <TextView
-                android:id="@+id/facility_address_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/facility_address_icon"
-                android:layout_toRightOf="@id/facility_phone_icon"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:text="Address Placeholder"
-                android:textSize="25sp" />
-            
-            <TextView
-                android:id="@+id/facility_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:layout_below="@+id/facility_address_textview"
-                android:text="Detail Placeholder"
-                android:textSize="15sp"/>
-
-            <Button
-                android:id="@+id/more_info_button"
-                android:theme="@style/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/facility_details"
-                android:layout_alignParentLeft="true"
-                android:text="More Info"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+                android:layout_below="@id/facility_imageview">
+
+
+
+
+                <TextView
+                    android:id="@+id/facility_name_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="Placeholder Name"
+                    android:gravity="center"
+                    android:background="@color/transparent_white"
+                    android:textSize="25sp"/>
+
+                <ImageButton
+                    android:id="@+id/facility_phone_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/facility_name_textview"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:layout_alignParentLeft="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/call_icon"/>
+
+                <TextView
+                    android:id="@+id/facility_phone_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/facility_phone_icon"
+                    android:layout_toRightOf="@id/facility_phone_icon"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:text="Phone Placeholder"
+                    android:textSize="25sp" />
+
+                <ImageButton
+                    android:id="@+id/facility_address_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/facility_phone_textview"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:layout_alignParentLeft="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/map_icon"/>
+
+                <TextView
+                    android:id="@+id/facility_address_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/facility_address_icon"
+                    android:layout_toRightOf="@id/facility_phone_icon"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:text="Address Placeholder"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/facility_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:layout_below="@+id/facility_address_textview"
+                    android:text="Detail Placeholder"
+                    android:textSize="15sp"/>
+
+                <Button
+                    android:id="@+id/more_info_button"
+                    android:theme="@style/button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/facility_details"
+                    android:layout_alignParentLeft="true"
+                    android:text="More Info"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

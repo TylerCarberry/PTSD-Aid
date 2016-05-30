@@ -62,7 +62,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     // Dimensions for the Google Maps ImageView
     private static final int MAP_IMAGE_WIDTH = 640; // You cannot exceed 640 in the free tier
-    private static final int MAP_IMAGE_HEIGHT = 400;
+    private static final int MAP_IMAGE_HEIGHT = 350;
 
     private static final int PERMISSION_LOCATION_REQUEST = 3;
 
