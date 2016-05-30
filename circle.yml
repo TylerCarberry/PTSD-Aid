@@ -18,7 +18,7 @@ dependencies:
   pre:
     # Update the avd
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
-    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22,sys-img-armeabi-v7a-google_apis-23,sys-img-armeabi-v7a-google_apis-22
     
   # override:
     # - export TERM="dumb"
@@ -32,7 +32,7 @@ test:
     - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    # - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
+    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
     
     - android list targets
     
