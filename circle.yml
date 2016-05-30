@@ -18,6 +18,8 @@ dependencies:
   pre:
     # Update the avd
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22
+    
   # override:
     # - export TERM="dumb"
     # - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
@@ -29,8 +31,22 @@ test:
     # Write them from environment variables
     - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
-
-    - ./gradlew build
+    
+    - ./android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
+    
+    # start the emulator
+    - emulator -avd test -no-audio -no-window:
+        background: true
+        parallel: true
+    # wait for it to have booted
+    - circle-android wait-for-boot
+    # unlock the emulator screen
+    - sleep 30
+    - adb shell input keyevent 82
+    # run tests  against the emulator.
+    - ./gradlew connectedAndroidTest -PdisablePreDex
+    
+    # - ./gradlew build
   
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
