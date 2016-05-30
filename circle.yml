@@ -12,13 +12,15 @@ machine:
     # See https://circleci.com/docs/oom/#out-of-memory-errors-in-android-builds
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
     
+    TERM: "dumb"
+    
 dependencies:
   pre:
     # Update the avd
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
-  override:
-    - export TERM="dumb"
-    - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
+  # override:
+    # - export TERM="dumb"
+    # - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
 
 test:
   override:
