@@ -27,23 +27,14 @@ dependencies:
     - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-addon-google_apis-google-22 # System image, requires android-22 and addon-google_apis-google-22, provides Google APIs
     - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-android-22 # System image, requires android-22
 
-    
-  # override:
-    # - export TERM="dumb"
-    # - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
-
 test:
   override:
-  
     # The files containing API keys are not tracked in git
     # Write them from environment variables
     - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    # - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
-    
-    - android list targets
-    
+    # Create an avd with play services
     - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
     
     # Start the emulator
@@ -53,16 +44,15 @@ test:
     
     # Wait for the emulator to have booted
     - circle-android wait-for-boot
-    
-    # unlock the emulator screen
     - sleep 30
+    
+    # Unlock the emulator screen
     - adb shell input keyevent 82
     
-    # run tests  against the emulator.
+    # Run espresso tests on the emulator.
     - ./gradlew connectedAndroidTest -PdisablePreDex
-    
-    # - ./gradlew build
   
   post:
+    # Collect the test reports
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/app/build/outputs/androidTest-results/connected/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
