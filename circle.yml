@@ -1,9 +1,3 @@
-# For an example circle.yml, see https://github.com/halvards/android-travis-spike/blob/master/initialize-android.sh
-
-general:
-  artifacts:
-    - PTSD
-
 machine:
   environment:
     # Use a longer timeout to prevent timeout errors
@@ -56,3 +50,6 @@ test:
     # Collect the test reports
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/app/build/outputs/androidTest-results/connected/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    
+    # Collect artifacts
+    - cp -r . $CIRCLE_ARTIFACTS
