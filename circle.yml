@@ -46,12 +46,12 @@ test:
     
     - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
     
-    # start the emulator
+    # Start the emulator
     - emulator -avd test -no-audio -no-window:
-      background: true
-      parallel: true
+        background: true
+        parallel: true
     
-    # wait for it to have booted
+    # Wait for the emulator to have booted
     - circle-android wait-for-boot
     
     # unlock the emulator screen
