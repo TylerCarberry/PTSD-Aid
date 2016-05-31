@@ -1,3 +1,5 @@
+# For an example circle.yml, see https://github.com/halvards/android-travis-spike/blob/master/initialize-android.sh
+
 general:
   artifacts:
     - PTSD
@@ -20,6 +22,12 @@ dependencies:
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22,sys-img-armeabi-v7a-google_apis-23,sys-img-armeabi-v7a-google_apis-22
     
+    - echo y | android update sdk --all --no-ui --filter android-22
+    - echo y | android update sdk --all --no-ui --filter addon-google_apis-google-22 # Google APIs, use with sys-img-armeabi-v7a-addon-google_apis-google-22
+    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-addon-google_apis-google-22 # System image, requires android-22 and addon-google_apis-google-22, provides Google APIs
+    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-android-22 # System image, requires android-22
+
+    
   # override:
     # - export TERM="dumb"
     # - if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
@@ -32,21 +40,26 @@ test:
     - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
-    - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
+    # - android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi armeabi-v7a --tag google_apis
     
     - android list targets
     
+    - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
+    
     # start the emulator
-    # - emulator -avd test -no-audio -no-window:
-    #    background: true
-    #    parallel: true
+    - emulator -avd test -no-audio -no-window:
+      background: true
+      parallel: true
+    
     # wait for it to have booted
-    # - circle-android wait-for-boot
+    - circle-android wait-for-boot
+    
     # unlock the emulator screen
-    # - sleep 30
-    # - adb shell input keyevent 82
+    - sleep 30
+    - adb shell input keyevent 82
+    
     # run tests  against the emulator.
-    # - ./gradlew connectedAndroidTest -PdisablePreDex
+    - ./gradlew connectedAndroidTest -PdisablePreDex
     
     # - ./gradlew build
   
