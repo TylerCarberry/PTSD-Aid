@@ -44,7 +44,8 @@ test:
     - adb shell input keyevent 82
     
     # Run espresso tests on the emulator.
-    - ./gradlew connectedAndroidTest -PdisablePreDex
+    - ./gradlew connectedAndroidTest -PdisablePreDex:
+      timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
   
   post:
     # Collect the test reports
