@@ -53,11 +53,6 @@ public class MainFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testAlwaysPasses() {
         assertTrue(true);
     }
-    
-    @Test
-    public void testAlwaysFails() {
-        assertTrue(false);
-    }
 
     /**
      * Verify that all of the emotions are visible when you start the app
