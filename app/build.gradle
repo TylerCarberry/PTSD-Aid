@@ -6,7 +6,7 @@ android {
 
     // Increase the timeout when installing the apk
     // Without it, CircleCi gets a com.android.ddmlib.InstallException
-    com.android.ddmlib.DdmPreferences.setTimeOut(30 * 1000)
+    com.android.ddmlib.DdmPreferences.setTimeOut(30 * 60 * 1000) // Set the timeout to 30 minutes
 
     defaultConfig {
         applicationId "com.tytanapps.ptsd"
@@ -26,7 +26,7 @@ android {
     adbOptions {
         // The default timeout is 5 seconds
         // This is too slow when running on CircleCi, so set a longer timeout
-        timeOutInMs 15 * 60 * 1000 // 15 minutes
+        timeOutInMs 30 * 60 * 1000 // 30 minutes
     }
 }
 
