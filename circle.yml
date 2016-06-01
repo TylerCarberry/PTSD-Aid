@@ -38,7 +38,7 @@ test:
     
     # Wait for the emulator to have booted
     - circle-android wait-for-boot
-    - sleep 30
+    - sleep 60
     
     # Unlock the emulator screen
     - adb shell input keyevent 82
