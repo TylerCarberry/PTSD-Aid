@@ -53,6 +53,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import angtrim.com.fivestarslibrary.FiveStarsDialog;
+import angtrim.com.fivestarslibrary.NegativeReviewListener;
+import angtrim.com.fivestarslibrary.ReviewListener;
+
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
  * between them using the navigation view.
@@ -117,6 +121,38 @@ public class MainActivity extends AppCompatActivity
         setupGoogleSignIn();
 
         setupRemoteConfig();
+
+        showRatingPrompt();
+    }
+
+    /**
+     * Prompt the user to rate the app on Google Play
+     * If the user selects 4/5 stars they are brought to the Play Store
+     * If they select 1-3 it opens an email intent
+     */
+    private void showRatingPrompt() {
+        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"tyler.carberry@gmail.com");
+        fiveStarsDialog.setRateText("How well do you like the app?")
+                .setTitle("Enjoying the app?")
+                .setForceMode(false)
+                .setUpperBound(4) // Market opened if a rating >= 4 is selected
+                .setNegativeReviewListener(new NegativeReviewListener() {
+                    @Override
+                    public void onNegativeReview(int i) {
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                "mailto","tyler.carberry@gmail.com", null));
+                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PTSD Aid");
+                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello! I would like to give feedback on PTSD Aid!\nWhat I liked:\n\nWhat I didn't like:\n\n");
+                        startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                    }
+                }) // OVERRIDE mail intent for negative review
+                .setReviewListener(new ReviewListener() {
+                    @Override
+                    public void onReview(int i) {
+
+                    }
+                }) // Used to listen for reviews (if you want to track them )
+                .showAfter(3);
     }
 
     private void setupRemoteConfig() {
