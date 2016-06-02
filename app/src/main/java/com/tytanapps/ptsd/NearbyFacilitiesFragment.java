@@ -75,7 +75,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     private int numberOfLoadedFacilities = 0;
 
     // The number of facilities to display on screen
-    private static final int FACILITIES_TO_DISPLAY = 15;
+    private static final int FACILITIES_TO_DISPLAY = 10;
 
     // Required default constructor
     public NearbyFacilitiesFragment() {
@@ -96,7 +96,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private ViewGroup getViewGroup() {
         View rootView = getView();
-        if(rootView instanceof ViewGroup)
+        if(rootView != null && rootView instanceof ViewGroup)
             return (ViewGroup) getView();
         return null;
     }
@@ -109,8 +109,16 @@ public class NearbyFacilitiesFragment extends Fragment {
         super.onStart();
 
         // Prevent loading the facilities multiple times
-        if(knownFacilities.size() == 0)
-            loadPTSDPrograms();
+        if(knownFacilities.size() == 0) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    loadPTSDPrograms();
+                }
+            });
+            t.run();
+
+        }
     }
 
     /**
