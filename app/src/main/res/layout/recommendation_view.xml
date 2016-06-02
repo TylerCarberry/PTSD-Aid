@@ -20,6 +20,7 @@
         android:layout_toRightOf="@id/bullet_imageview"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:text="Recommendations placeholder"
+        android:fontFamily="sans-serif-light"
         android:textSize="27sp"/>
 
 </RelativeLayout>

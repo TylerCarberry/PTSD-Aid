@@ -16,7 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/nvf"
-            android:adjustViewBounds="true"/>
+            android:adjustViewBounds="true"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
         <TextView
             android:id="@+id/website_name_textview"
@@ -24,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/website_icon_imageview"
             android:gravity="center_horizontal"
+            android:fontFamily="sans-serif-medium"
             android:textSize="30sp" />
 
         <TextView
@@ -31,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/website_name_textview"
+            android:fontFamily="sans-serif-light"
             android:textSize="20sp"/>
 
     </RelativeLayout>
