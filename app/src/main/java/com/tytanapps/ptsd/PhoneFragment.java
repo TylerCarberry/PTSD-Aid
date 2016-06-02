@@ -53,8 +53,7 @@ public class PhoneFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        readPhoneNumbers(database);
+
 
         // Write a message to the database
         //writeToDatabase(database);
@@ -62,6 +61,20 @@ public class PhoneFragment extends Fragment {
 
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                readPhoneNumbers(database);
+            }
+        });
+        t.start();
     }
 
     private void writeToDatabase(FirebaseDatabase database) {
@@ -130,8 +143,6 @@ public class PhoneFragment extends Fragment {
         Bitmap bitmap = drawableToBitmap(drawable);
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-        Log.d(LOG_TAG, "drawableToBase64: Null? " + (drawable == null));
-
         Canvas canvas = new Canvas(mutableBitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
@@ -156,31 +167,40 @@ public class PhoneFragment extends Fragment {
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
 
-                View rootView = getView();
-                if(rootView != null) {
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        View rootView = getView();
+                        if(rootView != null) {
 
-                    GenericTypeIndicator<HashMap<String, HashMap<String, String>>> t
-                            = new GenericTypeIndicator<HashMap<String, HashMap<String, String>>>() {
-                    };
-                    HashMap<String, HashMap<String, String>> hashMap = dataSnapshot.getValue(t);
+                            GenericTypeIndicator<HashMap<String, HashMap<String, String>>> t
+                                    = new GenericTypeIndicator<HashMap<String, HashMap<String, String>>>() {
+                            };
+                            HashMap<String, HashMap<String, String>> hashMap = dataSnapshot.getValue(t);
 
-                    if (hashMap != null) {
+                            if (hashMap != null) {
 
-                        LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
-                        LayoutInflater inflater = LayoutInflater.from(getActivity());
+                                LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
+                                LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                        for (HashMap<String, String> phoneSupport : hashMap.values()) {
+                                for (HashMap<String, String> phoneSupport : hashMap.values()) {
 
-                            insertPhoneCard(phoneSupport, phoneNumbersLinearLayout, inflater);
+                                    insertPhoneCard(phoneSupport, phoneNumbersLinearLayout, inflater);
 
 
+                                }
+                            }
                         }
                     }
-                }
+                });
+
+                t.run();
+
+
             }
 
             @Override
@@ -199,11 +219,6 @@ public class PhoneFragment extends Fragment {
                 String desc = phoneSupport.get("description");
                 String phone = phoneSupport.get("phone_number");
                 String bitmap_base64 = phoneSupport.get("icon");
-
-
-                Log.d(LOG_TAG, "Name: " + name);
-                Log.d(LOG_TAG, "Desc: " + desc);
-                Log.d(LOG_TAG, "Phone Number: " + phone);
 
                 CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
