@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -257,6 +259,9 @@ public class PhoneFragment extends Fragment {
             });
 
             phoneNumbersLinearLayout.addView(phoneCardView);
+            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
+                    R.anim.bottom_up);
+            phoneCardView.startAnimation(bottomUp);
         }
 
         return phoneCardView;
