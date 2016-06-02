@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -33,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
-import java.util.Random;
 
 
 /**
@@ -296,11 +294,5 @@ public class PhoneFragment extends Fragment {
         } catch (ActivityNotFoundException activityNotFoundException) {
             Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public int getRandomColor() {
-        Random rnd = new Random();
-        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-
     }
 }
