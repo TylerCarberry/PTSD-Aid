@@ -153,6 +153,10 @@ public class MainFragment extends Fragment {
                     });
                     fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
                     fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
+
 
                     animateOutEmotionPrompt();
 
@@ -168,6 +172,9 @@ public class MainFragment extends Fragment {
                     });
                     fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
                     fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
 
                     animateOutEmotionPrompt();
                     break;
@@ -190,6 +197,9 @@ public class MainFragment extends Fragment {
                     }
                     fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
                     fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
+                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
 
                     animateOutEmotionPrompt();
                     break;
@@ -241,8 +251,8 @@ public class MainFragment extends Fragment {
             p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
             emotionsLinearLayout.setLayoutParams(p);
 
-            View promptEmotionTextView = fragmentView.findViewById(R.id.prompt_emotion);
-            fadeOutAndRemoveView(promptEmotionTextView, 200);
+            //View promptEmotionTextView = fragmentView.findViewById(R.id.prompt_emotion);
+            //fadeOutAndRemoveView(promptEmotionTextView, 200);
 
             TextView headerTextView = (TextView) fragmentView.findViewById(R.id.main_header_text_view);
             headerTextView.setText(R.string.recommendations_title);
