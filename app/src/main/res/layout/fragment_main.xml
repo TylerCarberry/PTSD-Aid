@@ -23,93 +23,106 @@
         android:textColor="@color/white"
         android:fontFamily="sans-serif" />
 
-    <LinearLayout
-        android:id="@+id/emotions_linear_layout"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/emotions_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/main_header_text_view"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:clipChildren="false"
         android:clipToPadding="false"
-        android:animateLayoutChanges="true">
-
-        <ImageView
-            android:id="@+id/happy_face"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:src="@drawable/happy_emoji"
-            android:gravity="center"
-            android:contentDescription="@string/happy_face_content_description"/>
-
-        <ImageView
-            android:id="@+id/ok_face"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:src="@drawable/ok_emoji"
-            android:gravity="center"
-            android:contentDescription="@string/ok_face_content_description"/>
-
-        <ImageView
-            android:id="@+id/sad_face"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/single_tear_emoji"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:gravity="center"
-            android:contentDescription="@string/sad_face_content_description"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/emotions2_linear_layout"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/emotions_linear_layout"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
         android:clipChildren="false"
-        android:clipToPadding="false"
-        android:animateLayoutChanges="true">
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/sick_face"
+        <LinearLayout
+            android:id="@+id/emotions_linear_layout"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:src="@drawable/sick_emoji"
             android:gravity="center"
-            android:contentDescription="Sick"/>
+            android:layout_centerHorizontal="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:animateLayoutChanges="true">
 
-        <ImageView
-            android:id="@+id/poop_emoji"
+            <ImageView
+                android:id="@+id/happy_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:src="@drawable/happy_emoji"
+                android:gravity="center"
+                android:contentDescription="@string/happy_face_content_description"/>
+
+            <ImageView
+                android:id="@+id/ok_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:src="@drawable/ok_emoji"
+                android:gravity="center"
+                android:contentDescription="@string/ok_face_content_description"/>
+
+            <ImageView
+                android:id="@+id/sad_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/single_tear_emoji"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:gravity="center"
+                android:contentDescription="@string/sad_face_content_description"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/emotions2_linear_layout"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/poop_emoji"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_below="@id/emotions_linear_layout"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:gravity="center"
-            android:contentDescription="Poop"/>
+            android:layout_centerHorizontal="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:animateLayoutChanges="true">
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/sick_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:src="@drawable/sick_emoji"
+                android:gravity="center"
+                android:contentDescription="Sick"/>
+
+            <ImageView
+                android:id="@+id/poop_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/poop_emoji"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:gravity="center"
+                android:contentDescription="Poop"/>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
 
 
 
@@ -118,10 +131,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_below="@+id/emotions_linear_layout">
+        android:layout_below="@+id/emotions_container">
 
         <LinearLayout
             android:id="@+id/recommendations_linear_layout"

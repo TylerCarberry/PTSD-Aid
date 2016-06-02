@@ -52,6 +52,8 @@ public class MainFragment extends Fragment {
         rootView.findViewById(R.id.happy_face).setOnClickListener(emotionSelectedListener);
         rootView.findViewById(R.id.ok_face).setOnClickListener(emotionSelectedListener);
         rootView.findViewById(R.id.sad_face).setOnClickListener(emotionSelectedListener);
+        rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
+        rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
 
         return rootView;
     }
@@ -134,11 +136,15 @@ public class MainFragment extends Fragment {
             RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
             TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
 
+            // Remove on click listener from the emoji
             emotionPressed.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                 }
             });
+
+            fadeOutAllEmojiExcept(emotionPressed.getId());
+            animateOutEmotionPrompt();
 
             switch (emotionPressed.getId()) {
 
@@ -151,14 +157,8 @@ public class MainFragment extends Fragment {
                             openDrawer();
                         }
                     });
-                    fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
 
 
-                    animateOutEmotionPrompt();
 
                     break;
                 case R.id.ok_face:
@@ -170,13 +170,7 @@ public class MainFragment extends Fragment {
                             openDrawer();
                         }
                     });
-                    fragmentView.findViewById(R.id.sad_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
 
-                    animateOutEmotionPrompt();
                     break;
                 case R.id.sad_face:
                     // Don't recommend calling a trusted contact if one does not exist
@@ -195,13 +189,7 @@ public class MainFragment extends Fragment {
                             }
                         });
                     }
-                    fragmentView.findViewById(R.id.happy_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.ok_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.sick_face).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.poop_emoji).setVisibility(View.GONE);
-                    fragmentView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
 
-                    animateOutEmotionPrompt();
                     break;
             }
 
@@ -236,6 +224,22 @@ public class MainFragment extends Fragment {
             }
 
             animateInRecommendations(parentFrameLayout);
+        }
+    }
+
+    private void fadeOutAllEmojiExcept(int emoji_id) {
+        LinearLayout emojiLayout1 = (LinearLayout) getView().findViewById(R.id.emotions_linear_layout);
+        for(int i = 0; i < emojiLayout1.getChildCount(); i++) {
+            View child = emojiLayout1.getChildAt(i);
+            if(child.getId() != emoji_id)
+                child.setVisibility(View.GONE);
+        }
+
+        LinearLayout emojiLayout2 = (LinearLayout) getView().findViewById(R.id.emotions2_linear_layout);
+        for(int i = 0; i < emojiLayout2.getChildCount(); i++) {
+            View child = emojiLayout2.getChildAt(i);
+            if(child.getId() != emoji_id)
+                child.setVisibility(View.GONE);
         }
     }
 
