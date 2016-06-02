@@ -50,6 +50,7 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     private static final int PICK_CONTACT_REQUEST = 2;
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private boolean alreadySetPersistence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,11 @@ public class MainActivity extends AppCompatActivity
                 getFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, firstFragment).commit();
             }
+        }
+
+        if(!alreadySetPersistence) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            alreadySetPersistence = true;
         }
 
         // Set up the side drawer layout containing the user's information and navigation items

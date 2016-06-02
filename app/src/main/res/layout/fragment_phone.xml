@@ -10,175 +10,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/phone_linear_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
+            android:layout_height="wrap_content"
             android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin">
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/veterans_crisis_line_cardview"
-                android:layout_marginBottom="@dimen/activity_vertical_margin">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/veteran_support_imageview"
-                        android:src="@drawable/veterans_crisis_line"
-                        android:adjustViewBounds="true"/>
-
-                    <TextView
-                        android:id="@+id/veteran_support_phone_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/veteran_support_imageview"
-                        android:gravity="center_horizontal"
-                        android:text="@string/phone_veterans_crisis_line"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:id="@+id/veteran_support_details"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/veteran_support_phone_textview"
-                        android:text="@string/veterans_support_phone_details"
-                        android:textSize="20sp"/>
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/suicide_lifeline_cardview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/veterans_crisis_line_cardview"
-                android:layout_marginBottom="@dimen/activity_vertical_margin" >
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/suicide_lifeline_imageview"
-                        android:src="@drawable/nspl"
-                        android:adjustViewBounds="true"/>
-
-                    <TextView
-                        android:id="@+id/suicide_lifeline_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/suicide_lifeline_imageview"
-                        android:gravity="center_horizontal"
-                        android:text="@string/phone_veterans_crisis_line"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:id="@+id/suicide_lifeline_details"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/suicide_lifeline_textview"
-                        android:text="@string/suicide_lifeline_phone_details"
-                        android:textSize="20sp"/>
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/alcoholism_cardview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/suicide_lifeline_cardview"
-                android:layout_marginBottom="@dimen/activity_vertical_margin">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp" >
-
-                    <ImageView
-                        android:id="@+id/alcoholism_helpline_imageview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ncadd"
-                        android:adjustViewBounds="true"/>
-
-                    <TextView
-                        android:id="@+id/alcoholism_helpline_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/alcoholism_helpline_imageview"
-                        android:gravity="center_horizontal"
-                        android:text="@string/phone_alcoholism"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:id="@+id/safe_helpline_details"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/alcoholism_helpline_textview"
-                        android:text="@string/alcohol_phone_details"
-                        android:textSize="20sp"/>
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/veterans_foundation_cardview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/alcoholism_cardview"
-                android:layout_marginBottom="@dimen/activity_vertical_margin">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp" >
-
-                    <ImageView
-                        android:id="@+id/veterans_foundation_imageview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/nvf"
-                        android:adjustViewBounds="true"/>
-
-                    <TextView
-                        android:id="@+id/veterans_foundation_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/veterans_foundation_imageview"
-                        android:gravity="center_horizontal"
-                        android:text="@string/phone_veterans_foundation_hotline"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:id="@+id/veterans_foundation_details"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/veterans_foundation_textview"
-                        android:text="@string/veterans_foundation_phone_details"
-                        android:textSize="20sp"/>
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
-        </RelativeLayout>
+        </LinearLayout>
 
     </ScrollView>
 
