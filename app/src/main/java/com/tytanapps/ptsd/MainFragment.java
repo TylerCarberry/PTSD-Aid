@@ -286,7 +286,7 @@ public class MainFragment extends Fragment {
                 // Slide the view up and fade in
                 layout.animate()
                         .translationY(0)
-                        .alpha(1.0f).setDuration(1000);
+                        .alpha(1.0f).setDuration(500);
             }
         });
     }
