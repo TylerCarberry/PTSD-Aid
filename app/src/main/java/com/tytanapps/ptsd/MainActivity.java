@@ -1,5 +1,7 @@
 package com.tytanapps.ptsd;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
@@ -8,14 +10,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     // The connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
@@ -502,6 +508,59 @@ public class MainActivity extends AppCompatActivity
             showCreateTrustedContactDialog();
     }
 
+    private boolean contactsPermissionGranted() {
+        // Assume thisActivity is the current activity
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestContactsPermission() {
+        if (!contactsPermissionGranted()) {
+            requestPermissions(
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    PERMISSION_CONTACT_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        switch (requestCode) {
+            case PERMISSION_CONTACT_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    pickTrustedContact();
+
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                    alertDialog.setTitle("Please grant the contacts permission");
+                    alertDialog.setMessage("Grant the contacts permission to continue");
+                    alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            
+                        }
+                    });
+                    alertDialog.create().show();
+
+                    //errorLoadingResults(getString(R.string.error_location_permission));
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
     /**
      * Read a shared preference string from memory
      * @param prefKey The key of the shared preference
@@ -531,12 +590,18 @@ public class MainActivity extends AppCompatActivity
      * Open an intent to allow the user to pick one of their contacts
      */
     protected void pickTrustedContact() {
-        try {
-            Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
-            pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-            startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+        if(!contactsPermissionGranted()) {
+            requestContactsPermission();
+        }
+        else {
+
+            try {
+                Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+                pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+            } catch (ActivityNotFoundException activityNotFoundException) {
+                Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
