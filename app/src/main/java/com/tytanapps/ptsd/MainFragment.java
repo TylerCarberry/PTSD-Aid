@@ -149,82 +149,105 @@ public class MainFragment extends Fragment {
             switch (emotionPressed.getId()) {
 
                 case R.id.happy_face:
-                    emotionTextView.setText(R.string.recommendation_resources);
-                    recommendationsLinearLayout.addView(emotionRecommendationLayout);
-                    emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            openDrawer();
-                        }
-                    });
-
-
-
+                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
                     break;
-                case R.id.ok_face:
-                    emotionTextView.setText(R.string.recommendation_test);
-                    recommendationsLinearLayout.addView(emotionRecommendationLayout);
-                    emotionTextView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            openDrawer();
-                        }
-                    });
 
+                case R.id.ok_face:
+                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
                     break;
                 case R.id.sad_face:
-                    // Don't recommend calling a trusted contact if one does not exist
-                    String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                    if (!trustedContactPhone.equals("")) {
-                        emotionTextView.setText(R.string.recommendation_call_trusted_contact);
-                        recommendationsLinearLayout.addView(emotionRecommendationLayout);
-                        emotionRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                                if (!phoneNumber.equals(""))
-                                    ((MainActivity) getActivity()).openDialer(phoneNumber);
-                                else
-                                    ((MainActivity) getActivity()).showCreateTrustedContactDialog();
-                            }
-                        });
-                    }
+                    if (isUserSignedIn())
+                        recommendationsLinearLayout.addView(getCallTrustedContactLayout());
 
                     break;
+
+                case R.id.sick_face:
+                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
+
+                    break;
+
+                case R.id.poop_emoji:
+                    if (trustedContactCreated())
+                        recommendationsLinearLayout.addView(getCallTrustedContactLayout());
+
+                    break;
+
             }
 
-            if (!isUserSignedIn()) {
-                RelativeLayout signInRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
-                TextView signInTextView = (TextView) signInRecommendationLayout.findViewById(R.id.recommendation_textview);
-                signInTextView.setText(R.string.recommendation_sign_in);
+            if (!isUserSignedIn())
+                recommendationsLinearLayout.addView(getSuggestionSignInLayout());
 
-                signInRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        signIn();
-                    }
-                });
-
-                recommendationsLinearLayout.addView(signInRecommendationLayout);
-            }
-
-            String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-            if (trustedContactPhone.equals("")) {
-                RelativeLayout trustedContactRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
-                TextView trustedContactTextView = (TextView) trustedContactRecommendationLayout.findViewById(R.id.recommendation_textview);
-                trustedContactTextView.setText(R.string.recommendation_add_trusted_contact);
-                trustedContactRecommendationLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ((MainActivity) getActivity()).showCreateTrustedContactDialog();
-                    }
-                });
-
-                recommendationsLinearLayout.addView(trustedContactRecommendationLayout);
-            }
+            if (!trustedContactCreated())
+                recommendationsLinearLayout.addView(getAddTrustedContactLayout());
 
             animateInRecommendations(parentFrameLayout);
         }
+    }
+
+    private RelativeLayout getSuggestionLayoutTemplate() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        return (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
+    }
+
+    /**
+     *
+     * @return
+     */
+    private RelativeLayout getAddTrustedContactLayout() {
+       return createSuggestionLayout(getString(R.string.recommendation_add_trusted_contact), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+            }
+        });
+    }
+
+    private RelativeLayout getSuggestionSignInLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_sign_in), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+    }
+
+    private RelativeLayout getCallTrustedContactLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_call_trusted_contact), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                if (!phoneNumber.equals(""))
+                    ((MainActivity) getActivity()).openDialer(phoneNumber);
+                else
+                    ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+            }
+        });
+    }
+
+    private RelativeLayout getLearnResourcesLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_resources), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDrawer();
+            }
+        });
+
+    }
+
+    private RelativeLayout createSuggestionLayout(String text, View.OnClickListener onClickListener) {
+        RelativeLayout suggestionLayout = getSuggestionLayoutTemplate();
+        TextView signInTextView = (TextView) suggestionLayout.findViewById(R.id.recommendation_textview);
+        signInTextView.setText(text);
+        suggestionLayout.setOnClickListener(onClickListener);
+
+        return suggestionLayout;
+    }
+
+
+
+    private boolean trustedContactCreated() {
+        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        return !trustedContactPhone.equals("");
     }
 
     private void fadeOutAllEmojiExcept(int emoji_id) {
