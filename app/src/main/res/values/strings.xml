@@ -124,6 +124,9 @@
     <string name="error_open_dialer">Unable to open the dialer</string>
     <string name="error_choose_contact">Unable to choose a trusted contact</string>
     <string name="error_location_permission">Cannot load the VA facilities. Please grant the location permission</string>
+    <string name="recommendation_call_suicide_lifeline">Call Suicide Lifeline</string>
+    <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
+    <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
 
 
 </resources>

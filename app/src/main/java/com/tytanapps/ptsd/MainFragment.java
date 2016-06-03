@@ -4,8 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -17,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -147,17 +151,22 @@ public class MainFragment extends Fragment {
             animateOutEmotionPrompt();
 
             switch (emotionPressed.getId()) {
-
                 case R.id.happy_face:
+                    recommendationsLinearLayout.addView(getVeteranBenefitsLayout());
                     recommendationsLinearLayout.addView(getLearnResourcesLayout());
                     break;
 
                 case R.id.ok_face:
                     recommendationsLinearLayout.addView(getLearnResourcesLayout());
+                    recommendationsLinearLayout.addView(getJoinVeteranAssociationLayout());
+
                     break;
+
                 case R.id.sad_face:
                     if (isUserSignedIn())
                         recommendationsLinearLayout.addView(getCallTrustedContactLayout());
+
+                    recommendationsLinearLayout.addView(getJoinVeteranAssociationLayout());
 
                     break;
 
@@ -170,15 +179,18 @@ public class MainFragment extends Fragment {
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getCallTrustedContactLayout());
 
+                    recommendationsLinearLayout.addView(getCallSuicideLifelineLayout());
+
                     break;
 
             }
 
-            if (!isUserSignedIn())
-                recommendationsLinearLayout.addView(getSuggestionSignInLayout());
+            //if (!isUserSignedIn())
+            //    recommendationsLinearLayout.addView(getSuggestionSignInLayout());
 
             if (!trustedContactCreated())
                 recommendationsLinearLayout.addView(getAddTrustedContactLayout());
+
 
             animateInRecommendations(parentFrameLayout);
         }
@@ -211,15 +223,43 @@ public class MainFragment extends Fragment {
         });
     }
 
+    private RelativeLayout getVeteranBenefitsLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+    }
+
+    private RelativeLayout getJoinVeteranAssociationLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+    }
+
     private RelativeLayout getCallTrustedContactLayout() {
         return createSuggestionLayout(getString(R.string.recommendation_call_trusted_contact), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
-                    ((MainActivity) getActivity()).openDialer(phoneNumber);
+                    openDialer(phoneNumber);
                 else
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+            }
+        });
+    }
+
+    private RelativeLayout getCallSuicideLifelineLayout() {
+        return createSuggestionLayout(getString(R.string.recommendation_call_suicide_lifeline), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
+                openDialer(phoneNumber);
             }
         });
     }
@@ -326,6 +366,22 @@ public class MainFragment extends Fragment {
                         .alpha(1.0f).setDuration(500);
             }
         });
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    private void openDialer(String phoneNumber) {
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
