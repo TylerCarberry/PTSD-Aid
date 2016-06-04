@@ -58,6 +58,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.tytanapps.ptsd.fragments.MainFragment;
+import com.tytanapps.ptsd.fragments.NearbyFacilitiesFragment;
+import com.tytanapps.ptsd.fragments.PTSDTestFragment;
+import com.tytanapps.ptsd.fragments.PhoneFragment;
+import com.tytanapps.ptsd.fragments.ResourcesFragment;
+import com.tytanapps.ptsd.fragments.WebsiteFragment;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
@@ -391,7 +397,7 @@ public class MainActivity extends AppCompatActivity
      * Is the user signed in to the app with their Google Account
      * @return Whether the user is signed in to the app
      */
-    protected boolean isUserSignedIn() {
+    public boolean isUserSignedIn() {
         return isUserSignedIn;
     }
 
@@ -455,7 +461,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    protected void showCreateTrustedContactDialog() {
+    public void showCreateTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton(R.string.add_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
@@ -673,7 +679,7 @@ public class MainActivity extends AppCompatActivity
      * Get the request queue. Creates it if it has not yet been instantiated
      * @return The request queue for connecting with an API
      */
-    protected RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue() {
         if(requestQueue == null)
             instantiateRequestQueue();
 
@@ -683,7 +689,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Create the request queue. This is used to connect to the API in the background
      */
-    protected void instantiateRequestQueue() {
+    private void instantiateRequestQueue() {
         // Instantiate the cache
         Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
 

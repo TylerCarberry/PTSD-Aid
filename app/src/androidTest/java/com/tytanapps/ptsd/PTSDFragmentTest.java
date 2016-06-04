@@ -10,6 +10,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.widget.SeekBar;
 
+import com.tytanapps.ptsd.fragments.PTSDTestFragment;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;

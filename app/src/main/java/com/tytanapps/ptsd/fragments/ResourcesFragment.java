@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.RemoteConfigurable;
 
 
 /**

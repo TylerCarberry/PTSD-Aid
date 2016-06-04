@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="com.tytanapps.ptsd.MainFragment"
+    tools:context=".fragments.MainFragment"
     android:clipChildren="false"
     android:clipToPadding="false">
 

@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -21,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
 
 
 /**

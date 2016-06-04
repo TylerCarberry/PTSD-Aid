@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -29,6 +29,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.tytanapps.ptsd.Facility;
+import com.tytanapps.ptsd.FacilityAdapter;
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.Utilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -856,10 +861,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         Activity parentActivity = getActivity();
         if(parentActivity != null && parentActivity instanceof MainActivity) {
             RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
-            if (requestQueue == null) {
-                ((MainActivity) getActivity()).instantiateRequestQueue();
-                requestQueue = ((MainActivity) getActivity()).getRequestQueue();
-            }
             return requestQueue;
         }
         return null;

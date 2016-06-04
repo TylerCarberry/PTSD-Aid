@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.tytanapps.ptsd.R;
 
 import io.techery.progresshint.ProgressHintDelegate;
 

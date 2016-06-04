@@ -1,7 +1,6 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.app.Fragment;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,7 +20,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,34 +27,29 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.tytanapps.ptsd.R;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
 
 /**
- * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
- * the phone number to call. Tapping on the hotline calls them.
+ * Displays a list of websites to find more information about PTSD. Shows a brief description for
+ * each website. Tapping on the card opens the website.
  */
-public class PhoneFragment extends Fragment {
+public class WebsiteFragment extends Fragment {
 
-    private static final String LOG_TAG = PhoneFragment.class.getSimpleName();
+    private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 
-    public PhoneFragment() {
+    public WebsiteFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
-
-
-
-        // Write a message to the database
-        //writeToDatabase(database);
-
-
+        View rootView = inflater.inflate(R.layout.fragment_website, container, false);
 
         return rootView;
     }
@@ -69,7 +62,8 @@ public class PhoneFragment extends Fragment {
             @Override
             public void run() {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                readPhoneNumbers(database);
+                //writeToDatabase(database);
+                readWebsites(database);
             }
         });
         t.start();
@@ -78,29 +72,32 @@ public class PhoneFragment extends Fragment {
     private void writeToDatabase(FirebaseDatabase database) {
 
 
-        DatabaseReference myRef = database.getReference("phone_support");
+        DatabaseReference myRef = database.getReference("web_support");
         HashMap<String, HashMap<String, Object>> phones = new HashMap<>();
 
-        HashMap<String, Object> veteransCrisisLineHashmap = createPhoneHashMap("Veterans Crisis Line", getString(R.string.phone_veterans_crisis_line), getString(R.string.veterans_support_phone_details), R.drawable.veterans_crisis_line);
-        phones.put((String) veteransCrisisLineHashmap.get("name"), veteransCrisisLineHashmap);
+        HashMap<String, Object> veteransChatHashmap = createWebsiteHashMap(getString(R.string.veterans_chat_title), getString(R.string.website_chat), getString(R.string.veterans_chat_details), R.drawable.veterans_crisis_line);
+        phones.put((String) veteransChatHashmap.get("name"), veteransChatHashmap);
 
-        HashMap<String, Object> suicideHashmap = createPhoneHashMap("Suicide Lifeline", getString(R.string.phone_suicide_lifeline), getString(R.string.suicide_lifeline_phone_details), R.drawable.nspl);
-        phones.put((String) suicideHashmap.get("name"), suicideHashmap);
+        HashMap<String, Object> nimhHashmap = createWebsiteHashMap(getString(R.string.nimh_title), getString(R.string.website_nimh), getString(R.string.nimh_details), R.drawable.nimh);
+        phones.put((String) nimhHashmap.get("name"), nimhHashmap);
 
-        HashMap<String, Object> ncaadHashmap = createPhoneHashMap("NCAAD", getString(R.string.phone_alcoholism), getString(R.string.alcohol_phone_details), R.drawable.ncadd);
-        phones.put((String) ncaadHashmap.get("name"), ncaadHashmap);
+        HashMap<String, Object> vaHashmap = createWebsiteHashMap(getString(R.string.veterans_affairs), getString(R.string.website_va), getString(R.string.veteran_affairs_details), R.drawable.va);
+        phones.put((String) vaHashmap.get("name"), vaHashmap);
 
-        HashMap<String, Object> lifelineVetsHashmap = createPhoneHashMap("Lifeline for Vets", getString(R.string.phone_veterans_foundation_hotline), getString(R.string.veterans_foundation_phone_details), R.drawable.nvf);
-        phones.put((String) lifelineVetsHashmap.get("name"), lifelineVetsHashmap);
+        HashMap<String, Object> selfQuizHashmap = createWebsiteHashMap(getString(R.string.self_quiz), getString(R.string.website_self_check), getString(R.string.quiz_details), R.drawable.veterans_quiz);
+        phones.put((String) selfQuizHashmap.get("name"), selfQuizHashmap);
+
+        HashMap<String, Object> ptsdCoachHashmap = createWebsiteHashMap(getString(R.string.ptsd_coach), getString(R.string.website_coach), getString(R.string.ptsd_coach_details), R.drawable.ptsd_coach);
+        phones.put((String) ptsdCoachHashmap.get("name"), ptsdCoachHashmap);
 
         myRef.setValue(phones);
     }
 
-    private HashMap<String, Object> createPhoneHashMap(String name, String phoneNumber, String description, int drawableId) {
+    private HashMap<String, Object> createWebsiteHashMap(String name, String url, String description, int drawableId) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("name", name);
         hashMap.put("description", description);
-        hashMap.put("phone_number", phoneNumber);
+        hashMap.put("url", url);
 
         Bitmap bmp =  BitmapFactory.decodeResource(getResources(), drawableId);//your image
         ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
@@ -159,8 +156,8 @@ public class PhoneFragment extends Fragment {
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
-    private void readPhoneNumbers(final FirebaseDatabase database) {
-        DatabaseReference myRef = database.getReference("phone_support");
+    private void readWebsites(final FirebaseDatabase database) {
+        DatabaseReference myRef = database.getReference("web_support");
 
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
@@ -182,12 +179,11 @@ public class PhoneFragment extends Fragment {
 
                             if (hashMap != null) {
 
-                                LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
+                                LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
                                 LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                                for (HashMap<String, String> phoneSupport : hashMap.values()) {
-
-                                    insertPhoneCard(phoneSupport, phoneNumbersLinearLayout, inflater);
+                                for (HashMap<String, String> webSupport : hashMap.values()) {
+                                    insertWebCard(webSupport, websiteLinearLayout, inflater);
 
 
                                 }
@@ -209,26 +205,26 @@ public class PhoneFragment extends Fragment {
         });
     }
 
-    private void insertPhoneCard(final HashMap<String, String> phoneSupport, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
+    private void insertWebCard(final HashMap<String, String> webSupport, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String name = phoneSupport.get("name");
-                String desc = phoneSupport.get("description");
-                String phone = phoneSupport.get("phone_number");
-                String bitmap_base64 = phoneSupport.get("icon");
+                String name = webSupport.get("name");
+                String desc = webSupport.get("description");
+                String url = webSupport.get("url");
+                String bitmap_base64 = webSupport.get("icon");
 
-                CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
+                CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-                TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
-                descTextView.setText(desc);
+                TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+                nameTextView.setText(name);
 
-                TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
-                phoneTextView.setText(phone);
+                TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+                detailsTextView.setText(desc);
 
 
                 if (bitmap_base64 != null) {
-                    ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
+                    ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
 
                     byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
                     Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
@@ -244,55 +240,50 @@ public class PhoneFragment extends Fragment {
 
     }
 
-    private CardView getPhoneCardView(LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, String name, final String phoneNumber) {
-        CardView phoneCardView = null;
+    private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
+        CardView websiteCardView = null;
 
-        for(int i = 0; i < phoneNumbersLinearLayout.getChildCount(); i++) {
-            View child = phoneNumbersLinearLayout.getChildAt(i);
+        for(int i = 0; i < websitesLinearLayout.getChildCount(); i++) {
+            View child = websitesLinearLayout.getChildAt(i);
             if(child.getTag() != null && child.getTag().equals(name))
-                phoneCardView = (CardView) child;
+                websiteCardView = (CardView) child;
         }
-        if(phoneCardView == null) {
-            phoneCardView = (CardView) inflater.inflate(R.layout.phone_cardview, (ViewGroup) getView(), false);
+        if(websiteCardView == null) {
+            websiteCardView = (CardView) inflater.inflate(R.layout.web_cardview, (ViewGroup) getView(), false);
 
-            phoneCardView.setTag(name);
+            websiteCardView.setTag(name);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
 
             params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
-            phoneCardView.setLayoutParams(params);
+            websiteCardView.setLayoutParams(params);
 
-            phoneCardView.setOnClickListener(new View.OnClickListener() {
+            websiteCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openDialer(phoneNumber);
+                    openBrowser(url);
                 }
             });
 
-            phoneNumbersLinearLayout.addView(phoneCardView);
-            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.bottom_up);
-            phoneCardView.startAnimation(bottomUp);
+            websitesLinearLayout.addView(websiteCardView);
+            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_up);
+            websiteCardView.startAnimation(bottomUp);
         }
 
-        return phoneCardView;
+        return websiteCardView;
     }
 
     /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
      */
-    private void openDialer(String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
+    private void openBrowser(String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
+
 }
