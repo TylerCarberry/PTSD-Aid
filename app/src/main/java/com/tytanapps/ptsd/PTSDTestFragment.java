@@ -15,6 +15,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import io.techery.progresshint.ProgressHintDelegate;
+
 
 /**
  * A short multiple choice quiz to determine if you suffer from PTSD. Based on the results, gives
@@ -64,8 +66,30 @@ public class PTSDTestFragment extends Fragment {
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
             questionTextView.setText(question);
+            //questionTextView.setText("Sample Question");
 
             questionsLinearLayout.addView(layout);
+
+            io.techery.progresshint.addition.widget.SeekBar seekBar = (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
+
+            seekBar.getHintDelegate()
+                    .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {
+                        @Override public String getHint(android.widget.SeekBar seekBar, int progress) {
+                            String progressHint;
+                            if(progress < seekBar.getMax() / 5.0)
+                                progressHint = getString(R.string.not_at_all);
+                            else if(progress < seekBar.getMax() * 2.0/5)
+                                progressHint = getString(R.string.little_bit);
+                            else if(progress < seekBar.getMax() * 3.0/5)
+                                progressHint = getString(R.string.moderately);
+                            else if(progress < seekBar.getMax() * 4.0/5)
+                                progressHint = getString(R.string.quite_a_bit);
+                            else
+                                progressHint = getString(R.string.extremely);
+                            
+                            return progressHint;
+                        }
+                    });
         }
 
         addSubmitButton(questionsLinearLayout);
@@ -264,7 +288,7 @@ public class PTSDTestFragment extends Fragment {
 
                 if (childView instanceof ViewGroup) {
                     SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
-                    score[questionCount] = seekBar.getProgress() + 1;
+                    score[questionCount] = seekBar.getProgress()/((seekBar.getMax()+1)/5) + 1;
 
                     questionCount++;
                 }

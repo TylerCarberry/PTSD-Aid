@@ -48,6 +48,7 @@ dependencies {
     compile 'com.google.firebase:firebase-database:9.0.1'
 
     compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
+    compile 'com.github.techery.progresshint:library-addition:0.2.3'
 
     testCompile 'junit:junit:4.12'
 
