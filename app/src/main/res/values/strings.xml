@@ -127,6 +127,7 @@
     <string name="recommendation_call_suicide_lifeline">Call the suicide lifeline</string>
     <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
     <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
+    <string name="facility_more_info">More Info</string>
 
 
 </resources>

@@ -4,25 +4,23 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
@@ -49,6 +47,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -77,6 +76,10 @@ public class NearbyFacilitiesFragment extends Fragment {
     // The number of facilities to display on screen
     private static final int FACILITIES_TO_DISPLAY = 10;
 
+    private List<Facility> facilityList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private FacilityAdapter mAdapter;
+
     // Required default constructor
     public NearbyFacilitiesFragment() {
 
@@ -85,7 +88,17 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
+
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+
+        mAdapter = new FacilityAdapter(facilityList, getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        return rootView;
     }
 
     /**
@@ -339,26 +352,27 @@ public class NearbyFacilitiesFragment extends Fragment {
     /**
      * Load the facility image and place it into facilityImageView.
      * Try the street view image first, then the map image, then the default image.
-     * @param facilityImageView The ImageView to place the image into
      * @param facility The facility
      */
-    private void loadFacilityImage(ImageView facilityImageView, Facility facility) {
+    private void loadFacilityImage(Facility facility) {
         Bitmap cachedBitmap = loadCacheFacilityImage(facility.getFacilityId());
 
         if(cachedBitmap != null)
-            facilityImageView.setImageBitmap(cachedBitmap);
+            facility.setFacilityImage(cachedBitmap);
         else
-            loadStreetViewImage(facilityImageView, facility);
+            loadStreetViewImage(facility);
+
+        //if(facilityList.size() > 0)
+            mAdapter.notifyDataSetChanged();
     }
 
     /**
      * Load the street view imagery for the given address.
      * If there is no street view imagery, it uses the map view instead.
      * You should not call this directly. Call loadFacilityImage instead
-     * @param imageView The ImageView to place the image into
      * @param facility The facility
      */
-    private void loadStreetViewImage(final ImageView imageView, final Facility facility) {
+    private void loadStreetViewImage(final Facility facility) {
         Log.d(LOG_TAG, "Entering load street view image.");
 
         String url = "";
@@ -367,7 +381,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         try {
             url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
-            loadMapImage(imageView, facility);
+            loadMapImage(facility);
             return;
         }
         Log.d(LOG_TAG, url);
@@ -379,11 +393,11 @@ public class NearbyFacilitiesFragment extends Fragment {
                     public void onResponse(Bitmap bitmap) {
                         // If there is no street view image for the address use the map view instead
                         if(validStreetViewBitmap(bitmap)) {
-                            imageView.setImageBitmap(bitmap);
+                            facility.setFacilityImage(bitmap);
                             saveFacilityImage(bitmap, facility.getFacilityId());
                         }
                         else
-                            loadMapImage(imageView, facility);
+                            loadMapImage(facility);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -391,7 +405,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
 
                         // Load the map view instead
-                        loadMapImage(imageView, facility);
+                        loadMapImage(facility);
                     }
                 });
 
@@ -405,10 +419,9 @@ public class NearbyFacilitiesFragment extends Fragment {
      * Load the Google Maps imagery for the given address.
      * If there is no map imagery, it uses the default image instead.
      * You should not call this directly. Call loadFacilityImage instead
-     * @param imageView The ImageView to place the image into
      * @param facility The facility
      */
-    private void loadMapImage(final ImageView imageView, final Facility facility) {
+    private void loadMapImage(final Facility facility) {
         //Log.d(LOG_TAG, "loadMapImage() called with: " + "imageView = [" + imageView + "], facility = [" + facility + "]");
 
         final int defaultImageId = R.drawable.default_facility_image;
@@ -418,7 +431,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            imageView.setImageResource(defaultImageId);
+            facility.setFacilityImage(BitmapFactory.decodeResource(getResources(), defaultImageId));
             return;
         }
         Log.d(LOG_TAG, url);
@@ -429,14 +442,14 @@ public class NearbyFacilitiesFragment extends Fragment {
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
-                        imageView.setImageBitmap(bitmap);
+                        facility.setFacilityImage(bitmap);
                         saveFacilityImage(bitmap, facility.getFacilityId());
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d(LOG_TAG, "IMAGE errorListener " + error.toString());
-                        imageView.setImageResource(defaultImageId);
+                        facility.setFacilityImage(BitmapFactory.decodeResource(getResources(), defaultImageId));
                     }
                 });
 
@@ -458,12 +471,24 @@ public class NearbyFacilitiesFragment extends Fragment {
         hideLoadingBar();
 
         // Sort the facilities by distance
-        ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
+        final ArrayList<Facility> facilities = new ArrayList<>(knownFacilities.values());
         Collections.sort(facilities);
 
         // Display the facilities
-        for(int i = 0; i < FACILITIES_TO_DISPLAY; i++)
-            addFacilityCard(facilities.get(i));
+        for(int i = 0; i < FACILITIES_TO_DISPLAY; i++) {
+            final Facility facility = facilities.get(i);
+            facilityList.add(facility);
+
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    loadFacilityImage(facility);
+                }
+            });
+            t.run();
+        }
+
+        mAdapter.notifyDataSetChanged();
     }
 
     private boolean locationPermissionGranted() {
@@ -756,22 +781,6 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
-     * Get the url for the Google Maps Api
-     * @param name The street address
-     * @param town The town
-     * @param state The state. Can be initials or full name
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    private Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
-        // Encode the address
-        String location = name + ", " + town + ", " + state;
-        location = URLEncoder.encode(location, "UTF-8");
-
-        return Uri.parse("geo:0,0?q=" + location);
-    }
-
-    /**
      * Add a card to the list containing information about the facility
      * @param facility The facility to add
      */
@@ -786,104 +795,8 @@ public class NearbyFacilitiesFragment extends Fragment {
             String description = facility.getDescription();
             final String phoneNumber = Utilities.getFirstPhoneNumber(facility.getPhoneNumber());
 
-            // If the facility does not have all of its information, do not show it
-            if(name != null && description != null && phoneNumber != null) {
-                TextView nameTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_name_textview);
-                nameTextView.setText(name);
 
-                TextView descriptionTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_details);
-                descriptionTextView.setText(description);
-
-                View.OnClickListener callOnClick = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openDialer(phoneNumber);
-                    }
-                };
-
-                TextView phoneTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_phone_textview);
-                phoneTextView.setText(phoneNumber);
-                phoneTextView.setOnClickListener(callOnClick);
-
-                ImageView phoneIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_phone_icon);
-                phoneIcon.setOnClickListener(callOnClick);
-
-                View.OnClickListener mapOnClick = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            openMapIntent(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-                TextView addressTextView = (TextView) cardRelativeLayout.findViewById(R.id.facility_address_textview);
-                addressTextView.setText(facility.getFullAddress());
-                addressTextView.setOnClickListener(mapOnClick);
-
-                ImageView addressIcon = (ImageView) cardRelativeLayout.findViewById(R.id.facility_address_icon);
-                addressIcon.setOnClickListener(mapOnClick);
-
-                ImageView facilityImageView = (ImageView) cardRelativeLayout.findViewById(R.id.facility_imageview);
-                loadFacilityImage(facilityImageView, facility);
-                facilityImageView.setOnClickListener(mapOnClick);
-
-                // Tapping the more info button opens the website
-                Button moreInfoButton = (Button) cardRelativeLayout.findViewById(R.id.more_info_button);
-                moreInfoButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                        openUrl(url);
-                    }
-                });
-
-                // Add the facility card to the list
-                LinearLayout parentLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.facilities_linear_layout);
-                parentLinearLayout.addView(cardRelativeLayout);
-            }
         }
-    }
-
-    /**
-     * Open the maps app to a specified location
-     * @param geoLocation The uri of the location to open
-     */
-    private void openMapIntent(Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    private void openDialer(String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Opens the browser to the specified url
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    private void openUrl(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        startActivity(intent);
     }
 
     /**

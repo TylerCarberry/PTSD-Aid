@@ -113,7 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/facility_details"
                     android:layout_alignParentLeft="true"
-                    android:text="More Info"
+                    android:text="@string/facility_more_info"
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"

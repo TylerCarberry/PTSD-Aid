@@ -1,5 +1,7 @@
 package com.tytanapps.ptsd;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +38,8 @@ public class Facility implements Comparable<Facility>, Serializable {
 
     // The distance from the user in miles
     private double distance;
+
+    private Bitmap facilityImage;
 
     // The PTSD programs offered at that location
     private Set<String> programs;
@@ -305,5 +309,13 @@ public class Facility implements Comparable<Facility>, Serializable {
         if(getDistance() > another.getDistance())
             return 1;
         return 0;
+    }
+
+    public Bitmap getFacilityImage() {
+        return facilityImage;
+    }
+
+    public void setFacilityImage(Bitmap facilityImage) {
+        this.facilityImage = facilityImage;
     }
 }
