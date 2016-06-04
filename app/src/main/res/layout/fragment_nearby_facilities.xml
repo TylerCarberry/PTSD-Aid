@@ -25,8 +25,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:textSize="25sp"
-        android:text="@string/loading"/>
+        android:textSize="25sp" />
 
     <Button
         android:id="@+id/retry_load_button"
