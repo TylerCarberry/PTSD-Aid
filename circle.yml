@@ -48,7 +48,7 @@ test:
     #    timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
     
     - ./gradlew build:
-      timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
+        timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
   
   post:
     # Collect the test reports
