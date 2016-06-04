@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -150,28 +151,78 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"tyler.carberry@gmail.com");
-        fiveStarsDialog.setRateText("How well do you like the app?")
-                .setTitle("Enjoying the app?")
-                .setForceMode(false)
-                .setUpperBound(4) // Market opened if a rating >= 4 is selected
-                .setNegativeReviewListener(new NegativeReviewListener() {
-                    @Override
-                    public void onNegativeReview(int i) {
-                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                                "mailto","tyler.carberry@gmail.com", null));
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PTSD Aid");
-                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello! I would like to give feedback on PTSD Aid!\nWhat I liked:\n\nWhat I didn't like:\n\n");
-                        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                    }
-                }) // OVERRIDE mail intent for negative review
-                .setReviewListener(new ReviewListener() {
-                    @Override
-                    public void onReview(int i) {
+        int ratingPromptShowAfter = (int) mFirebaseRemoteConfig.getDouble("rating_prompt_show_after");
+        int ratingUpperBound = (int) mFirebaseRemoteConfig.getDouble("rating_upper_bound");
+        final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
 
-                    }
-                }) // Used to listen for reviews (if you want to track them )
-                .showAfter(3);
+        final String deviceInformation = getDeviceInformation();
+
+        if(ratingPromptShowAfter > 0) {
+            FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
+            fiveStarsDialog.setRateText("How well do you like PTSD Aid?")
+                    .setTitle("Enjoying the app?")
+                    .setForceMode(false)
+                    .setUpperBound(ratingUpperBound) // Market opened if a rating >= 4 is selected
+                    .setNegativeReviewListener(new NegativeReviewListener() {
+                        @Override
+                        public void onNegativeReview(int i) {
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                    "mailto", supportEmailAddress, null));
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PTSD Aid");
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello! I would like to give feedback on PTSD Aid!\n\nWhat I liked:\n\nWhat I didn't like:\n\n\nDevice Information:\n" + deviceInformation);
+                            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        }
+                    }) // OVERRIDE mail intent for negative review
+                    .setReviewListener(new ReviewListener() {
+                        @Override
+                        public void onReview(int i) {
+
+                        }
+                    }) // Used to listen for reviews (if you want to track them )
+                    .showAfter(ratingPromptShowAfter);
+        }
+    }
+
+    private String getDeviceInformation() {
+        String deviceInformation = "";
+
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            int verCode = pInfo.versionCode;
+            
+            deviceInformation += "APP VERSION: " + version + " (" + verCode + ")\n";
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
+        //deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
+        //deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
+        //deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
+        //deviceInformation += "BOARD: " + Build.BOARD + "\n";
+        //deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
+        deviceInformation += "BRAND: " + Build.BRAND + "\n";
+        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
+        //deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
+        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
+        //deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
+        //deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
+        //deviceInformation += "HOST: " + Build.HOST + "\n";
+        //deviceInformation += "ID: " + Build.ID + "\n";
+        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
+        deviceInformation += "MODEL: " + Build.MODEL + "\n";
+        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
+        //deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
+        //deviceInformation += "TAGS: " + Build.TAGS + "\n";
+        //deviceInformation += "TYPE: " + Build.TYPE + "\n";
+        //deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
+        //deviceInformation += "USER: " + Build.USER + "\n";
+        //deviceInformation += "TIME: " + Build.TIME + "\n";
+
+        return deviceInformation;
     }
 
     private void setupRemoteConfig() {
@@ -190,15 +241,12 @@ public class MainActivity extends AppCompatActivity
                         // Once the config is successfully fetched it must be activated before newly fetched
                         // values are returned.
                         mFirebaseRemoteConfig.activateFetched();
-                        //displayPrice();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         Log.d(LOG_TAG, "Fetch failed");
-                        //mPriceTextView.setText(mFirebaseRemoteConfig.getString(PRICE_PREFIX_CONFIG_KEY) +
-                        //        mFirebaseRemoteConfig.getLong(PRICE_CONFIG_KEY));
                     }
                 });
     }
