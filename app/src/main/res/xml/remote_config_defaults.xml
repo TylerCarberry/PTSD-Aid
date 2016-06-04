@@ -21,5 +21,10 @@
         <key>counseling_text</key>
         <value>The Vet Centers provides bereavement, military sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center use the VA Facilities tab</value>
     </entry>
+    <entry>
+        <key>show_extra_emoji</key>
+        <value>false</value>
+    </entry>
+
 </defaultsMap>
     <!-- END xml_defaults -->

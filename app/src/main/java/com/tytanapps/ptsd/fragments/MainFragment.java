@@ -22,8 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.RemoteConfigurable;
 
 
 /**
@@ -59,8 +61,20 @@ public class MainFragment extends Fragment {
         rootView.findViewById(R.id.happy_face).setOnClickListener(emotionSelectedListener);
         rootView.findViewById(R.id.ok_face).setOnClickListener(emotionSelectedListener);
         rootView.findViewById(R.id.sad_face).setOnClickListener(emotionSelectedListener);
-        rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
-        rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
+
+        if(getActivity() instanceof RemoteConfigurable) {
+            FirebaseRemoteConfig remoteConfig = ((RemoteConfigurable)getActivity()).getRemoteConfig();
+
+            if(remoteConfig.getBoolean("show_extra_emoji")){
+                rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
+                rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
+            }
+            else {
+                rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
+            }
+        }
+
+
 
         return rootView;
     }
