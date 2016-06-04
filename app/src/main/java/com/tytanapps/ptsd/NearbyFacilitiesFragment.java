@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -88,7 +89,32 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
+
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                numberOfLoadedFacilities = 0;
+                knownFacilities.clear();
+                facilityList.clear();
+                mAdapter.notifyDataSetChanged();
+
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadPTSDPrograms();
+                    }
+                });
+                t.run();
+            }
+        });
+        swipeRefreshLayout.setEnabled(false);
+
+
+        return rootView;
     }
 
     /**
@@ -505,6 +531,10 @@ public class NearbyFacilitiesFragment extends Fragment {
             });
             t.run();
         }
+
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(true);
 
         mAdapter.notifyDataSetChanged();
     }
