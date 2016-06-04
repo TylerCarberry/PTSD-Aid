@@ -25,7 +25,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 
@@ -70,8 +69,6 @@ public class WebsiteFragment extends Fragment {
     }
 
     private void writeToDatabase(FirebaseDatabase database) {
-
-
         DatabaseReference myRef = database.getReference("web_support");
         HashMap<String, HashMap<String, Object>> phones = new HashMap<>();
 
@@ -160,7 +157,7 @@ public class WebsiteFragment extends Fragment {
         DatabaseReference myRef = database.getReference("web_support");
 
         // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.orderByChild("order").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -171,30 +168,17 @@ public class WebsiteFragment extends Fragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
+                            LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
+                            LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                            GenericTypeIndicator<HashMap<String, HashMap<String, String>>> t
-                                    = new GenericTypeIndicator<HashMap<String, HashMap<String, String>>>() {
-                            };
-                            HashMap<String, HashMap<String, String>> hashMap = dataSnapshot.getValue(t);
-
-                            if (hashMap != null) {
-
-                                LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
-                                LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-                                for (HashMap<String, String> webSupport : hashMap.values()) {
-                                    insertWebCard(webSupport, websiteLinearLayout, inflater);
-
-
-                                }
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                insertWebCard(child, websiteLinearLayout, inflater);
                             }
                         }
                     }
                 });
 
                 t.run();
-
-
             }
 
             @Override
@@ -205,14 +189,14 @@ public class WebsiteFragment extends Fragment {
         });
     }
 
-    private void insertWebCard(final HashMap<String, String> webSupport, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
+    private void insertWebCard(final DataSnapshot snapshot, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String name = webSupport.get("name");
-                String desc = webSupport.get("description");
-                String url = webSupport.get("url");
-                String bitmap_base64 = webSupport.get("icon");
+                String name = (String) snapshot.child("name").getValue();
+                String desc = (String) snapshot.child("description").getValue();
+                String url = (String) snapshot.child("url").getValue();
+                String bitmap_base64 = (String) snapshot.child("icon").getValue();
 
                 CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
@@ -222,7 +206,6 @@ public class WebsiteFragment extends Fragment {
                 TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
                 detailsTextView.setText(desc);
 
-
                 if (bitmap_base64 != null) {
                     ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
 
@@ -231,13 +214,10 @@ public class WebsiteFragment extends Fragment {
 
                     iconImageView.setImageBitmap(bmp);
                 }
-
             }
         });
 
         t.run();
-
-
     }
 
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
