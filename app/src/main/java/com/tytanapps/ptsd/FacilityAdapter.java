@@ -76,7 +76,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openDialer(facility.getPhoneNumber());
+                    openDialer(Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
                 }
             };
 

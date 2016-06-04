@@ -385,7 +385,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             description += program + "\n";
 
         facilityToUpdate.setName(name);
-        facilityToUpdate.setPhoneNumber(phoneNumber);
+        facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
         facilityToUpdate.setUrl(url);
         facilityToUpdate.setStreetAddress(address);
         facilityToUpdate.setCity(city);
