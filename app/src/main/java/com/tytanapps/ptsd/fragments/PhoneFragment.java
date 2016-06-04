@@ -27,7 +27,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 
@@ -164,7 +163,7 @@ public class PhoneFragment extends Fragment {
         DatabaseReference myRef = database.getReference("phone_support");
 
         // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.orderByChild("order").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -176,22 +175,11 @@ public class PhoneFragment extends Fragment {
                         View rootView = getView();
                         if(rootView != null) {
 
-                            GenericTypeIndicator<HashMap<String, HashMap<String, String>>> t
-                                    = new GenericTypeIndicator<HashMap<String, HashMap<String, String>>>() {
-                            };
-                            HashMap<String, HashMap<String, String>> hashMap = dataSnapshot.getValue(t);
+                            LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
+                            LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                            if (hashMap != null) {
-
-                                LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
-                                LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-                                for (HashMap<String, String> phoneSupport : hashMap.values()) {
-
-                                    insertPhoneCard(phoneSupport, phoneNumbersLinearLayout, inflater);
-
-
-                                }
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                insertPhoneCard(child, phoneNumbersLinearLayout, inflater);
                             }
                         }
                     }
@@ -210,14 +198,14 @@ public class PhoneFragment extends Fragment {
         });
     }
 
-    private void insertPhoneCard(final HashMap<String, String> phoneSupport, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
+    private void insertPhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String name = phoneSupport.get("name");
-                String desc = phoneSupport.get("description");
-                String phone = phoneSupport.get("phone_number");
-                String bitmap_base64 = phoneSupport.get("icon");
+                String name = (String) phoneDataSnapshot.child("name").getValue();
+                String desc = (String) phoneDataSnapshot.child("description").getValue();
+                String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
+                String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
 
                 CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
@@ -227,7 +215,6 @@ public class PhoneFragment extends Fragment {
                 TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
                 phoneTextView.setText(phone);
 
-
                 if (bitmap_base64 != null) {
                     ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
 
@@ -236,13 +223,10 @@ public class PhoneFragment extends Fragment {
 
                     iconImageView.setImageBitmap(bmp);
                 }
-
             }
         });
 
         t.run();
-
-
     }
 
     private CardView getPhoneCardView(LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, String name, final String phoneNumber) {
