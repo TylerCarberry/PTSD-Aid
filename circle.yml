@@ -29,23 +29,26 @@ test:
     - echo $ids_xml_3 > app/src/main/res/values/ids.xml
     
     # Create an avd with play services
-    - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
+    # - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
     
     # Start the emulator
-    - emulator -avd test -no-audio -no-window:
-        background: true
-        parallel: true
+    # - emulator -avd test -no-audio -no-window:
+    #     background: true
+    #    parallel: true
     
     # Wait for the emulator to have booted
-    - circle-android wait-for-boot
-    - sleep 60
+    # - circle-android wait-for-boot
+    # - sleep 60
     
     # Unlock the emulator screen
-    - adb shell input keyevent 82
+    # - adb shell input keyevent 82
     
     # Run espresso tests on the emulator.
-    - ./gradlew connectedAndroidTest -PdisablePreDex:
-        timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
+    #- ./gradlew connectedAndroidTest -PdisablePreDex:
+    #    timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
+    
+    - ./gradlew build:
+      timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
   
   post:
     # Collect the test reports
