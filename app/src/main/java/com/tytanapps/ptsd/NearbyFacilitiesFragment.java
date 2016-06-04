@@ -88,17 +88,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
-
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-
-        mAdapter = new FacilityAdapter(facilityList, getActivity());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
     }
 
     /**
@@ -120,8 +110,9 @@ public class NearbyFacilitiesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        setupRecyclerView();
 
-        // Prevent loading the facilities multiple times
+        // Load the VA facilities if they have not yet been loaded
         if(knownFacilities.size() == 0) {
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -130,8 +121,20 @@ public class NearbyFacilitiesFragment extends Fragment {
                 }
             });
             t.run();
-
         }
+    }
+
+    /**
+     * Setup the RecyclerView and link it to the FacilityAdapter
+     */
+    private void setupRecyclerView() {
+        recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+
+        mAdapter = new FacilityAdapter(facilityList, getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
     /**
@@ -140,103 +143,109 @@ public class NearbyFacilitiesFragment extends Fragment {
      */
     private void loadPTSDPrograms() {
         // Request the location permission if it has not been granted
-        if(!locationPermissionGranted()) {
+        if (!locationPermissionGranted()) {
             requestLocationPermission();
-            return;
-        }
+        } else {
+            String url = calculateVaAPIUrl();
 
+            StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // The JSON that the sever responds starts with //
+                    // Trim the first two characters to create valid JSON.
+                    response = response.substring(2);
 
-        String url = calculateVaAPIUrl();
+                    // Load the initial JSON request. This this is a program name and the
+                    // facility ID where it is located.
+                    try {
+                        JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+                        int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // Trim the first two characters to create valid JSON.
-                response = response.substring(2);
-
-                // Load the initial JSON request. This this is a program name and the
-                // facility ID where it is located.
-                try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
-
-                    if(numberOfResults == 0) {
-                        errorLoadingResults();
-                        return;
-                    }
-
-                    double userLocation[] = Utilities.getGPSLocation(getActivity());
-                    // If the user's GPS location cannot be found
-                    if(userLocation[0] == 0 && userLocation[1] == 0) {
-                        errorLoadingResults("Your GPS location cannot be determined");
-                        return;
-                    }
-
-                    // Add each PTSD program to the correct VA facility
-                    for(int i = 1; i < numberOfResults; i++) {
-                        JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-
-                        int facilityID = ptsdProgramJson.getInt("FAC_ID");
-                        String programName = (String) ptsdProgramJson.get("PROGRAM");
-
-                        // There are multiple programs at the same facility.
-                        // Combine them if necessary.
-                        Facility facility;
-                        if(knownFacilities.containsKey(facilityID))
-                            facility = knownFacilities.get(facilityID);
-                        else
-                            facility = new Facility(facilityID);
-
-                        facility.addProgram(programName);
-                        knownFacilities.put(facilityID, facility);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                // We only have the id of each facility. Load the rest of the information
-                // about that location such as phone number and address.
-                if(knownFacilities != null && knownFacilities.size() > 0) {
-                    for(int facilityId : knownFacilities.keySet()) {
-                        Facility facility = knownFacilities.get(facilityId);
-
-                        // Try to load the facility from cache
-                        Facility cachedFacility = readCachedFacility(facilityId);
-                        if(cachedFacility != null) {
-                            facility = cachedFacility;
-                            knownFacilities.put(facilityId, facility);
-                            numberOfLoadedFacilities++;
-
-                            // When all facilities have loaded, sort them by distance and show them to the user
-                            if(numberOfLoadedFacilities == knownFacilities.size())
-                                allFacilitiesHaveLoaded();
+                        if (numberOfResults == 0) {
+                            errorLoadingResults();
+                            return;
                         }
-                        // Load the facility using the api. Display them after they all load
-                        else
-                            loadFacility(facility, knownFacilities.size());
+
+                        double userLocation[] = Utilities.getGPSLocation(getActivity());
+                        // If the user's GPS location cannot be found
+                        if (userLocation[0] == 0 && userLocation[1] == 0) {
+                            errorLoadingResults("Your GPS location cannot be determined");
+                            return;
+                        }
+
+                        // Add each PTSD program to the correct VA facility
+                        for (int i = 1; i < numberOfResults; i++) {
+                            JSONObject ptsdProgramJson = rootJson.getJSONObject("" + i);
+                            addPTSDProgram(ptsdProgramJson);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    // We only have the id of each facility. Load the rest of the information
+                    // about that location such as phone number and address.
+                    if (knownFacilities != null && knownFacilities.size() > 0) {
+                        for (int facilityId : knownFacilities.keySet()) {
+                            Facility facility = knownFacilities.get(facilityId);
+
+                            // Try to load the facility from cache
+                            Facility cachedFacility = readCachedFacility(facilityId);
+                            if (cachedFacility != null) {
+                                facility = cachedFacility;
+                                knownFacilities.put(facilityId, facility);
+                                numberOfLoadedFacilities++;
+
+                                // When all facilities have loaded, sort them by distance and show them to the user
+                                if (numberOfLoadedFacilities == knownFacilities.size())
+                                    allFacilitiesHaveLoaded();
+                            }
+                            // Load the facility using the api. Display them after they all load
+                            else
+                                loadFacility(facility, knownFacilities.size());
+                        }
                     }
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(LOG_TAG, error.toString());
+                    errorLoadingResults();
+                }
+            });
+
+            // Set a longer Volley timeout policy
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            // Start loading the PTSD programs in the background
+            RequestQueue requestQueue = getRequestQueue();
+            if (requestQueue != null)
+                requestQueue.add(stringRequest);
+            else
                 errorLoadingResults();
-            }
-        });
+        }
+    }
 
-        // Set a longer Volley timeout policy
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+    /**
+     * Add a PTSD program to the VA facility in which its held
+     * @param ptsdProgramJson The JSON representing the PTSD program
+     * @throws JSONException Invalid JSON for the PTSD program
+     */
+    private void addPTSDProgram(JSONObject ptsdProgramJson) throws JSONException {
+        int facilityID = ptsdProgramJson.getInt("FAC_ID");
+        String programName = (String) ptsdProgramJson.get("PROGRAM");
 
-        // Start loading the PTSD programs in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(stringRequest);
+        // There are multiple programs at the same facility.
+        // Combine them if necessary.
+        Facility facility;
+        if (knownFacilities.containsKey(facilityID))
+            facility = knownFacilities.get(facilityID);
         else
-            errorLoadingResults();
+            facility = new Facility(facilityID);
+
+        facility.addProgram(programName);
+        knownFacilities.put(facilityID, facility);
     }
 
     /**
@@ -250,8 +259,6 @@ public class NearbyFacilitiesFragment extends Fragment {
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(LOG_TAG, response);
-
                 // The JSON that the sever responds starts with //
                 // I am cropping the first two characters to create valid JSON.
                 response = response.substring(2);
@@ -259,50 +266,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                 try {
                     // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    JSONObject locationJson = rootJson.getJSONObject("1");
-
-                    String name = (String) locationJson.get("FAC_NAME");
-                    String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
-                    String address = (String) locationJson.get("ADDRESS");
-                    String city = (String) locationJson.get("CITY");
-                    String state = (String) locationJson.get("STATE");
-                    String zip = ""+locationJson.get("ZIP");
-                    double locationLat = locationJson.getDouble("LATITUDE");
-                    double locationLong = locationJson.getDouble("LONGITUDE");
-
-                    String description = "";
-
-                    // For some reason the facility urls start with vaww. instead of www.
-                    // These cannot be loaded on my phone so use www. instead.
-                    String url = (String) locationJson.get("FANDL_URL");
-                    url = url.replace("vaww", "www");
-
-                    double userLocation[] = Utilities.getGPSLocation(getActivity());
-                    double distance = 0;
-
-                    // The description contains the distance and all PTSD programs located there
-                    if(userLocation[0] != 0 && userLocation[1] != 0) {
-                        distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
-                        facility.setDistance(distance);
-
-                        DecimalFormat df = new DecimalFormat("#.##");
-                        description = "Distance: " + df.format(distance) + " miles\n\n";
-                    }
-
-                    Set<String> programs = facility.getPrograms();
-                    for(String program : programs)
-                        description += program + "\n";
-
-                    facility.setName(name);
-                    facility.setPhoneNumber(phoneNumber);
-                    facility.setUrl(url);
-                    facility.setStreetAddress(address);
-                    facility.setCity(city);
-                    facility.setState(state);
-                    facility.setZip(zip);
-                    facility.setDescription(description);
-                    facility.setLatitude(locationLat);
-                    facility.setLongitude(locationLong);
+                    parseJSONFacility(facility, rootJson);
 
                     // Save the facility to a file so it doesn't need to be loaded next time
                     cacheFacility(facility);
@@ -350,6 +314,61 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
+     * Parse the JSON facility and save it to a Facility object
+     * @param facilityToUpdate The facility to save the information to
+     * @param rootJson To JSON containing information about the VA facility
+     * @throws JSONException Invalid facility JSON
+     */
+    private Facility parseJSONFacility(Facility facilityToUpdate, JSONObject rootJson) throws JSONException {
+        JSONObject locationJson = rootJson.getJSONObject("1");
+
+        String name = (String) locationJson.get("FAC_NAME");
+        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
+        String address = (String) locationJson.get("ADDRESS");
+        String city = (String) locationJson.get("CITY");
+        String state = (String) locationJson.get("STATE");
+        String zip = ""+locationJson.get("ZIP");
+        double locationLat = locationJson.getDouble("LATITUDE");
+        double locationLong = locationJson.getDouble("LONGITUDE");
+
+        String description = "";
+
+        // For some reason the facility urls start with vaww. instead of www.
+        // These cannot be loaded on my phone so use www. instead.
+        String url = (String) locationJson.get("FANDL_URL");
+        url = url.replace("vaww", "www");
+
+        double userLocation[] = Utilities.getGPSLocation(getActivity());
+        double distance = 0;
+
+        // The description contains the distance and all PTSD programs located there
+        if(userLocation[0] != 0 && userLocation[1] != 0) {
+            distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+            facilityToUpdate.setDistance(distance);
+
+            DecimalFormat df = new DecimalFormat("#.##");
+            description = "Distance: " + df.format(distance) + " miles\n\n";
+        }
+
+        Set<String> programs = facilityToUpdate.getPrograms();
+        for(String program : programs)
+            description += program + "\n";
+
+        facilityToUpdate.setName(name);
+        facilityToUpdate.setPhoneNumber(phoneNumber);
+        facilityToUpdate.setUrl(url);
+        facilityToUpdate.setStreetAddress(address);
+        facilityToUpdate.setCity(city);
+        facilityToUpdate.setState(state);
+        facilityToUpdate.setZip(zip);
+        facilityToUpdate.setDescription(description);
+        facilityToUpdate.setLatitude(locationLat);
+        facilityToUpdate.setLongitude(locationLong);
+
+        return facilityToUpdate;
+    }
+
+    /**
      * Load the facility image and place it into facilityImageView.
      * Try the street view image first, then the map image, then the default image.
      * @param facility The facility
@@ -362,8 +381,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         else
             loadStreetViewImage(facility);
 
-        //if(facilityList.size() > 0)
-            mAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -373,7 +391,7 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility
      */
     private void loadStreetViewImage(final Facility facility) {
-        Log.d(LOG_TAG, "Entering load street view image.");
+        //Log.d(LOG_TAG, "Entering load street view image.");
 
         String url = "";
 
@@ -384,7 +402,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             loadMapImage(facility);
             return;
         }
-        Log.d(LOG_TAG, url);
+        //Log.d(LOG_TAG, url);
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
@@ -434,7 +452,7 @@ public class NearbyFacilitiesFragment extends Fragment {
             facility.setFacilityImage(BitmapFactory.decodeResource(getResources(), defaultImageId));
             return;
         }
-        Log.d(LOG_TAG, url);
+        //Log.d(LOG_TAG, url);
 
 
         // Retrieves an image specified by the URL, displays it in the UI.

@@ -3,9 +3,10 @@ package com.tytanapps.ptsd;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,6 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
         public ImageView facilityImageView, callIcon, addressIcon;
         public Button moreInfoButton;
-
-
 
         public MyViewHolder(View view) {
             super(view);
@@ -107,8 +106,12 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             addressIcon.setOnClickListener(mapOnClick);
 
             ImageView facilityImageView = holder.facilityImageView;
-            Log.d(LOG_TAG, "onBindViewHolder: " + (facility.getFacilityImage() == null));
-            facilityImageView.setImageBitmap(facility.getFacilityImage());
+            Bitmap facilityImage = facility.getFacilityImage();
+            if(facilityImage != null)
+                facilityImageView.setImageBitmap(facility.getFacilityImage());
+            else
+                facilityImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.default_facility_image));
+
             facilityImageView.setOnClickListener(mapOnClick);
 
             // Tapping the more info button opens the website
