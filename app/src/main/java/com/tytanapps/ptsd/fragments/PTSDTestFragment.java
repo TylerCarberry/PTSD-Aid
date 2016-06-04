@@ -68,11 +68,11 @@ public class PTSDTestFragment extends Fragment {
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
             questionTextView.setText(question);
-            //questionTextView.setText("Sample Question");
 
             questionsLinearLayout.addView(layout);
 
-            io.techery.progresshint.addition.widget.SeekBar seekBar = (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
+            io.techery.progresshint.addition.widget.SeekBar seekBar =
+                    (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
 
             seekBar.getHintDelegate()
                     .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {

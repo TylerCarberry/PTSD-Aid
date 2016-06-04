@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -433,7 +432,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             loadMapImage(facility);
             return;
         }
-        //Log.d(LOG_TAG, url);
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
@@ -757,10 +755,8 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     /**
      * Determine if the response from the Street View API was a valid street view image
-     *
      * If there is no street view imagery for the address, Google returns a static image
      * stating that there is no imagery. I then load a map of the address instead.
-     *
      * I cannot find a way to check if the street view exists properly. However, since the image
      * is always the same, I check the color of one of the pixels.
      *
@@ -831,25 +827,6 @@ public class NearbyFacilitiesFragment extends Fragment {
     private String calculateFacilityAPIURL(int facilityId, String licenceKey) {
         return "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
                 + facilityId + "&license=" + licenceKey + "&ReturnFormat=JSON";
-    }
-
-    /**
-     * Add a card to the list containing information about the facility
-     * @param facility The facility to add
-     */
-    private void addFacilityCard(final Facility facility) {
-        View fragmentView = getView();
-        if(fragmentView != null) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            RelativeLayout cardRelativeLayout = (RelativeLayout) inflater.inflate(R.layout.facility_layout, getViewGroup(), false);
-
-            // Get the information from the facility
-            String name = facility.getName();
-            String description = facility.getDescription();
-            final String phoneNumber = Utilities.getFirstPhoneNumber(facility.getPhoneNumber());
-
-
-        }
     }
 
     /**

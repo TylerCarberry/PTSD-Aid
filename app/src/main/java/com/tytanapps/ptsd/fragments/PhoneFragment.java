@@ -49,16 +49,7 @@ public class PhoneFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
-
-
-
-        // Write a message to the database
-        //writeToDatabase(database);
-
-
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_phone, container, false);
     }
 
     @Override
@@ -76,8 +67,6 @@ public class PhoneFragment extends Fragment {
     }
 
     private void writeToDatabase(FirebaseDatabase database) {
-
-
         DatabaseReference myRef = database.getReference("phone_support");
         HashMap<String, HashMap<String, Object>> phones = new HashMap<>();
 
@@ -145,7 +134,6 @@ public class PhoneFragment extends Fragment {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
-
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream .toByteArray();
@@ -186,8 +174,6 @@ public class PhoneFragment extends Fragment {
                 });
 
                 t.run();
-
-
             }
 
             @Override
@@ -229,38 +215,47 @@ public class PhoneFragment extends Fragment {
         t.run();
     }
 
-    private CardView getPhoneCardView(LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, String name, final String phoneNumber) {
-        CardView phoneCardView = null;
+    /**
+     * Get the card view representing a phone number. If it does not exist, create it and insert
+     * it in the linear layout
+     * @param inflater The layout inflater to create the phone card
+     * @param phoneNumbersLinearLayout A linear layout containing all of the phone cards
+     * @param name The name of the phone hotline
+     * @param phoneNumber The phone number in the form #-###-###-###
+     * @return The cardview containing the phone number information
+     */
+    private CardView getPhoneCardView(LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout,
+                                      String name, final String phoneNumber) {
+        CardView phoneCardView;
 
         for(int i = 0; i < phoneNumbersLinearLayout.getChildCount(); i++) {
             View child = phoneNumbersLinearLayout.getChildAt(i);
             if(child.getTag() != null && child.getTag().equals(name))
-                phoneCardView = (CardView) child;
+                // Card has already been created
+                return (CardView) child;
         }
-        if(phoneCardView == null) {
-            phoneCardView = (CardView) inflater.inflate(R.layout.phone_cardview, (ViewGroup) getView(), false);
+        // Card has not yet been created
+        phoneCardView = (CardView) inflater.inflate(R.layout.phone_cardview, (ViewGroup) getView(), false);
 
-            phoneCardView.setTag(name);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
+        phoneCardView.setTag(name);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
 
-            params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
-            phoneCardView.setLayoutParams(params);
+        params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
+        phoneCardView.setLayoutParams(params);
 
-            phoneCardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openDialer(phoneNumber);
-                }
-            });
+        phoneCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialer(phoneNumber);
+            }
+        });
 
-            phoneNumbersLinearLayout.addView(phoneCardView);
-            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.bottom_up);
-            phoneCardView.startAnimation(bottomUp);
-        }
+        phoneNumbersLinearLayout.addView(phoneCardView);
+        Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_up);
+        phoneCardView.startAnimation(bottomUp);
 
         return phoneCardView;
     }

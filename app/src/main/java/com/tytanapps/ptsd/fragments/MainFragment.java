@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,9 +72,6 @@ public class MainFragment extends Fragment {
                 rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
             }
         }
-
-
-
         return rootView;
     }
 
@@ -128,7 +124,7 @@ public class MainFragment extends Fragment {
      * Sign in to the user's Google Account
      */
     private void signIn() {
-        Log.d(LOG_TAG, "signIn() called with: " + "");
+        //Log.d(LOG_TAG, "signIn() called with: " + "");
         Activity parentActivity = getActivity();
         if(parentActivity instanceof MainActivity)
             ((MainActivity) getActivity()).signIn();
@@ -169,45 +165,43 @@ public class MainFragment extends Fragment {
 
             switch (emotionPressed.getId()) {
                 case R.id.happy_face:
-                    recommendationsLinearLayout.addView(getVeteranBenefitsLayout());
-                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
+                    recommendationsLinearLayout.addView(getSuggestionVAWebsite());
+                    recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     break;
 
                 case R.id.ok_face:
-                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
-                    recommendationsLinearLayout.addView(getJoinVeteranAssociationLayout());
+                    recommendationsLinearLayout.addView(getSuggestionVisitResources());
+                    recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
 
                     break;
 
                 case R.id.sad_face:
                     if (isUserSignedIn())
-                        recommendationsLinearLayout.addView(getCallTrustedContactLayout());
+                        recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
 
-                    recommendationsLinearLayout.addView(getJoinVeteranAssociationLayout());
+                    recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
 
                     break;
 
                 case R.id.sick_face:
-                    recommendationsLinearLayout.addView(getLearnResourcesLayout());
+                    recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
                     break;
 
                 case R.id.poop_emoji:
                     if (trustedContactCreated())
-                        recommendationsLinearLayout.addView(getCallTrustedContactLayout());
+                        recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
 
-                    recommendationsLinearLayout.addView(getCallSuicideLifelineLayout());
+                    recommendationsLinearLayout.addView(getSuggestionCallSuicideLifeline());
 
                     break;
-
             }
 
             //if (!isUserSignedIn())
-            //    recommendationsLinearLayout.addView(getSuggestionSignInLayout());
+            //    recommendationsLinearLayout.addView(getSuggestionSignIn());
 
             if (!trustedContactCreated())
-                recommendationsLinearLayout.addView(getAddTrustedContactLayout());
-
+                recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
             animateInRecommendations(parentFrameLayout);
         }
@@ -219,10 +213,11 @@ public class MainFragment extends Fragment {
     }
 
     /**
-     *
-     * @return
+     * Get the recommendation to create a trusted contact
+     * When tapped, show the create trusted contact dialog
+     * @return The Relative Layout containing the suggestion
      */
-    private RelativeLayout getAddTrustedContactLayout() {
+    private RelativeLayout getSuggestionAddTrustedContact() {
        return createSuggestionLayout(getString(R.string.recommendation_add_trusted_contact), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -231,7 +226,12 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private RelativeLayout getSuggestionSignInLayout() {
+    /**
+     * Get the recommendation to sign in to your Google Account
+     * When tapped, open the sign in dialog
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionSignIn() {
         return createSuggestionLayout(getString(R.string.recommendation_sign_in), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -240,25 +240,39 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private RelativeLayout getVeteranBenefitsLayout() {
+    /**
+     * Get the recommendation to visit the VA website
+     * When tapped, do nothing TODO
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionVAWebsite() {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                //signIn();
             }
         });
     }
-
-    private RelativeLayout getJoinVeteranAssociationLayout() {
+    /**
+     * Get the recommendation to join a veteran accociation
+     * When tapped, do nothing TODO
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionJoinVeteranAssociation() {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                //signIn();
             }
         });
     }
 
-    private RelativeLayout getCallTrustedContactLayout() {
+    /**
+     * Get the recommendation to call your trusted contact
+     * When tapped, call your trusted contact if it exists. Create one if it doesn't
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionCallTrustedContact() {
         return createSuggestionLayout(getString(R.string.recommendation_call_trusted_contact), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -271,7 +285,12 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private RelativeLayout getCallSuicideLifelineLayout() {
+    /**
+     * Get the recommendation to call the suicide lifeline
+     * When tapped, call the suicide lifeline
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionCallSuicideLifeline() {
         return createSuggestionLayout(getString(R.string.recommendation_call_suicide_lifeline), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -281,7 +300,12 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private RelativeLayout getLearnResourcesLayout() {
+    /**
+     * Get the recommendation to look at the resources
+     * When tapped, open the drawer
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionVisitResources() {
         return createSuggestionLayout(getString(R.string.recommendation_resources), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -300,8 +324,9 @@ public class MainFragment extends Fragment {
         return suggestionLayout;
     }
 
-
-
+    /**
+     * @return Whether the trusted contact has been created
+     */
     private boolean trustedContactCreated() {
         String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
         return !trustedContactPhone.equals("");

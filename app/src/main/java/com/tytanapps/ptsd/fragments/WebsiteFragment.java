@@ -45,12 +45,9 @@ public class WebsiteFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_website, container, false);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_website, container, false);
     }
 
     @Override
@@ -208,16 +205,23 @@ public class WebsiteFragment extends Fragment {
 
                 if (bitmap_base64 != null) {
                     ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-
-                    byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
-                    Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-
+                    Bitmap bmp = decodeBitmap(bitmap_base64);
                     iconImageView.setImageBitmap(bmp);
                 }
             }
         });
 
         t.run();
+    }
+
+    /**
+     * Decode a bitmap from a base64 string
+     * @param bitmap_base64 The encoded bitmap
+     * @return The decoded bitmap
+     */
+    private Bitmap decodeBitmap(String bitmap_base64) {
+        byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {

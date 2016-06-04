@@ -31,14 +31,19 @@ public class ResourcesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_resources, container, false);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        readResources(database);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_resources, container, false);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        readResources(FirebaseDatabase.getInstance());
+    }
+
+    /**
+     * Read the resources from the firebase database and add them to the list
+     * @param database The database to read from
+     */
     private void readResources(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("resources");
 
@@ -66,7 +71,6 @@ public class ResourcesFragment extends Fragment {
                 });
 
                 t.run();
-
             }
 
             @Override
@@ -77,14 +81,20 @@ public class ResourcesFragment extends Fragment {
         });
     }
 
-    private void insertResource(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
+    /**
+     * Add a resource to the list
+     * @param resourceDataSnapshot The data snapshot containing information about the resource
+     * @param resourcesLinearLayout The linearlayout to add the info to
+     * @param inflater The layout inflater to create the view from xml
+     */
+    private void insertResource(final DataSnapshot resourceDataSnapshot, final LinearLayout resourcesLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String title = (String) phoneDataSnapshot.child("title").getValue();
-                String desc = (String) phoneDataSnapshot.child("description").getValue();
+                String title = (String) resourceDataSnapshot.child("title").getValue();
+                String desc = (String) resourceDataSnapshot.child("description").getValue();
 
-                LinearLayout resourceHeaderView = getResourceView(inflater, phoneNumbersLinearLayout, title);
+                LinearLayout resourceHeaderView = getResourceView(inflater, resourcesLinearLayout, title);
 
                 TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
                 headerTextView.setText(title);
@@ -97,31 +107,37 @@ public class ResourcesFragment extends Fragment {
         t.run();
     }
 
+    /**
+     * Get the view with information about the resource. Create it and add it to
+     * the list if it doesn't exist
+     * @param inflater The layout inflater to create the view from xml
+     * @param resourcesLinearLayout The linear layout containing the resources
+     * @param name The name of the resource to find
+     * @return The Linear Layout containing information about the resource
+     */
     private LinearLayout getResourceView(LayoutInflater inflater, LinearLayout resourcesLinearLayout, String name) {
-        Log.d(LOG_TAG, "getResourceView() called with: " + "inflater = [" + inflater + "], resourcesLinearLayout = [" + resourcesLinearLayout + "], name = [" + name + "]");
-
         LinearLayout resourceView = null;
 
+        // Find the resource view if it exists
         for(int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
             View child = resourcesLinearLayout.getChildAt(i);
 
             if(child.getTag() != null && child.getTag().equals(name))
-                resourceView = (LinearLayout) child;
+                return (LinearLayout) child;
         }
-        if(resourceView == null) {
-            resourceView = (LinearLayout) inflater.inflate(R.layout.resource_item, (ViewGroup) getView(), false);
 
-            resourceView.setTag(name);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
+        // Resource view does not exist, make it
+        resourceView = (LinearLayout) inflater.inflate(R.layout.resource_item, (ViewGroup) getView(), false);
+        resourceView.setTag(name);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, // width
+                LinearLayout.LayoutParams.WRAP_CONTENT  // height
+        );
 
-            params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
-            resourceView.setLayoutParams(params);
+        params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
+        resourceView.setLayoutParams(params);
 
-            resourcesLinearLayout.addView(resourceView);
-        }
+        resourcesLinearLayout.addView(resourceView);
 
         return resourceView;
     }
