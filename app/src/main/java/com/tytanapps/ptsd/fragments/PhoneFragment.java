@@ -162,6 +162,7 @@ public class PhoneFragment extends Fragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
+                            rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
 
                             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());

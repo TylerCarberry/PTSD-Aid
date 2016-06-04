@@ -165,6 +165,8 @@ public class WebsiteFragment extends Fragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
+                            rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
+
                             LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
