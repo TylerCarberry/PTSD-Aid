@@ -248,7 +248,7 @@ public class MainFragment extends Fragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //signIn();
+                openBrowser(getString(R.string.website_va));
             }
         });
     }
@@ -261,7 +261,7 @@ public class MainFragment extends Fragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //signIn();
+               openBrowser("http://veteransnetwork.net/directory.php");
             }
         });
     }
@@ -427,6 +427,17 @@ public class MainFragment extends Fragment {
         } catch (ActivityNotFoundException activityNotFoundException) {
             Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
+     */
+    private void openBrowser(String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 
 }
