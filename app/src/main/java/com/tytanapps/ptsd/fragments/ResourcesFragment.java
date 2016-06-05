@@ -117,8 +117,6 @@ public class ResourcesFragment extends Fragment {
      * @return The Linear Layout containing information about the resource
      */
     private LinearLayout getResourceView(LayoutInflater inflater, LinearLayout resourcesLinearLayout, String name) {
-        LinearLayout resourceView = null;
-
         // Find the resource view if it exists
         for(int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
             View child = resourcesLinearLayout.getChildAt(i);
@@ -128,7 +126,7 @@ public class ResourcesFragment extends Fragment {
         }
 
         // Resource view does not exist, make it
-        resourceView = (LinearLayout) inflater.inflate(R.layout.resource_item, (ViewGroup) getView(), false);
+        LinearLayout resourceView = (LinearLayout) inflater.inflate(R.layout.resource_item, (ViewGroup) getView(), false);
         resourceView.setTag(name);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, // width
@@ -137,7 +135,6 @@ public class ResourcesFragment extends Fragment {
 
         params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
         resourceView.setLayoutParams(params);
-
         resourcesLinearLayout.addView(resourceView);
 
         return resourceView;

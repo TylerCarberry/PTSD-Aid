@@ -186,9 +186,8 @@ public class MainActivity extends AppCompatActivity
     private String getDeviceInformation() {
         String deviceInformation = "";
 
-        PackageInfo pInfo = null;
         try {
-            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
             int verCode = pInfo.versionCode;
             
@@ -282,7 +281,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         // Close the drawer layout if it is open
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -366,12 +365,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        if(drawer != null && toggle != null)
+            drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        // The navigation view is contained within the drawer layout
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         // Add the header view containing the user's information
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -383,7 +379,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        navigationView.addHeaderView(navigationHeader);
+        // The navigation view is contained within the drawer layout
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if(navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+            navigationView.addHeaderView(navigationHeader);
+        }
         navHeader = navigationHeader;
     }
 
@@ -405,15 +406,17 @@ public class MainActivity extends AppCompatActivity
 
             GoogleSignInAccount googleAccount = result.getSignInAccount();
 
-            String name = googleAccount.getDisplayName();
-            String email = googleAccount.getEmail();
-            Uri profilePicture = googleAccount.getPhotoUrl();
+            if(googleAccount != null) {
+                String name = googleAccount.getDisplayName();
+                String email = googleAccount.getEmail();
+                Uri profilePicture = googleAccount.getPhotoUrl();
 
-            View signInButton = findViewById(R.id.button_sign_in);
-            if(signInButton != null)
-                signInButton.setVisibility(View.INVISIBLE);
+                View signInButton = findViewById(R.id.button_sign_in);
+                if (signInButton != null)
+                    signInButton.setVisibility(View.INVISIBLE);
 
-            updateNavigationHeader(name, email, profilePicture);
+                updateNavigationHeader(name, email, profilePicture);
+            }
         }
     }
 
@@ -579,7 +582,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
 
         switch (requestCode) {
             case PERMISSION_CONTACT_REQUEST: {
@@ -592,8 +595,7 @@ public class MainActivity extends AppCompatActivity
                     pickTrustedContact();
 
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // Permission denied
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                     alertDialog.setTitle("Please grant the contacts permission");
                     alertDialog.setMessage("Grant the contacts permission to continue");
@@ -607,7 +609,6 @@ public class MainActivity extends AppCompatActivity
 
                     //errorLoadingResults(getString(R.string.error_location_permission));
                 }
-                return;
             }
 
             // other 'case' lines to check for other
@@ -695,19 +696,15 @@ public class MainActivity extends AppCompatActivity
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
 
-        if (cursor == null) {
-            return null;
-        }
         String contactName = null;
-        if(cursor.moveToFirst()) {
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        if (cursor != null) {
+            if (cursor.moveToFirst())
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+
+            if (cursor != null && !cursor.isClosed())
+                cursor.close();
         }
 
-        if(cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-
-        Log.d(LOG_TAG, "getContactName() returned: " + contactName);
         return contactName;
     }
 
@@ -816,5 +813,5 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {}
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 }
