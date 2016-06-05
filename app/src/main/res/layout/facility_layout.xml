@@ -21,6 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/default_facility_image"
+                android:contentDescription="@string/facility_image_content_description"
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"/>
 
@@ -51,6 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/facility_name_textview"
                     android:paddingTop="@dimen/activity_vertical_margin"
+                    android:contentDescription="@string/phone_icon_content_description"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:layout_alignParentLeft="true"
                     android:background="@android:color/transparent"
@@ -76,6 +78,7 @@
                     android:layout_below="@+id/facility_phone_textview"
                     android:paddingTop="@dimen/activity_vertical_margin"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:contentDescription="@string/address_icon_content_description"
                     android:layout_alignParentLeft="true"
                     android:background="@android:color/transparent"
                     android:src="@drawable/map_icon"/>

@@ -20,7 +20,7 @@
     <string name="recommendation_sign_in">Sign In</string>
     <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
     <string name="sad_face_content_description">Sad Face</string>
-    <string name="ok_face_content_description">Ok Face</string>
+    <string name="ok_face_content_description">OK Face</string>
     <string name="happy_face_content_description">Happy Face</string>
 
     <!-- PTSD Test -->
@@ -128,6 +128,12 @@
     <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
     <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
     <string name="facility_more_info">More Info</string>
+    <string name="phone_icon_content_description">Phone Icon</string>
+    <string name="website_icon_content_description">Website icon</string>
+    <string name="facility_image_content_description">Facility Image</string>
+    <string name="address_icon_content_description">Address icon</string>
+    <string name="sick_emoji_content_description">Sick emoji</string>
+    <string name="poop_emoji_content_description">Poop emoji</string>
 
 
 </resources>

@@ -151,7 +151,6 @@ public class MainFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
-            TextView emotionTextView = (TextView) emotionRecommendationLayout.findViewById(R.id.recommendation_textview);
 
             // Remove on click listener from the emoji
             emotionPressed.setOnClickListener(new View.OnClickListener() {
@@ -254,7 +253,7 @@ public class MainFragment extends Fragment {
         });
     }
     /**
-     * Get the recommendation to join a veteran accociation
+     * Get the recommendation to join a veteran association
      * When tapped, do nothing TODO
      * @return The Relative Layout containing the suggestion
      */
@@ -333,18 +332,22 @@ public class MainFragment extends Fragment {
     }
 
     private void fadeOutAllEmojiExcept(int emoji_id) {
-        LinearLayout emojiLayout1 = (LinearLayout) getView().findViewById(R.id.emotions_linear_layout);
-        for(int i = 0; i < emojiLayout1.getChildCount(); i++) {
-            View child = emojiLayout1.getChildAt(i);
-            if(child.getId() != emoji_id)
-                child.setVisibility(View.GONE);
-        }
+        View rootView = getView();
+        if(rootView != null) {
 
-        LinearLayout emojiLayout2 = (LinearLayout) getView().findViewById(R.id.emotions2_linear_layout);
-        for(int i = 0; i < emojiLayout2.getChildCount(); i++) {
-            View child = emojiLayout2.getChildAt(i);
-            if(child.getId() != emoji_id)
-                child.setVisibility(View.GONE);
+            LinearLayout emojiLayout1 = (LinearLayout) rootView.findViewById(R.id.emotions_linear_layout);
+            for (int i = 0; i < emojiLayout1.getChildCount(); i++) {
+                View child = emojiLayout1.getChildAt(i);
+                if (child.getId() != emoji_id)
+                    child.setVisibility(View.GONE);
+            }
+
+            LinearLayout emojiLayout2 = (LinearLayout) rootView.findViewById(R.id.emotions2_linear_layout);
+            for (int i = 0; i < emojiLayout2.getChildCount(); i++) {
+                View child = emojiLayout2.getChildAt(i);
+                if (child.getId() != emoji_id)
+                    child.setVisibility(View.GONE);
+            }
         }
     }
 

@@ -103,7 +103,7 @@
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:src="@drawable/sick_emoji"
                         android:gravity="center"
-                        android:contentDescription="Sick"/>
+                        android:contentDescription="@string/sick_emoji_content_description"/>
 
                     <ImageView
                         android:id="@+id/poop_emoji"
@@ -116,7 +116,7 @@
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:gravity="center"
-                        android:contentDescription="Poop"/>
+                        android:contentDescription="@string/poop_emoji_content_description"/>
 
                 </LinearLayout>
 

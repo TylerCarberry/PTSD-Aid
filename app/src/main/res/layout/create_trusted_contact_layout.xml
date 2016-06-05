@@ -25,7 +25,7 @@
         android:textColor="@color/white"/>
 
     <TextView
-        android:id="@+id/explaination_textview"
+        android:id="@+id/explanation_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/trusted_contact_explanation"
@@ -45,7 +45,7 @@
         android:layout_centerHorizontal="true"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_below="@id/explaination_textview"
+        android:layout_below="@id/explanation_textview"
         android:gravity="center_horizontal"
         android:text="@string/add_trusted_contact_prompt"
         android:fontFamily="sans-serif-light"

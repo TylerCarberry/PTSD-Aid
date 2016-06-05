@@ -837,8 +837,7 @@ public class NearbyFacilitiesFragment extends Fragment {
     private RequestQueue getRequestQueue() {
         Activity parentActivity = getActivity();
         if(parentActivity != null && parentActivity instanceof MainActivity) {
-            RequestQueue requestQueue = ((MainActivity) getActivity()).getRequestQueue();
-            return requestQueue;
+            return ((MainActivity) getActivity()).getRequestQueue();
         }
         return null;
     }

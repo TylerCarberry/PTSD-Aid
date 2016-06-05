@@ -58,7 +58,7 @@ public class Facility implements Comparable<Facility>, Serializable {
      * @param facilityId The unique id of the facility
      * @param name The name of the facility
      * @param description The description of the facility
-     * @param phoneNumber The phone number of the facililty
+     * @param phoneNumber The phone number of the facility
      * @param url The url for more information about the facility
      * @param streetAddress The street address of the facility
      * @param city The city the facility is located in
@@ -290,7 +290,7 @@ public class Facility implements Comparable<Facility>, Serializable {
 
     /**
      * Get all of the PTSD programs offered at the facility
-     * @return All of the PTSD prgrams offered at the facility
+     * @return All of the PTSD programs offered at the facility
      */
     public Set<String> getPrograms() {
         return programs;

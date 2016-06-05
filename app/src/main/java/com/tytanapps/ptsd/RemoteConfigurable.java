@@ -3,7 +3,7 @@ package com.tytanapps.ptsd;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 /**
- * Created by Tyler on 5/28/16.
+ * Classes that utilize Firebase Remote Configuration
  */
 public interface RemoteConfigurable {
 

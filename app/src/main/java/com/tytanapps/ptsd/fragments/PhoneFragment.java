@@ -137,9 +137,7 @@ public class PhoneFragment extends Fragment {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream .toByteArray();
-        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-        return encoded;
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
     public static Bitmap base64ToBitmap(String base64) {

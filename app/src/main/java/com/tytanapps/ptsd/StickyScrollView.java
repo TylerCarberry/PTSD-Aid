@@ -125,7 +125,7 @@ public class StickyScrollView extends ScrollView {
     }
 
     public void setup(){
-        stickyViews = new ArrayList<View>();
+        stickyViews = new ArrayList<>();
     }
 
     private int getLeftForViewRelativeOnlyChild(View v){
