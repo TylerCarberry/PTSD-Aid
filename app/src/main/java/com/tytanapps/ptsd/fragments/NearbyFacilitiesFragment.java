@@ -535,9 +535,12 @@ public class NearbyFacilitiesFragment extends Fragment {
             t.run();
         }
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setRefreshing(false);
-        swipeRefreshLayout.setEnabled(true);
+        View rootView = getView();
+        if(rootView != null) {
+            SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setEnabled(true);
+        }
 
         mAdapter.notifyDataSetChanged();
     }
