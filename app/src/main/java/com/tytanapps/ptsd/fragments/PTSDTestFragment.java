@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.RemoteConfigurable;
 
 import io.techery.progresshint.ProgressHintDelegate;
 
@@ -39,6 +40,13 @@ public class PTSDTestFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
 
         LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
+        if(getActivity() instanceof RemoteConfigurable) {
+            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean("questions_sticky")) {
+                TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+                headerTextView.setTag("sticky");
+            }
+        }
+
         insertQuestions(questionsLinearLayout);
 
         return rootView;

@@ -22,6 +22,11 @@
         <value>tyler.carberry@gmail.com</value>
     </entry>
 
+    <entry>
+        <key>questions_sticky</key>
+        <value>false</value>
+    </entry>
+
 
 </defaultsMap>
 <!-- END xml_defaults -->
