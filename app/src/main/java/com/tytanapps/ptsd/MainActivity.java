@@ -232,14 +232,14 @@ public class MainActivity extends AppCompatActivity
         mFirebaseRemoteConfig.setConfigSettings(configSettings);
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
-        mFirebaseRemoteConfig.fetch(24 * 60 * 60) // cache for 24 hours
+        mFirebaseRemoteConfig.fetch(1 * 60 * 60) // cache for 1 hour
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(LOG_TAG, "Fetch Succeeded");
-                        // Once the config is successfully fetched it must be activated before newly fetched
-                        // values are returned.
-                        mFirebaseRemoteConfig.activateFetched();
+                        // Once the config is successfully fetched it must be activated before
+                        // newly fetched values are returned. This is done in onStop() so values
+                        // do not change as the user is interacting with the app.
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -271,6 +271,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop() {
         //Log.d(LOG_TAG, "onStop() called with: " + "");
+
+        if(mFirebaseRemoteConfig != null)
+            mFirebaseRemoteConfig.activateFetched();
+
         super.onStop();
     }
 
