@@ -148,15 +148,10 @@ public class MainFragment extends Fragment {
             LinearLayout recommendationsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.recommendations_linear_layout);
             recommendationsLinearLayout.removeAllViews();
 
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-            RelativeLayout emotionRecommendationLayout = (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
-
             // Remove on click listener from the emoji
             emotionPressed.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                }
+                public void onClick(View v) {}
             });
 
             fadeOutAllEmojiExcept(emotionPressed.getId());

@@ -4,9 +4,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -27,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.Utilities;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -105,49 +103,6 @@ public class WebsiteFragment extends Fragment {
         return hashMap;
     }
 
-
-    public static Bitmap drawableToBitmap (Drawable drawable) {
-        Bitmap bitmap = null;
-
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
-                return bitmapDrawable.getBitmap();
-            }
-        }
-
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
-        } else {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
-
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
-    public static String drawableToBase64 (Drawable drawable) {
-        Bitmap bitmap = drawableToBitmap(drawable);
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-        Canvas canvas = new Canvas(mutableBitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    public static Bitmap base64ToBitmap(String base64) {
-        byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-    }
-
     private void readWebsites(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("web_support");
 
@@ -205,23 +160,13 @@ public class WebsiteFragment extends Fragment {
 
                 if (bitmap_base64 != null) {
                     ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-                    Bitmap bmp = decodeBitmap(bitmap_base64);
+                    Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
                     iconImageView.setImageBitmap(bmp);
                 }
             }
         });
 
         t.run();
-    }
-
-    /**
-     * Decode a bitmap from a base64 string
-     * @param bitmap_base64 The encoded bitmap
-     * @return The decoded bitmap
-     */
-    private Bitmap decodeBitmap(String bitmap_base64) {
-        byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
