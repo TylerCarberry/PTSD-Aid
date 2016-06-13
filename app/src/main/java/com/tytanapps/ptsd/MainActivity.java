@@ -520,11 +520,6 @@ public class MainActivity extends AppCompatActivity
                 pickTrustedContact();
             }
         });
-        alertDialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
 
         LayoutInflater inflater = LayoutInflater.from(this);
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, null, false);
