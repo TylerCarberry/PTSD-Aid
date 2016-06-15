@@ -19,9 +19,11 @@
     <string name="recommendation_call_trusted_contact">Call your trusted contact</string>
     <string name="recommendation_sign_in">Sign In</string>
     <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
-    <string name="recommendation_call_suicide_lifeline">Call the suicide lifeline</string>
+    <string name="recommendation_call_veterans_crisis_line">Call the Veterans Crisis Line</string>
     <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
+    <string name="veterans_network_website">http://veteransnetwork.net/directory.php</string>
     <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
+    <string name="recommendation_find_facility">Find a nearby VA facility</string>
     <string name="sad_face_content_description">Sad Face</string>
     <string name="ok_face_content_description">OK Face</string>
     <string name="happy_face_content_description">Happy Face</string>
@@ -134,6 +136,6 @@
     <string name="website_icon_content_description">Website icon</string>
     <string name="facility_image_content_description">Facility Image</string>
     <string name="address_icon_content_description">Address icon</string>
-
+    <string name="recommendation_call_veterans_foundation">Call the veterans foundation</string>
 
 </resources>

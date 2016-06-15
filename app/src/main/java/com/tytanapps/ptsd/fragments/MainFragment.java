@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
@@ -166,28 +167,27 @@ public class MainFragment extends Fragment {
                 case R.id.ok_face:
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
-
                     break;
 
                 case R.id.sad_face:
-                    if (isUserSignedIn())
+                    if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
-
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
-
+                    recommendationsLinearLayout.addView(getSuggestionCallVeteranFoundation());
                     break;
 
                 case R.id.sick_face:
+                    recommendationsLinearLayout.addView(getSuggestionFindFacility());
+                    if (trustedContactCreated())
+                        recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
-
                     break;
 
                 case R.id.poop_emoji:
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
-
-                    recommendationsLinearLayout.addView(getSuggestionCallSuicideLifeline());
-
+                    recommendationsLinearLayout.addView(getSuggestionCallVeteransCrisisLine());
+                    recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
                     break;
             }
 
@@ -236,7 +236,7 @@ public class MainFragment extends Fragment {
 
     /**
      * Get the recommendation to visit the VA website
-     * When tapped, do nothing TODO
+     * When tapped, open the VA website
      * @return The Relative Layout containing the suggestion
      */
     private RelativeLayout getSuggestionVAWebsite() {
@@ -247,16 +247,17 @@ public class MainFragment extends Fragment {
             }
         });
     }
+
     /**
      * Get the recommendation to join a veteran association
-     * When tapped, do nothing TODO
+     * When tapped, open the veterans network website
      * @return The Relative Layout containing the suggestion
      */
     private RelativeLayout getSuggestionJoinVeteranAssociation() {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               openBrowser("http://veteransnetwork.net/directory.php");
+               openBrowser(getString(R.string.veterans_network_website));
             }
         });
     }
@@ -284,11 +285,26 @@ public class MainFragment extends Fragment {
      * When tapped, call the suicide lifeline
      * @return The Relative Layout containing the suggestion
      */
-    private RelativeLayout getSuggestionCallSuicideLifeline() {
-        return createSuggestionLayout(getString(R.string.recommendation_call_suicide_lifeline), new View.OnClickListener() {
+    private RelativeLayout getSuggestionCallVeteransCrisisLine() {
+        return createSuggestionLayout(getString(R.string.recommendation_call_veterans_crisis_line), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
+                openDialer(phoneNumber);
+            }
+        });
+    }
+
+    /**
+     * Get the recommendation to call the Veteran Foundation
+     * When tapped, call the veteran foundation
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionCallVeteranFoundation() {
+        return createSuggestionLayout(getString(R.string.recommendation_call_veterans_foundation), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
                 openDialer(phoneNumber);
             }
         });
@@ -303,12 +319,43 @@ public class MainFragment extends Fragment {
         return createSuggestionLayout(getString(R.string.recommendation_resources), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDrawer();
+                try {
+                    ((MainActivity)getActivity()).switchFragment(new ResourcesFragment());
+                } catch(Exception e) {
+                    FirebaseCrash.report(e);
+                    openDrawer();
+                }
             }
         });
 
     }
 
+    /**
+     * Get the recommendation to look at the resources
+     * When tapped, open the drawer
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionFindFacility() {
+        return createSuggestionLayout(getString(R.string.recommendation_find_facility), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    ((MainActivity)getActivity()).switchFragment(new NearbyFacilitiesFragment());
+                } catch(Exception e) {
+                    FirebaseCrash.report(e);
+                    openDrawer();
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Create a suggestion layout to show the user
+     * @param text The message to show in the recommendation
+     * @param onClickListener The action to perform when the recommendation is tapped
+     * @return The suggestion layout
+     */
     private RelativeLayout createSuggestionLayout(String text, View.OnClickListener onClickListener) {
         RelativeLayout suggestionLayout = getSuggestionLayoutTemplate();
         TextView signInTextView = (TextView) suggestionLayout.findViewById(R.id.recommendation_textview);
