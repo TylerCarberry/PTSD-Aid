@@ -14,24 +14,29 @@
     <string name="main_header">Welcome!</string>
     <string name="emotion_prompt">How are you feeling right now?</string>
     <string name="recommendations_title">Recommendations</string>
-    <string name="recommendation_resources">Look at the resources to learn about possible symptoms of PTSD</string>
+    <string name="recommendation_resources">Look at the resources to learn about possible symptoms of Post Traumatic Stress Disorder</string>
     <string name="recommendation_test">Take the PTSD test to determine if you suffer from PTSD</string>
-    <string name="recommendation_call_trusted_contact">Consider calling your trusted contact</string>
+    <string name="recommendation_call_trusted_contact">Call your trusted contact</string>
     <string name="recommendation_sign_in">Sign In</string>
     <string name="recommendation_add_trusted_contact">Add a trusted contact</string>
+    <string name="recommendation_call_suicide_lifeline">Call the suicide lifeline</string>
+    <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
+    <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
     <string name="sad_face_content_description">Sad Face</string>
     <string name="ok_face_content_description">OK Face</string>
     <string name="happy_face_content_description">Happy Face</string>
+    <string name="sick_emoji_content_description">Sick emoji</string>
+    <string name="poop_emoji_content_description">Poop emoji</string>
 
     <!-- PTSD Test -->
     <string name="stress_prompt">How much you have been bothered by the following in the past month?</string>
     <string-array
         name="stress_questions">
-        <item>Repeated, disturbing memories, thoughts, or images of a stressful military experience?</item>
-        <item>Repeated, disturbing dreams of a stressful military experience?</item>
+        <item>Repeated, disturbing memories or thoughts of a stressful military experience while awake?</item>
+        <item>Repeated, disturbing dreams of a stressful military experience while sleeping?</item>
         <item>Suddenly acting or feeling as if a stressful military experience were happening again (as if you were reliving it)?</item>
         <item>Feeling very upset when something reminded you of a stressful military experience?</item>
-        <item>Having physical reactions (e.g., heart pounding, trouble breathing, sweating) when something reminded you of a stressful military experience?</item>
+        <item>Having physical reactions (heart pounding, trouble breathing, sweating) when something reminded you of a stressful military experience?</item>
         <item>Avoiding thinking about or talking about a stressful military experience or avoiding having feelings related to it?</item>
         <item>Avoiding activities or situations because they reminded you of a stressful military experience?</item>
         <item>Trouble remembering important parts of a stressful military experience?</item>
@@ -124,16 +129,11 @@
     <string name="error_open_dialer">Unable to open the dialer</string>
     <string name="error_choose_contact">Unable to choose a trusted contact</string>
     <string name="error_location_permission">Cannot load the VA facilities. Please grant the location permission</string>
-    <string name="recommendation_call_suicide_lifeline">Call the suicide lifeline</string>
-    <string name="recommendation_veteran_association">Join a veteran association to meet veterans who share the same experiences as you</string>
-    <string name="recommendation_veteran_benefits">View the VA website to find information for veterans</string>
     <string name="facility_more_info">More Info</string>
     <string name="phone_icon_content_description">Phone Icon</string>
     <string name="website_icon_content_description">Website icon</string>
     <string name="facility_image_content_description">Facility Image</string>
     <string name="address_icon_content_description">Address icon</string>
-    <string name="sick_emoji_content_description">Sick emoji</string>
-    <string name="poop_emoji_content_description">Poop emoji</string>
 
 
 </resources>
