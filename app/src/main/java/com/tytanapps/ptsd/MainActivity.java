@@ -56,6 +56,7 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -194,6 +195,7 @@ public class MainActivity extends AppCompatActivity
             deviceInformation += "APP VERSION: " + version + " (" + verCode + ")\n";
 
         } catch (PackageManager.NameNotFoundException e) {
+            FirebaseCrash.report(e);
             e.printStackTrace();
         }
         

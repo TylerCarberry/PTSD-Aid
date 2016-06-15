@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.Facility;
 import com.tytanapps.ptsd.FacilityAdapter;
 import com.tytanapps.ptsd.MainActivity;
@@ -45,7 +46,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -209,6 +209,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                             addPTSDProgram(ptsdProgramJson);
                         }
                     } catch (JSONException e) {
+                        FirebaseCrash.report(e);
                         e.printStackTrace();
                     }
 
@@ -308,6 +309,7 @@ public class NearbyFacilitiesFragment extends Fragment {
                         allFacilitiesHaveLoaded();
 
                 } catch (JSONException e) {
+                    FirebaseCrash.report(e);
                     e.printStackTrace();
                     numberOfLoadedFacilities++;
 
@@ -429,6 +431,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         try {
             url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
+            FirebaseCrash.report(e);
             loadMapImage(facility);
             return;
         }
@@ -477,6 +480,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         try {
             url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
         } catch (UnsupportedEncodingException e) {
+            FirebaseCrash.report(e);
             e.printStackTrace();
             facility.setFacilityImage(BitmapFactory.decodeResource(getResources(), defaultImageId));
             return;
@@ -658,9 +662,8 @@ public class NearbyFacilitiesFragment extends Fragment {
             out = new ObjectOutputStream(new FileOutputStream(file));
             out.writeObject(facility);
             out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            FirebaseCrash.report(e);
             e.printStackTrace();
         }
     }
@@ -704,11 +707,8 @@ public class NearbyFacilitiesFragment extends Fragment {
         } catch (FileNotFoundException e) {
             // If the file was not found, nothing is wrong.
             // It just means that the facility has not yet been cached.
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            FirebaseCrash.report(e);
             e.printStackTrace();
         }
 
