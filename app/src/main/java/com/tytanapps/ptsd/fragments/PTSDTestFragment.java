@@ -39,15 +39,7 @@ public class PTSDTestFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
 
-        LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-        if(getActivity() instanceof RemoteConfigurable) {
-            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean("questions_sticky")) {
-                TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
-                headerTextView.setTag("sticky");
-            }
-        }
-
-        insertQuestions(questionsLinearLayout);
+        setupQuestionsLayout(rootView);
 
         return rootView;
     }
@@ -61,6 +53,22 @@ public class PTSDTestFragment extends Fragment {
         if(rootView instanceof ViewGroup)
             return (ViewGroup) getView();
         return null;
+    }
+
+    /**
+     * Add the prompt and the questions to the layout
+     * @param rootView The root view of the fragment containing the questions layout
+     */
+    private void setupQuestionsLayout(View rootView) {
+        LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
+        if(getActivity() instanceof RemoteConfigurable) {
+            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean("questions_sticky")) {
+                TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+                headerTextView.setTag("sticky");
+            }
+        }
+
+        insertQuestions(questionsLinearLayout);
     }
 
     /**

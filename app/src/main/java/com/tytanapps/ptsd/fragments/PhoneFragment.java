@@ -52,7 +52,13 @@ public class PhoneFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        loadPhoneNumbersFromFirebase();
+    }
 
+    /**
+     * Load the list of phone numbers from a Firebase database
+     */
+    private void loadPhoneNumbersFromFirebase() {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -100,6 +106,10 @@ public class PhoneFragment extends Fragment {
         return hashMap;
     }
 
+    /**
+     * Read the phone numbers from a Firebase database
+     * @param database The database containing the phone number information
+     */
     private void readPhoneNumbers(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("phone_support");
 
@@ -138,6 +148,12 @@ public class PhoneFragment extends Fragment {
         });
     }
 
+    /**
+     * Add a phone card to the list
+     * @param phoneDataSnapshot The DataSnapshot containing information about the phone number
+     * @param phoneNumbersLinearLayout The linear layout to add the phone number to
+     * @param inflater The layout inflater to inflate the card from xml
+     */
     private void insertPhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override

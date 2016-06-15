@@ -15,7 +15,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,7 +41,6 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d(LOG_TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
     }
 
@@ -50,7 +48,42 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        setupEmotions(rootView);
+        return rootView;
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Hide the sign in button if the user is already signed in
+        if(isUserSignedIn()) {
+            View rootView = getView();
+            if(rootView != null) {
+                View signInButton = rootView.findViewById(R.id.button_sign_in);
+                if (signInButton != null)
+                    signInButton.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
+     * Add listeners to the emoji buttons to show the suggestions when tapped
+     * Hides the extra emoji if show_extra_emoji is false on remote config
+     * @param rootView The root view of the fragment, containing the emotion buttons
+     */
+    private void setupEmotions(View rootView) {
         View.OnClickListener emotionSelectedListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,18 +106,10 @@ public class MainFragment extends Fragment {
                 rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
             }
         }
-        return rootView;
-    }
-
-    /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
+        else {
+            rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
+            rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
+        }
     }
 
     /**
@@ -95,37 +120,10 @@ public class MainFragment extends Fragment {
         drawer.openDrawer(Gravity.LEFT);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // Hide the sign in button if the user is already signed in
-        if(isUserSignedIn()) {
-            View fragmentView = getView();
-            if(fragmentView != null) {
-                View signInButton = fragmentView.findViewById(R.id.button_sign_in);
-                if (signInButton != null)
-                    signInButton.setVisibility(View.INVISIBLE);
-            }
-        }
-    }
-
-    /**
-     * Get a shared preference String from a saved file
-     * @param prefKey The key of the String
-     * @param defaultValue The default value if no key exists
-     * @return The shared preference String with the given key
-     */
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(prefKey, defaultValue);
-    }
-
     /**
      * Sign in to the user's Google Account
      */
     private void signIn() {
-        //Log.d(LOG_TAG, "signIn() called with: " + "");
         Activity parentActivity = getActivity();
         if(parentActivity instanceof MainActivity)
             ((MainActivity) getActivity()).signIn();
@@ -133,7 +131,7 @@ public class MainFragment extends Fragment {
 
     /**
      * Determine whether the user is signed in to their Google account
-     * Precondition: MainFragment is a member of MainActivity
+     * Precondition: MainFragment is contained in of MainActivity
      * @return Whether the user is signed in
      */
     private boolean isUserSignedIn() {
@@ -141,10 +139,14 @@ public class MainFragment extends Fragment {
     }
 
 
+    /**
+     * When an emotion icon is tapped, show the corresponding recommendations and hide the other icons
+     * @param emotionPressed The emotion icon that was tapped
+     */
     private void emotionSelected(View emotionPressed) {
         View fragmentView = getView();
         if(fragmentView != null) {
-            FrameLayout parentFrameLayout = (FrameLayout) fragmentView.findViewById(R.id.recommendations_container);
+            ViewGroup parentFrameLayout = (ViewGroup) fragmentView.findViewById(R.id.recommendations_container);
 
             LinearLayout recommendationsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.recommendations_linear_layout);
             recommendationsLinearLayout.removeAllViews();
@@ -158,6 +160,7 @@ public class MainFragment extends Fragment {
             fadeOutAllEmojiExcept(emotionPressed.getId());
             animateOutEmotionPrompt();
 
+            // Show the suggestions for each emotion
             switch (emotionPressed.getId()) {
                 case R.id.happy_face:
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
@@ -191,9 +194,6 @@ public class MainFragment extends Fragment {
                     break;
             }
 
-            //if (!isUserSignedIn())
-            //    recommendationsLinearLayout.addView(getSuggestionSignIn());
-
             if (!trustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
@@ -201,6 +201,10 @@ public class MainFragment extends Fragment {
         }
     }
 
+    /**
+     * Get a blank suggestion layout
+     * @return A blank suggestion layout
+     */
     private RelativeLayout getSuggestionLayoutTemplate() {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         return (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
@@ -243,7 +247,7 @@ public class MainFragment extends Fragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowser(getString(R.string.website_va));
+                openBrowserIntent(getString(R.string.website_va));
             }
         });
     }
@@ -257,7 +261,7 @@ public class MainFragment extends Fragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               openBrowser(getString(R.string.veterans_network_website));
+               openBrowserIntent(getString(R.string.veterans_network_website));
             }
         });
     }
@@ -273,7 +277,7 @@ public class MainFragment extends Fragment {
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
-                    openDialer(phoneNumber);
+                    openDialerIntent(phoneNumber);
                 else
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
             }
@@ -290,7 +294,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
-                openDialer(phoneNumber);
+                openDialerIntent(phoneNumber);
             }
         });
     }
@@ -305,7 +309,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
-                openDialer(phoneNumber);
+                openDialerIntent(phoneNumber);
             }
         });
     }
@@ -373,6 +377,10 @@ public class MainFragment extends Fragment {
         return !trustedContactPhone.equals("");
     }
 
+    /**
+     * Fade out and remove all emoji except for one
+     * @param emoji_id The id of the view to not remove
+     */
     private void fadeOutAllEmojiExcept(int emoji_id) {
         View rootView = getView();
         if(rootView != null) {
@@ -397,37 +405,16 @@ public class MainFragment extends Fragment {
      * Fade out the view asking the user how they are feeling
      */
     private void animateOutEmotionPrompt() {
-        View fragmentView = getView();
-        if(fragmentView != null) {
-
-            LinearLayout emotionsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.emotions_linear_layout);
+        View rootView = getView();
+        if(rootView != null) {
+            LinearLayout emotionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.emotions_linear_layout);
             RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
             p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
             emotionsLinearLayout.setLayoutParams(p);
 
-            //View promptEmotionTextView = fragmentView.findViewById(R.id.prompt_emotion);
-            //fadeOutAndRemoveView(promptEmotionTextView, 200);
-
-            TextView headerTextView = (TextView) fragmentView.findViewById(R.id.main_header_text_view);
+            TextView headerTextView = (TextView) rootView.findViewById(R.id.main_header_text_view);
             headerTextView.setText(R.string.recommendations_title);
         }
-    }
-
-    /**
-     * Fade a view out and remove it once it has fully vanished
-     * @param view The view to fade out and remove
-     * @param duration The duration of the fade out in milliseconds
-     */
-    private void fadeOutAndRemoveView(final View view, int duration) {
-        // Start the animation
-        view.animate().alpha(0.0f)
-                .setDuration(duration).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                view.setVisibility(View.GONE);
-            }
-        });
     }
 
     /**
@@ -460,7 +447,7 @@ public class MainFragment extends Fragment {
      * This does not call the number directly, the user needs to press the call button
      * @param phoneNumber The phone number to call
      */
-    private void openDialer(String phoneNumber) {
+    private void openDialerIntent(String phoneNumber) {
 
         try {
             Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -476,10 +463,21 @@ public class MainFragment extends Fragment {
      * Precondition: url is a valid url
      * @param url The url to open
      */
-    private void openBrowser(String url) {
+    private void openBrowserIntent(String url) {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
+    }
+
+    /**
+     * Get a shared preference String from a saved file
+     * @param prefKey The key of the String
+     * @param defaultValue The default value if no key exists
+     * @return The shared preference String with the given key
+     */
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(prefKey, defaultValue);
     }
 
 }

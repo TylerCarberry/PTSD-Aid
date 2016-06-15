@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -296,6 +297,13 @@ public class Facility implements Comparable<Facility>, Serializable {
         return programs;
     }
 
+    public void setAddress(String streetAddress, String city, String state, String zipCode) {
+        this.streetAddress = streetAddress;
+        this.city = city;
+        this.state = state;
+        this.zip = zipCode;
+    }
+
     /**
      * Compare two facilities by distance to the user
      * @param another The other facility to compare to
@@ -303,7 +311,7 @@ public class Facility implements Comparable<Facility>, Serializable {
      *         Negative if it is farther away. 0 if they have the same distance
      */
     @Override
-    public int compareTo(Facility another) {
+    public int compareTo(@NonNull Facility another) {
         if(getDistance() < another.getDistance())
             return -1;
         if(getDistance() > another.getDistance())

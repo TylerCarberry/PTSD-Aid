@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -85,9 +86,8 @@ public class NearbyFacilitiesFragment extends Fragment {
     private RecyclerView recyclerView;
     private FacilityAdapter mAdapter;
 
-    // Required default constructor
     public NearbyFacilitiesFragment() {
-
+        // Required default constructor
     }
 
     @Override
@@ -95,43 +95,9 @@ public class NearbyFacilitiesFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Refresh items
-                numberOfLoadedFacilities = 0;
-                knownFacilities.clear();
-                facilityList.clear();
-                mAdapter.notifyDataSetChanged();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadPTSDPrograms();
-                    }
-                });
-                t.run();
-            }
-        });
-        swipeRefreshLayout.setEnabled(false);
-
+        setupRefreshLayout(rootView);
 
         return rootView;
-    }
-
-    /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * This is needed when inflating views
-     * @return The root view of the fragment as a ViewGroup,
-     *         Null if the root view is null or not a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView != null && rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
     }
 
     /**
@@ -155,16 +121,60 @@ public class NearbyFacilitiesFragment extends Fragment {
     }
 
     /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * This is needed when inflating views
+     * @return The root view of the fragment as a ViewGroup,
+     *         Null if the root view is null or not a ViewGroup
+     */
+    private ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView != null && rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+        View rootView = getView();
+        if(rootView != null) {
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
-        mAdapter = new FacilityAdapter(facilityList, getActivity());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+            mAdapter = new FacilityAdapter(facilityList, getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(mAdapter);
+        }
+    }
+
+    /**
+     * Setup the refresh layout to refresh on swipe down past the first item
+     * @param rootView The root view of the fragment containing the refresh layout
+     */
+    private void setupRefreshLayout(View rootView) {
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                numberOfLoadedFacilities = 0;
+                knownFacilities.clear();
+                facilityList.clear();
+                mAdapter.notifyDataSetChanged();
+
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadPTSDPrograms();
+                    }
+                });
+                t.run();
+            }
+        });
+        swipeRefreshLayout.setEnabled(false);
     }
 
     /**
@@ -389,10 +399,7 @@ public class NearbyFacilitiesFragment extends Fragment {
         facilityToUpdate.setName(name);
         facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
         facilityToUpdate.setUrl(url);
-        facilityToUpdate.setStreetAddress(address);
-        facilityToUpdate.setCity(city);
-        facilityToUpdate.setState(state);
-        facilityToUpdate.setZip(zip);
+        facilityToUpdate.setAddress(address, city, state, zip);
         facilityToUpdate.setDescription(description);
         facilityToUpdate.setLatitude(locationLat);
         facilityToUpdate.setLongitude(locationLong);
@@ -423,8 +430,6 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility
      */
     private void loadStreetViewImage(final Facility facility) {
-        //Log.d(LOG_TAG, "Entering load street view image.");
-
         String url = "";
 
         // If the street view url cannot be created, load the map view instead
@@ -472,8 +477,6 @@ public class NearbyFacilitiesFragment extends Fragment {
      * @param facility The facility
      */
     private void loadMapImage(final Facility facility) {
-        //Log.d(LOG_TAG, "loadMapImage() called with: " + "imageView = [" + imageView + "], facility = [" + facility + "]");
-
         final int defaultImageId = R.drawable.default_facility_image;
 
         String url;
@@ -485,8 +488,6 @@ public class NearbyFacilitiesFragment extends Fragment {
             facility.setFacilityImage(BitmapFactory.decodeResource(getResources(), defaultImageId));
             return;
         }
-        //Log.d(LOG_TAG, url);
-
 
         // Retrieves an image specified by the URL, displays it in the UI.
         ImageRequest request = new ImageRequest(url,
@@ -549,12 +550,18 @@ public class NearbyFacilitiesFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * @return Whether the location permission has been granted
+     */
     private boolean locationPermissionGranted() {
-        // Assume thisActivity is the current activity
         return ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Request the location permission
+     * Only needed in Android version 6.0 and up
+     */
     @TargetApi(Build.VERSION_CODES.M)
     private void requestLocationPermission() {
         if (!locationPermissionGranted()) {
@@ -566,7 +573,7 @@ public class NearbyFacilitiesFragment extends Fragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
 
         switch (requestCode) {
             case PERMISSION_LOCATION_REQUEST: {
@@ -579,15 +586,13 @@ public class NearbyFacilitiesFragment extends Fragment {
                     loadPTSDPrograms();
 
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // Permission denied
                     errorLoadingResults(getString(R.string.error_location_permission));
                 }
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
+            // Other 'case' lines to check for other permissions this app might request
         }
     }
 
