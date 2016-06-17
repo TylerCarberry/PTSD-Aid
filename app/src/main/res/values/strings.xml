@@ -119,10 +119,6 @@
     <string name="change_trusted_contact">Change Trusted Contact</string>
     <string name="add_trusted_contact">Add Trusted Contact</string>
 
-    <!-- Saved preference keys -->
-    <string name="pref_trusted_name_key">trusted_name_key</string>
-    <string name="pref_trusted_phone_key">trusted_phone_key</string>
-
     <!-- Other -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -137,5 +133,11 @@
     <string name="facility_image_content_description">Facility Image</string>
     <string name="address_icon_content_description">Address icon</string>
     <string name="recommendation_call_veterans_foundation">Call the veterans foundation</string>
+    <string name="rating_prompt_message">How well do you like PTSD Aid?</string>
+    <string name="rating_prompt_title">Enjoying the app?</string>
+    <string name="support_subject">PTSD Aid</string>
+    <string name="support_body">Hello! I would like to give feedback on PTSD Aid!\n\nWhat I liked:\n\nWhat I didn\'t like:\n\n\nDevice Information:\n</string>
+    <string name="contacts_permission_title">Please grant the contacts permission</string>
+    <string name="contacts_permission_message">Grant the contacts permission to continue</string>
 
 </resources>

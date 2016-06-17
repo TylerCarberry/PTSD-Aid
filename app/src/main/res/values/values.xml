@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="remote_config_cache_seconds">43200</integer>
+
+    <integer name="map_image_width">640</integer>
+    <integer name="map_image_height">350</integer>
+
+
+
+</resources>

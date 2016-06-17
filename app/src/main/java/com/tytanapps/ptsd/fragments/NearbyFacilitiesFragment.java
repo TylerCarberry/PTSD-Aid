@@ -64,10 +64,6 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = NearbyFacilitiesFragment.class.getSimpleName();
 
-    // Dimensions for the Google Maps ImageView
-    private static final int MAP_IMAGE_WIDTH = 640; // You cannot exceed 640 in the free tier
-    private static final int MAP_IMAGE_HEIGHT = 350;
-
     private static final int PERMISSION_LOCATION_REQUEST = 3;
 
     // Stores the facilities that have already loaded
@@ -416,8 +412,11 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
 
         if(cachedBitmap != null)
             facility.setFacilityImage(cachedBitmap);
-        else
-            loadStreetViewImage(facility);
+        else {
+            int imageWidth = getResources().getInteger(R.integer.map_image_width);
+            int imageHeight = getResources().getInteger(R.integer.map_image_height);
+            loadStreetViewImage(facility, imageWidth, imageHeight);
+        }
 
         mAdapter.notifyDataSetChanged();
     }
@@ -428,15 +427,15 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadStreetViewImage(final Facility facility) {
+    private void loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
         String url = "";
 
         // If the street view url cannot be created, load the map view instead
         try {
-            url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
+            url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
         } catch (UnsupportedEncodingException e) {
             FirebaseCrash.report(e);
-            loadMapImage(facility);
+            loadMapImage(facility, imageWidth, imageHeight);
             return;
         }
 
@@ -451,7 +450,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
                             saveFacilityImage(bitmap, facility.getFacilityId());
                         }
                         else
-                            loadMapImage(facility);
+                            loadMapImage(facility, imageWidth, imageHeight);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -459,7 +458,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
                         Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
 
                         // Load the map view instead
-                        loadMapImage(facility);
+                        loadMapImage(facility, imageWidth, imageHeight);
                     }
                 });
 
@@ -475,12 +474,12 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadMapImage(final Facility facility) {
+    private void loadMapImage(final Facility facility, int imageWidth, int imageHeight) {
         final int defaultImageId = R.drawable.default_facility_image;
 
         String url;
         try {
-            url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState());
+            url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
         } catch (UnsupportedEncodingException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
@@ -785,9 +784,9 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateStreetViewAPIUrl(String address, String town, String state) throws UnsupportedEncodingException {
+    private String calculateStreetViewAPIUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
         String url = "https://maps.googleapis.com/maps/api/streetview?size=" +
-                MAP_IMAGE_WIDTH + "x" + MAP_IMAGE_HEIGHT + "&location=";
+                imageWidth + "x" + imageHeight + "&location=";
 
         // Encode the address
         String params = address + ", " + town + ", " + state;
@@ -802,7 +801,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateMapAPIUrl(String address, String town, String state) throws UnsupportedEncodingException {
+    private String calculateMapAPIUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
         String url = "http://maps.google.com/maps/api/staticmap?center=";
 
         // Encode the address
@@ -810,7 +809,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
         paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
 
         // Place a red marker over the location
-        url += paramLocation + "&zoom=16&size=" + MAP_IMAGE_WIDTH + "x" + MAP_IMAGE_HEIGHT
+        url += paramLocation + "&zoom=16&size=" + imageWidth + "x" + imageHeight
                 + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
 
         return url;

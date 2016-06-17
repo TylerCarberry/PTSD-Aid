@@ -101,8 +101,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -160,8 +158,8 @@ public class MainActivity extends AppCompatActivity
 
         if(ratingPromptShowAfter > 0) {
             FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
-            fiveStarsDialog.setRateText("How well do you like PTSD Aid?")
-                    .setTitle("Enjoying the app?")
+            fiveStarsDialog.setRateText(getString(R.string.rating_prompt_message))
+                    .setTitle(getString(R.string.rating_prompt_title))
                     .setForceMode(false)
                     .setUpperBound(ratingUpperBound) // Market opened if a rating >= 4 is selected
                     .setNegativeReviewListener(new NegativeReviewListener() {
@@ -169,8 +167,8 @@ public class MainActivity extends AppCompatActivity
                         public void onNegativeReview(int i) {
                             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                                     "mailto", supportEmailAddress, null));
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PTSD Aid");
-                            emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello! I would like to give feedback on PTSD Aid!\n\nWhat I liked:\n\nWhat I didn't like:\n\n\nDevice Information:\n" + deviceInformation);
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject));
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_body) + deviceInformation);
                             startActivity(Intent.createChooser(emailIntent, "Send email..."));
                         }
                     }) // OVERRIDE mail intent for negative review
@@ -280,7 +278,7 @@ public class MainActivity extends AppCompatActivity
         mFirebaseRemoteConfig.setConfigSettings(configSettings);
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
-        int cacheSeconds = 12 * 60 * 60; // 12 hours
+        int cacheSeconds = getResources().getInteger(R.integer.remote_config_cache_seconds);
         if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
             cacheSeconds = 0;
 
@@ -593,8 +591,8 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     // Permission denied
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                    alertDialog.setTitle("Please grant the contacts permission");
-                    alertDialog.setMessage("Grant the contacts permission to continue");
+                    alertDialog.setTitle(R.string.contacts_permission_title);
+                    alertDialog.setMessage(R.string.contacts_permission_message);
                     alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -675,8 +673,6 @@ public class MainActivity extends AppCompatActivity
 
             saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
             saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
-
-            Log.d(LOG_TAG, "Trusted contact changed: NAME: " + name + " PHONENUMBER: " + phoneNumber);
         }
     }
 
@@ -686,8 +682,6 @@ public class MainActivity extends AppCompatActivity
      * @return The contact's name
      */
     public String getContactName(String phoneNumber) {
-        Log.d(LOG_TAG, "getContactName() called with: " + "phoneNumber = [" + phoneNumber + "]");
-
         ContentResolver cr = getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);

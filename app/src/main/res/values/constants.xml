@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Saved preference keys -->
+    <string name="pref_trusted_name_key">trusted_name_key</string>
+    <string name="pref_trusted_phone_key">trusted_phone_key</string>
+
+    <integer name="max_map_image_width">640</integer>
+    <integer name="max_map_image_height">640</integer>
+
+
+</resources>
