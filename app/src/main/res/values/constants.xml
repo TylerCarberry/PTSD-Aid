@@ -4,6 +4,8 @@
     <!-- Saved preference keys -->
     <string name="pref_trusted_name_key">trusted_name_key</string>
     <string name="pref_trusted_phone_key">trusted_phone_key</string>
+    <string name="rc_questions_sticky">questions_sticky</string>
+    <string name="rc_show_extra_emoji">show_extra_emoji</string>
 
     <integer name="max_map_image_width">640</integer>
     <integer name="max_map_image_height">640</integer>

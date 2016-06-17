@@ -225,12 +225,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onStart() {
-        //Log.d(LOG_TAG, "onStart() called with: " + "");
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 

@@ -74,9 +74,6 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
     // This number is still incremented when the API load fails
     private int numberOfLoadedFacilities = 0;
 
-    // The number of facilities to display on screen
-    private static final int FACILITIES_TO_DISPLAY = 10;
-
     private List<Facility> facilityList = new ArrayList<>();
     private RecyclerView recyclerView;
     private FacilityAdapter mAdapter;
@@ -204,7 +201,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
                         double userLocation[] = Utilities.getGPSLocation(getActivity());
                         // If the user's GPS location cannot be found
                         if (userLocation[0] == 0 && userLocation[1] == 0) {
-                            errorLoadingResults("Your GPS location cannot be determined");
+                            errorLoadingResults(getString(R.string.gps_error));
                             return;
                         }
 
@@ -525,7 +522,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
         Collections.sort(facilities);
 
         // Display the facilities
-        for(int i = 0; i < FACILITIES_TO_DISPLAY; i++) {
+        for(int i = 0; i < getResources().getInteger(R.integer.facilities_to_display); i++) {
             final Facility facility = facilities.get(i);
             facilityList.add(facility);
 

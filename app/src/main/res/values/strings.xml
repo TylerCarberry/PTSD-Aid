@@ -139,5 +139,6 @@
     <string name="support_body">Hello! I would like to give feedback on PTSD Aid!\n\nWhat I liked:\n\nWhat I didn\'t like:\n\n\nDevice Information:\n</string>
     <string name="contacts_permission_title">Please grant the contacts permission</string>
     <string name="contacts_permission_message">Grant the contacts permission to continue</string>
+    <string name="gps_error">Your GPS location cannot be determined</string>
 
 </resources>

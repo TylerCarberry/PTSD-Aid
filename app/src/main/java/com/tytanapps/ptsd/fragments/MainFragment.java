@@ -97,7 +97,7 @@ public class MainFragment extends AnalyticsFragment {
         if(getActivity() instanceof RemoteConfigurable) {
             FirebaseRemoteConfig remoteConfig = ((RemoteConfigurable)getActivity()).getRemoteConfig();
 
-            if(remoteConfig.getBoolean("show_extra_emoji")){
+            if(remoteConfig.getBoolean(getString(R.string.rc_show_extra_emoji))){
                 rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
                 rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
             }

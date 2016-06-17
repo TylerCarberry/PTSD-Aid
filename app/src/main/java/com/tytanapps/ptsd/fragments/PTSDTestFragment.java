@@ -64,7 +64,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
     private void setupQuestionsLayout(View rootView) {
         LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
         if(getActivity() instanceof RemoteConfigurable) {
-            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean("questions_sticky")) {
+            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean(getString(R.string.rc_questions_sticky))) {
                 TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
                 headerTextView.setTag("sticky");
             }
