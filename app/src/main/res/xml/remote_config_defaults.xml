@@ -27,6 +27,11 @@
         <value>false</value>
     </entry>
 
+    <entry>
+        <key>never_fetched</key>
+        <value>true</value>
+    </entry>
+
 
 </defaultsMap>
 <!-- END xml_defaults -->

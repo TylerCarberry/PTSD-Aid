@@ -234,7 +234,11 @@ public class MainActivity extends AppCompatActivity
         mFirebaseRemoteConfig.setConfigSettings(configSettings);
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
-        mFirebaseRemoteConfig.fetch(1 * 60 * 60) // cache for 1 hour
+        int cacheSeconds = 12 * 60 * 60; // 12 hours
+        if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
+            cacheSeconds = 0;
+        
+        mFirebaseRemoteConfig.fetch(cacheSeconds)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
