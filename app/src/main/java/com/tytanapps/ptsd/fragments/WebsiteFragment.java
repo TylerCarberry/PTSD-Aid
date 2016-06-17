@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,7 +33,7 @@ import java.util.HashMap;
  * Displays a list of websites to find more information about PTSD. Shows a brief description for
  * each website. Tapping on the card opens the website.
  */
-public class WebsiteFragment extends Fragment {
+public class WebsiteFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 

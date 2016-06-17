@@ -35,7 +35,7 @@ import java.util.HashMap;
  * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
  * the phone number to call. Tapping on the hotline calls them.
  */
-public class PhoneFragment extends Fragment {
+public class PhoneFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = PhoneFragment.class.getSimpleName();
 

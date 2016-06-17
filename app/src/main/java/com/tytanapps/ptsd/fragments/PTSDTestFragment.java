@@ -1,7 +1,6 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.RemoteConfigurable;
 
@@ -26,7 +28,7 @@ import io.techery.progresshint.ProgressHintDelegate;
  * you recommendations on what to do next. Find a professional is always a recommendation even if
  * the user shows no signs of PTSD.
  */
-public class PTSDTestFragment extends Fragment {
+public class PTSDTestFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
 
@@ -152,6 +154,15 @@ public class PTSDTestFragment extends Fragment {
      * Calculate the total score and notify the user appropriately
      */
     private void submit() {
+        // Obtain the shared Tracker instance.
+        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Submit Test")
+                .build());
+
         int score = getScore();
         showResults(score);
     }

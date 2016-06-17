@@ -3,7 +3,6 @@ package com.tytanapps.ptsd.fragments;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,7 +60,7 @@ import java.util.Set;
  * Displays the address, phone number, programs, and an image for each facility.
  * You can call them, get directions, or load the website for each VA facility.
  */
-public class NearbyFacilitiesFragment extends Fragment {
+public class NearbyFacilitiesFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = NearbyFacilitiesFragment.class.getSimpleName();
 

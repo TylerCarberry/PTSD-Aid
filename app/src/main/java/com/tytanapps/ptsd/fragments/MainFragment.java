@@ -3,7 +3,6 @@ package com.tytanapps.ptsd.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,7 @@ import com.tytanapps.ptsd.RemoteConfigurable;
  * The main fragment displayed when you launch the app. Prompts the user for their emotion
  * and gives them recommendations based on their answer.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
 

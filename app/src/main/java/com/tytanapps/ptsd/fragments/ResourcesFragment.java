@@ -20,7 +20,7 @@ import com.tytanapps.ptsd.R;
 /**
  * Shows information about PTSD. Gives symptoms, causes, and treatment for PTSD.
  */
-public class ResourcesFragment extends Fragment {
+public class ResourcesFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
