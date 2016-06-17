@@ -226,40 +226,6 @@ public class MainActivity extends AppCompatActivity
         return deviceInformation;
     }
 
-    private void setupRemoteConfig() {
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
-
-        int cacheSeconds = 12 * 60 * 60; // 12 hours
-        if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
-            cacheSeconds = 0;
-        
-        mFirebaseRemoteConfig.fetch(cacheSeconds)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(LOG_TAG, "Fetch Succeeded");
-                        // Once the config is successfully fetched it must be activated before
-                        // newly fetched values are returned. This is done in onStop() so values
-                        // do not change as the user is interacting with the app.
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(LOG_TAG, "Fetch failed");
-                    }
-                });
-    }
-
-    public FirebaseRemoteConfig getRemoteConfig() {
-        return mFirebaseRemoteConfig;
-    }
-
     @Override
     public void onStart() {
         //Log.d(LOG_TAG, "onStart() called with: " + "");
@@ -272,16 +238,6 @@ public class MainActivity extends AppCompatActivity
 
         // Attempt to sign the user in automatically
         silentSignIn();
-    }
-
-    @Override
-    public void onStop() {
-        //Log.d(LOG_TAG, "onStop() called with: " + "");
-
-        if(mFirebaseRemoteConfig != null)
-            mFirebaseRemoteConfig.activateFetched();
-
-        super.onStop();
     }
 
     /**
@@ -314,6 +270,41 @@ public class MainActivity extends AppCompatActivity
                 handlePickContractRequest(contactUri);
             }
         }
+    }
+
+    private void setupRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+
+        int cacheSeconds = 12 * 60 * 60; // 12 hours
+        if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
+            cacheSeconds = 0;
+
+        mFirebaseRemoteConfig.fetch(cacheSeconds)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(LOG_TAG, "Fetch Succeeded");
+                        mFirebaseRemoteConfig.activateFetched();
+                        // Once the config is successfully fetched it must be activated before
+                        // newly fetched values are returned. This is done in onStop() so values
+                        // do not change as the user is interacting with the app.
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d(LOG_TAG, "Fetch failed");
+                    }
+                });
+    }
+
+    public FirebaseRemoteConfig getRemoteConfig() {
+        return mFirebaseRemoteConfig;
     }
 
     /**
