@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
+
 /**
  * Loads a list of nearby VA facilities that offer PTSD programs.
  * Displays the address, phone number, programs, and an image for each facility.
@@ -410,8 +412,9 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
         if(cachedBitmap != null)
             facility.setFacilityImage(cachedBitmap);
         else {
-            int imageWidth = getResources().getInteger(R.integer.map_image_width);
-            int imageHeight = getResources().getInteger(R.integer.map_image_height);
+            int imageWidth = getRemoteConfigInt(this, R.string.rc_map_width);
+            int imageHeight = getRemoteConfigInt(this, R.string.rc_map_height);
+
             loadStreetViewImage(facility, imageWidth, imageHeight);
         }
 
@@ -522,7 +525,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
         Collections.sort(facilities);
 
         // Display the facilities
-        for(int i = 0; i < getResources().getInteger(R.integer.facilities_to_display); i++) {
+        for(int i = 0; i < Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display); i++) {
             final Facility facility = facilities.get(i);
             facilityList.add(facility);
 

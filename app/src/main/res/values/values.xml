@@ -3,9 +3,5 @@
 
     <integer name="remote_config_cache_seconds">43200</integer>
 
-    <integer name="map_image_width">640</integer>
-    <integer name="map_image_height">350</integer>
-    <integer name="facilities_to_display">10</integer>
-
 
 </resources>

@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +14,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.support.annotation.NonNull;
 import android.util.Base64;
+
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -222,5 +226,35 @@ public class Utilities {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream .toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    /**
+     * Get the FirebaseRemoteConfig of a fragment's parent activity
+     * PRECONDITION: The activity containing fragment implements RemoteConfigurable
+     * @param fragment The fragment to get the remote config from
+     * @return The FirebaseRemoteConfig of fragment's activity
+     */
+    private static FirebaseRemoteConfig getRemoteConfig(@NonNull Fragment fragment) {
+        return ((RemoteConfigurable)fragment.getActivity()).getRemoteConfig();
+    }
+
+    public static boolean getRemoteConfigBoolean(@NonNull Fragment fragment, @NonNull int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getBoolean(fragment.getString(resId));
+    }
+
+    public static int getRemoteConfigInt(@NonNull Fragment fragment, @NonNull int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return (int) firebaseRemoteConfig.getDouble(fragment.getString(resId));
+    }
+
+    public static double getRemoteConfigDouble(@NonNull Fragment fragment, @NonNull int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getDouble(fragment.getString(resId));
+    }
+
+    public static String getRemoteConfigString(@NonNull Fragment fragment, @NonNull int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getString(fragment.getString(resId));
     }
 }

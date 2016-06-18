@@ -18,9 +18,10 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.RemoteConfigurable;
 
 import io.techery.progresshint.ProgressHintDelegate;
+
+import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
 
 
 /**
@@ -63,11 +64,10 @@ public class PTSDTestFragment extends AnalyticsFragment {
      */
     private void setupQuestionsLayout(View rootView) {
         LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-        if(getActivity() instanceof RemoteConfigurable) {
-            if(((RemoteConfigurable)getActivity()).getRemoteConfig().getBoolean(getString(R.string.rc_questions_sticky))) {
-                TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
-                headerTextView.setTag("sticky");
-            }
+
+        if(getRemoteConfigBoolean(this, R.string.rc_questions_sticky)) {
+            TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+            headerTextView.setTag("sticky");
         }
 
         insertQuestions(questionsLinearLayout);

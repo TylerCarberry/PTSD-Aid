@@ -32,6 +32,23 @@
         <value>true</value>
     </entry>
 
+    <entry>
+        <key>map_image_width</key>
+        <value>640</value>
+    </entry>
+
+    <entry>
+        <key>map_image_height</key>
+        <value>350</value>
+    </entry>
+
+    <entry>
+        <key>facilities_to_display</key>
+        <value>10</value>
+    </entry>
+
+
+
 
 </defaultsMap>
 <!-- END xml_defaults -->
