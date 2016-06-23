@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.Utilities;
 
 
 /**
@@ -99,6 +99,9 @@ public class ResourcesFragment extends AnalyticsFragment {
 
                 TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
                 headerTextView.setText(title);
+                if(Utilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+                    headerTextView.setTag("sticky");
+                }
 
                 TextView descTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_desc);
                 descTextView.setText(desc);

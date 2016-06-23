@@ -47,6 +47,16 @@
         <value>10</value>
     </entry>
 
+    <entry>
+        <key>check_recommendations_database</key>
+        <value>false</value>
+    </entry>
+
+    <entry>
+        <key>resource_sticky</key>
+        <value>true</value>
+    </entry>
+
 
 
 

@@ -221,7 +221,7 @@ public class MainFragment extends AnalyticsFragment {
             if (!trustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-            if(firebaseDatabaseLoaded) {
+            if(firebaseDatabaseLoaded && Utilities.getRemoteConfigBoolean(this, R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
