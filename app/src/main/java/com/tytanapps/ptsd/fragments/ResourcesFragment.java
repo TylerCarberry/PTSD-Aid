@@ -24,6 +24,8 @@ public class ResourcesFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
+    private boolean firebaseDatabaseLoaded = false;
+
     public ResourcesFragment() {
         // Required empty public constructor
     }
@@ -37,14 +39,29 @@ public class ResourcesFragment extends AnalyticsFragment {
     @Override
     public void onStart() {
         super.onStart();
-        readResources(FirebaseDatabase.getInstance());
+        insertDefaultResources();
+        readResourcesFromFirebase(FirebaseDatabase.getInstance());
+    }
+
+    private void insertDefaultResources() {
+        View rootView = getView();
+        if(rootView != null) {
+            LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+            insertResource(getString(R.string.symptoms), getString(R.string.symptoms_detail), inflater, phoneNumbersLinearLayout);
+            insertResource(getString(R.string.causes), getString(R.string.causes_detail), inflater, phoneNumbersLinearLayout);
+            insertResource(getString(R.string.diagnosis), getString(R.string.diagnosis_detail), inflater, phoneNumbersLinearLayout);
+            insertResource(getString(R.string.treatment), getString(R.string.treatment_detail), inflater, phoneNumbersLinearLayout);
+            insertResource(getString(R.string.counseling), getString(R.string.counseling_detail), inflater, phoneNumbersLinearLayout);
+        }
     }
 
     /**
      * Read the resources from the firebase database and add them to the list
      * @param database The database to read from
      */
-    private void readResources(final FirebaseDatabase database) {
+    private void readResourcesFromFirebase(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("resources");
 
         // Read from the database
@@ -59,13 +76,11 @@ public class ResourcesFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
-
                             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertResource(child, phoneNumbersLinearLayout, inflater);
+                                insertFirebaseResource(child, phoneNumbersLinearLayout, inflater);
                             }
                         }
                     }
@@ -88,27 +103,46 @@ public class ResourcesFragment extends AnalyticsFragment {
      * @param resourcesLinearLayout The linearlayout to add the info to
      * @param inflater The layout inflater to create the view from xml
      */
-    private void insertResource(final DataSnapshot resourceDataSnapshot, final LinearLayout resourcesLinearLayout, final LayoutInflater inflater) {
+    private void insertFirebaseResource(final DataSnapshot resourceDataSnapshot, final LinearLayout resourcesLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 String title = (String) resourceDataSnapshot.child("title").getValue();
                 String desc = (String) resourceDataSnapshot.child("description").getValue();
 
-                LinearLayout resourceHeaderView = getResourceView(inflater, resourcesLinearLayout, title);
-
-                TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
-                headerTextView.setText(title);
-                if(Utilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
-                    headerTextView.setTag("sticky");
-                }
-
-                TextView descTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_desc);
-                descTextView.setText(desc);
+                insertResource(title, desc, inflater, resourcesLinearLayout);
             }
         });
 
         t.run();
+    }
+
+    private void insertResource(String title, String desc, LayoutInflater inflater, LinearLayout resourcesLinearLayout) {
+        LinearLayout resourceHeaderView = getResourceView(inflater, resourcesLinearLayout, title);
+
+        TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
+        headerTextView.setText(title);
+        if(Utilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+            headerTextView.setTag("sticky");
+        }
+
+        TextView descTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_desc);
+        descTextView.setText(desc);
+    }
+
+    private void determineIfFirebaseDatabaseLoaded() {
+        FirebaseDatabase myRef = FirebaseDatabase.getInstance();
+        myRef.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                firebaseDatabaseLoaded = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                firebaseDatabaseLoaded = false;
+            }
+        });
     }
 
     /**
