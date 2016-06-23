@@ -39,6 +39,8 @@ public class MainFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
+    private boolean firebaseDatabaseLoaded = false;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -59,6 +61,8 @@ public class MainFragment extends AnalyticsFragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        determineIfFirebaseDatabaseLoaded();
 
         // Hide the sign in button if the user is already signed in
         if(isUserSignedIn()) {
@@ -134,6 +138,21 @@ public class MainFragment extends AnalyticsFragment {
         return ((MainActivity) getActivity()).isUserSignedIn();
     }
 
+    private void determineIfFirebaseDatabaseLoaded() {
+        FirebaseDatabase myRef = FirebaseDatabase.getInstance();
+        myRef.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                firebaseDatabaseLoaded = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                firebaseDatabaseLoaded = false;
+            }
+        });
+    }
+
 
     /**
      * When an emotion icon is tapped, show the corresponding recommendations and hide the other icons
@@ -202,9 +221,8 @@ public class MainFragment extends AnalyticsFragment {
             if (!trustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-
-            final String finalEmotionName = emotionName;
-            if(emotionName.length() > 0) {
+            if(firebaseDatabaseLoaded) {
+                final String finalEmotionName = emotionName;
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), finalEmotionName, emotionPressed.getId());
             }
             else {
