@@ -111,7 +111,7 @@
     <string name="website_nimh">http://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd/index.shtml</string>
     <string name="veterans_affairs">Veterans Affairs</string>
     <string name="veteran_affairs_details">Find more information about PTSD from the Department of Veterans Affairs</string>
-    <string name="website_va">http://www.ptsd.va.gov/public/index.asp/</string>
+    <string name="website_va">http://www.ptsd.va.gov/</string>
     <string name="self_quiz">Self-Check Quiz</string>
     <string name="quiz_details">A more in depth quiz about whether stress and depression may be affecting you. A VA Chat Counselor will review it and respond within 15 minutes. It is completely confidential.</string>
     <string name="website_self_check">https://www.vetselfcheck.org/Welcome.cfm</string>
