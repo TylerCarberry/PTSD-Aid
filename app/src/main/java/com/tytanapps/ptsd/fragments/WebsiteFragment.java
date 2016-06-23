@@ -46,21 +46,18 @@ public class WebsiteFragment extends AnalyticsFragment {
     public void onResume() {
         super.onResume();
 
-        insertDefaultWebsites();
-
-        Thread t = new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
+                insertDefaultWebsites();
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 readFirebaseWebsites(database);
             }
-        });
-        t.start();
+        }).start();
     }
 
     private void insertDefaultWebsites() {
         View rootView = getView();
-
         if(rootView != null) {
             LinearLayout websitesLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -70,8 +67,6 @@ public class WebsiteFragment extends AnalyticsFragment {
             insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
             insertWebCard(getString(R.string.nimh_title), getString(R.string.nimh_details), getString(R.string.website_nimh), R.drawable.nimh, inflater, websitesLinearLayout);
             insertWebCard(getString(R.string.ptsd_coach), getString(R.string.ptsd_coach_details), getString(R.string.website_coach), R.drawable.ptsd_coach, inflater, websitesLinearLayout);
-
-
         }
 
     }
@@ -91,8 +86,6 @@ public class WebsiteFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
-
                             LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -115,20 +108,13 @@ public class WebsiteFragment extends AnalyticsFragment {
     }
 
     private void insertFirebaseWebCard(final DataSnapshot snapshot, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String name = (String) snapshot.child("name").getValue();
-                String desc = (String) snapshot.child("description").getValue();
-                String url = (String) snapshot.child("url").getValue();
-                String bitmap_base64 = (String) snapshot.child("icon").getValue();
-                Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
+        String name = (String) snapshot.child("name").getValue();
+        String desc = (String) snapshot.child("description").getValue();
+        String url = (String) snapshot.child("url").getValue();
+        String bitmap_base64 = (String) snapshot.child("icon").getValue();
+        Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
 
-                insertWebCard(name, desc, url, bmp, inflater, websitesLinearLayout);
-            }
-        });
-
-        t.run();
+        insertWebCard(name, desc, url, bmp, inflater, websitesLinearLayout);
     }
 
     private void insertWebCard(String name, String desc, String url, Bitmap bmp, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
@@ -144,21 +130,23 @@ public class WebsiteFragment extends AnalyticsFragment {
         iconImageView.setImageBitmap(bmp);
     }
 
-    private void insertWebCard(String name, String desc, String url, int imageResource, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
-        CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
+    private void insertWebCard(final String name, final String desc, final String url, final int imageResource, final LayoutInflater inflater, final LinearLayout websitesLinearLayout) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-        TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
-        nameTextView.setText(name);
+                TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+                nameTextView.setText(name);
 
-        TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
-        detailsTextView.setText(desc);
+                TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+                detailsTextView.setText(desc);
 
-        ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-        iconImageView.setImageResource(imageResource);
+                ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
+                iconImageView.setImageResource(imageResource);
+            }
+        });
     }
-
-
-
 
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
         CardView websiteCardView = null;

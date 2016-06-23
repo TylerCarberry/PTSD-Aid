@@ -39,8 +39,14 @@ public class ResourcesFragment extends AnalyticsFragment {
     @Override
     public void onStart() {
         super.onStart();
-        insertDefaultResources();
-        readResourcesFromFirebase(FirebaseDatabase.getInstance());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                insertDefaultResources();
+                readResourcesFromFirebase(FirebaseDatabase.getInstance());
+            }
+        }).run();
+
     }
 
     private void insertDefaultResources() {
@@ -104,17 +110,10 @@ public class ResourcesFragment extends AnalyticsFragment {
      * @param inflater The layout inflater to create the view from xml
      */
     private void insertFirebaseResource(final DataSnapshot resourceDataSnapshot, final LinearLayout resourcesLinearLayout, final LayoutInflater inflater) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String title = (String) resourceDataSnapshot.child("title").getValue();
-                String desc = (String) resourceDataSnapshot.child("description").getValue();
+        String title = (String) resourceDataSnapshot.child("title").getValue();
+        String desc = (String) resourceDataSnapshot.child("description").getValue();
 
-                insertResource(title, desc, inflater, resourcesLinearLayout);
-            }
-        });
-
-        t.run();
+        insertResource(title, desc, inflater, resourcesLinearLayout);
     }
 
     private void insertResource(String title, String desc, LayoutInflater inflater, LinearLayout resourcesLinearLayout) {

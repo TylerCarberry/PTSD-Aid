@@ -48,8 +48,14 @@ public class PhoneFragment extends AnalyticsFragment {
     @Override
     public void onResume() {
         super.onResume();
-        insertDefaultPhoneNumbers();
-        loadPhoneNumbersFromFirebase();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                insertDefaultPhoneNumbers();
+                loadPhoneNumbersFromFirebase();
+            }
+        });
+        t.run();
     }
 
     private void insertDefaultPhoneNumbers() {
@@ -64,7 +70,6 @@ public class PhoneFragment extends AnalyticsFragment {
             insertPhoneCard(getString(R.string.suicice_lifeline), getString(R.string.suicide_lifeline_phone_details), getString(R.string.phone_suicide_lifeline), inflater, phoneNumbersLinearLayout, R.drawable.nspl);
             insertPhoneCard(getString(R.string.ncaad), getString(R.string.alcohol_phone_details), getString(R.string.phone_alcoholism), inflater, phoneNumbersLinearLayout, R.drawable.ncadd);
         }
-
     }
 
     /**
@@ -128,19 +133,12 @@ public class PhoneFragment extends AnalyticsFragment {
      * @param inflater The layout inflater to inflate the card from xml
      */
     private void insertFirebasePhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String name = (String) phoneDataSnapshot.child("name").getValue();
-                String desc = (String) phoneDataSnapshot.child("description").getValue();
-                String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
-                String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
+        String name = (String) phoneDataSnapshot.child("name").getValue();
+        String desc = (String) phoneDataSnapshot.child("description").getValue();
+        String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
+        String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
 
-                insertPhoneCard(name, desc, phone, bitmap_base64, inflater, phoneNumbersLinearLayout);
-            }
-        });
-
-        t.run();
+        insertPhoneCard(name, desc, phone, bitmap_base64, inflater, phoneNumbersLinearLayout);
     }
 
     private void insertPhoneCard(String name, String desc, String phone, String bitmap_base64, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout) {
