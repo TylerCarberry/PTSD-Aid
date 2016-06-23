@@ -153,6 +153,10 @@ public class MainActivity extends AppCompatActivity
         int ratingPromptShowAfter = (int) mFirebaseRemoteConfig.getDouble("rating_prompt_show_after");
         int ratingUpperBound = (int) mFirebaseRemoteConfig.getDouble("rating_upper_bound");
         final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
+        final String supportSubject = mFirebaseRemoteConfig.getString("support_subject");
+
+        // There is an issue with escape characters with Firebase. Instead use the ^ symbol for new line
+        final String supportMessage = mFirebaseRemoteConfig.getString("support_message").replace("^", "\n");
 
         final String deviceInformation = getDeviceInformation();
 
@@ -167,8 +171,8 @@ public class MainActivity extends AppCompatActivity
                         public void onNegativeReview(int i) {
                             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                                     "mailto", supportEmailAddress, null));
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject));
-                            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_body) + deviceInformation);
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, supportSubject);
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, supportMessage + deviceInformation);
                             startActivity(Intent.createChooser(emailIntent, "Send email..."));
                         }
                     }) // OVERRIDE mail intent for negative review

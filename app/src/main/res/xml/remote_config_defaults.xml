@@ -57,6 +57,16 @@
         <value>true</value>
     </entry>
 
+    <entry>
+        <key>support_subject</key>
+        <value>PTSD Aid</value>
+    </entry>
+
+    <entry>
+        <key>support_message</key>
+        <value>Hello! I would like to give feedback on PTSD Aid!^^What I liked:^^What I didn\'t like:^^^Device Information:^</value>
+    </entry>
+
 
 
 
