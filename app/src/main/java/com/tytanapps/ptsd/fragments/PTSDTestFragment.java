@@ -236,7 +236,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, shareText);
-        startActivity(Intent.createChooser(intent, "Share via"));
+        startActivity(Intent.createChooser(intent, getString(R.string.share_results_chooser)));
     }
 
     /**
@@ -248,11 +248,9 @@ public class PTSDTestFragment extends AnalyticsFragment {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
         int[] answers = getEachAnswer();
 
-        String shareText = getString(R.string.stress_prompt);
-        shareText += "\n\n";
+        String shareText = getString(R.string.stress_prompt) + "\n\n";
 
         for(int i = 0; i < questions.length; i++) {
-
             // Include each question prompt
             shareText += (i+1) + ") ";
             shareText += questions[i] + "\n";

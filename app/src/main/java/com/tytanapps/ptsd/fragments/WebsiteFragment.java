@@ -1,8 +1,6 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -114,6 +112,12 @@ public class WebsiteFragment extends AnalyticsFragment {
         });
     }
 
+    /**
+     * Add a website card to the list from Firebase
+     * @param snapshot The data snapshot containing information about the website
+     * @param websitesLinearLayout The linear layout to add the website to
+     * @param inflater The inflater to inflate the card
+     */
     private void insertFirebaseWebCard(final DataSnapshot snapshot, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
         String name = (String) snapshot.child("name").getValue();
         String desc = (String) snapshot.child("description").getValue();
@@ -124,6 +128,15 @@ public class WebsiteFragment extends AnalyticsFragment {
         insertWebCard(name, desc, url, bmp, inflater, websitesLinearLayout);
     }
 
+    /**
+     * Add a website card to the list
+     * @param name The name of the website
+     * @param desc The description of the website
+     * @param url The url of the website
+     * @param bmp A bitmap of the logo to show
+     * @param inflater The inflater to inflate the card
+     * @param websitesLinearLayout The linear layout to add the website to
+     */
     private void insertWebCard(String name, String desc, String url, Bitmap bmp, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
         CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
@@ -137,6 +150,15 @@ public class WebsiteFragment extends AnalyticsFragment {
         iconImageView.setImageBitmap(bmp);
     }
 
+    /**
+     * Add a website card to the list
+     * @param name The name of the website
+     * @param desc The description of the website
+     * @param url The url of the website
+     * @param imageResource The resource id of the logo drawable
+     * @param inflater The inflater to inflate the card
+     * @param websitesLinearLayout The linear layout to add the website to
+     */
     private void insertWebCard(final String name, final String desc, final String url, final int imageResource, final LayoutInflater inflater, final LinearLayout websitesLinearLayout) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -178,7 +200,7 @@ public class WebsiteFragment extends AnalyticsFragment {
             websiteCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openBrowser(url);
+                    Utilities.openBrowserIntent(WebsiteFragment.this, url);
                 }
             });
 
@@ -188,17 +210,6 @@ public class WebsiteFragment extends AnalyticsFragment {
         }
 
         return websiteCardView;
-    }
-
-    /**
-     * Open a website in the browser
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    private void openBrowser(String url) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
     }
 
 }

@@ -77,7 +77,6 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
     private int numberOfLoadedFacilities = 0;
 
     private List<Facility> facilityList = new ArrayList<>();
-    private RecyclerView recyclerView;
     private FacilityAdapter mAdapter;
 
     public NearbyFacilitiesFragment() {
@@ -131,7 +130,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
     private void setupRecyclerView() {
         View rootView = getView();
         if(rootView != null) {
-            recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
             mAdapter = new FacilityAdapter(facilityList, getActivity());
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -537,7 +536,6 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
         }
 
         enableRefreshLayout();
-
         mAdapter.notifyDataSetChanged();
     }
 

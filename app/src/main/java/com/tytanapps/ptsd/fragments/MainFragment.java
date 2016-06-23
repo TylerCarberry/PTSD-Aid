@@ -3,11 +3,8 @@ package com.tytanapps.ptsd.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -18,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
@@ -332,7 +328,7 @@ public class MainFragment extends AnalyticsFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openBrowserIntent(getString(R.string.website_va));
+                Utilities.openBrowserIntent(MainFragment.this, (getString(R.string.website_va)));
             }
         });
     }
@@ -346,7 +342,7 @@ public class MainFragment extends AnalyticsFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               openBrowserIntent(getString(R.string.veterans_network_website));
+                Utilities.openBrowserIntent(MainFragment.this, (getString(R.string.veterans_network_website)));
             }
         });
     }
@@ -362,7 +358,7 @@ public class MainFragment extends AnalyticsFragment {
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
-                    openDialerIntent(phoneNumber);
+                    Utilities.openDialer(MainFragment.this, phoneNumber);
                 else
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
             }
@@ -379,7 +375,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
-                openDialerIntent(phoneNumber);
+                Utilities.openDialer(MainFragment.this, phoneNumber);
             }
         });
     }
@@ -394,7 +390,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
-                openDialerIntent(phoneNumber);
+                Utilities.openDialer(MainFragment.this, phoneNumber);
             }
         });
     }
@@ -409,7 +405,7 @@ public class MainFragment extends AnalyticsFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openBrowserIntent(url);
+                        Utilities.openBrowserIntent(MainFragment.this, url);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -426,7 +422,7 @@ public class MainFragment extends AnalyticsFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openDialerIntent(phoneNumber);
+                        Utilities.openDialer(MainFragment.this, phoneNumber);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -570,33 +566,6 @@ public class MainFragment extends AnalyticsFragment {
                         .alpha(1.0f).setDuration(500);
             }
         });
-    }
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    private void openDialerIntent(String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Open a website in the browser
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    private void openBrowserIntent(String url) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
     }
 
     /**

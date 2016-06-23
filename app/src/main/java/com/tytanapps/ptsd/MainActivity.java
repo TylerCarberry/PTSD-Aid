@@ -147,7 +147,8 @@ public class MainActivity extends AppCompatActivity
         showRatingPrompt();
 
         if(BuildConfig.DEBUG) {
-            Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
+            ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
+            //Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
             FirebaseMessaging.getInstance().subscribeToTopic("debug");
         }
     }

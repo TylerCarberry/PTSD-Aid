@@ -1,10 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
@@ -17,7 +14,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.Utilities;
 
 
 /**
@@ -58,9 +55,11 @@ public class PhoneFragment extends AnalyticsFragment {
         t.run();
     }
 
+    /**
+     * Add the phone numbers that are to be used offline
+     */
     private void insertDefaultPhoneNumbers() {
         View rootView = getView();
-
         if(rootView != null) {
             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -222,7 +221,7 @@ public class PhoneFragment extends AnalyticsFragment {
         phoneCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialer(phoneNumber);
+                Utilities.openDialer(PhoneFragment.this, phoneNumber);
             }
         });
 
@@ -231,21 +230,5 @@ public class PhoneFragment extends AnalyticsFragment {
         phoneCardView.startAnimation(bottomUp);
 
         return phoneCardView;
-    }
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    private void openDialer(String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
     }
 }

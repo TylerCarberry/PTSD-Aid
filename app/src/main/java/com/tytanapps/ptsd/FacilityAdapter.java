@@ -46,7 +46,6 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
     }
 
-
     public FacilityAdapter(List<Facility> facilityList, Context context) {
         this.facilityList = facilityList;
         this.context = context;
