@@ -2,11 +2,9 @@ package com.tytanapps.ptsd.fragments;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +22,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
-
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 
 
 /**
@@ -51,58 +46,37 @@ public class WebsiteFragment extends AnalyticsFragment {
     public void onResume() {
         super.onResume();
 
+        insertDefaultWebsites();
+
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                //writeToDatabase(database);
-                readWebsites(database);
+                readFirebaseWebsites(database);
             }
         });
         t.start();
     }
 
-    private void writeToDatabase(FirebaseDatabase database) {
-        DatabaseReference myRef = database.getReference("web_support");
-        HashMap<String, HashMap<String, Object>> phones = new HashMap<>();
+    private void insertDefaultWebsites() {
+        View rootView = getView();
 
-        HashMap<String, Object> veteransChatHashmap = createWebsiteHashMap(getString(R.string.veterans_chat_title), getString(R.string.website_chat), getString(R.string.veterans_chat_details), R.drawable.veterans_crisis_line);
-        phones.put((String) veteransChatHashmap.get("name"), veteransChatHashmap);
+        if(rootView != null) {
+            LinearLayout websitesLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-        HashMap<String, Object> nimhHashmap = createWebsiteHashMap(getString(R.string.nimh_title), getString(R.string.website_nimh), getString(R.string.nimh_details), R.drawable.nimh);
-        phones.put((String) nimhHashmap.get("name"), nimhHashmap);
+            insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
+            insertWebCard(getString(R.string.veterans_affairs), getString(R.string.veteran_affairs_details), getString(R.string.website_va), R.drawable.va, inflater, websitesLinearLayout);
+            insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
+            insertWebCard(getString(R.string.nimh_title), getString(R.string.nimh_details), getString(R.string.website_nimh), R.drawable.nimh, inflater, websitesLinearLayout);
+            insertWebCard(getString(R.string.ptsd_coach), getString(R.string.ptsd_coach_details), getString(R.string.website_coach), R.drawable.ptsd_coach, inflater, websitesLinearLayout);
 
-        HashMap<String, Object> vaHashmap = createWebsiteHashMap(getString(R.string.veterans_affairs), getString(R.string.website_va), getString(R.string.veteran_affairs_details), R.drawable.va);
-        phones.put((String) vaHashmap.get("name"), vaHashmap);
 
-        HashMap<String, Object> selfQuizHashmap = createWebsiteHashMap(getString(R.string.self_quiz), getString(R.string.website_self_check), getString(R.string.quiz_details), R.drawable.veterans_quiz);
-        phones.put((String) selfQuizHashmap.get("name"), selfQuizHashmap);
+        }
 
-        HashMap<String, Object> ptsdCoachHashmap = createWebsiteHashMap(getString(R.string.ptsd_coach), getString(R.string.website_coach), getString(R.string.ptsd_coach_details), R.drawable.ptsd_coach);
-        phones.put((String) ptsdCoachHashmap.get("name"), ptsdCoachHashmap);
-
-        myRef.setValue(phones);
     }
 
-    private HashMap<String, Object> createWebsiteHashMap(String name, String url, String description, int drawableId) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("name", name);
-        hashMap.put("description", description);
-        hashMap.put("url", url);
-
-        Bitmap bmp =  BitmapFactory.decodeResource(getResources(), drawableId);//your image
-        ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, bYtE);
-        bmp.recycle();
-        byte[] byteArray = bYtE.toByteArray();
-        String imageFile = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-        hashMap.put("icon", imageFile);
-
-        return hashMap;
-    }
-
-    private void readWebsites(final FirebaseDatabase database) {
+    private void readFirebaseWebsites(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("web_support");
 
         // Read from the database
@@ -123,7 +97,7 @@ public class WebsiteFragment extends AnalyticsFragment {
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertWebCard(child, websiteLinearLayout, inflater);
+                                insertFirebaseWebCard(child, websiteLinearLayout, inflater);
                             }
                         }
                     }
@@ -140,7 +114,7 @@ public class WebsiteFragment extends AnalyticsFragment {
         });
     }
 
-    private void insertWebCard(final DataSnapshot snapshot, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
+    private void insertFirebaseWebCard(final DataSnapshot snapshot, final LinearLayout websitesLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -148,25 +122,43 @@ public class WebsiteFragment extends AnalyticsFragment {
                 String desc = (String) snapshot.child("description").getValue();
                 String url = (String) snapshot.child("url").getValue();
                 String bitmap_base64 = (String) snapshot.child("icon").getValue();
+                Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
 
-                CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
-
-                TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
-                nameTextView.setText(name);
-
-                TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
-                detailsTextView.setText(desc);
-
-                if (bitmap_base64 != null) {
-                    ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-                    Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
-                    iconImageView.setImageBitmap(bmp);
-                }
+                insertWebCard(name, desc, url, bmp, inflater, websitesLinearLayout);
             }
         });
 
         t.run();
     }
+
+    private void insertWebCard(String name, String desc, String url, Bitmap bmp, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
+        CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
+
+        TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+        nameTextView.setText(name);
+
+        TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+        detailsTextView.setText(desc);
+
+        ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
+        iconImageView.setImageBitmap(bmp);
+    }
+
+    private void insertWebCard(String name, String desc, String url, int imageResource, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
+        CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
+
+        TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+        nameTextView.setText(name);
+
+        TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+        detailsTextView.setText(desc);
+
+        ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
+        iconImageView.setImageResource(imageResource);
+    }
+
+
+
 
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
         CardView websiteCardView = null;
