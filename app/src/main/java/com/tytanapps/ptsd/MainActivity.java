@@ -57,7 +57,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.fragments.MainFragment;
@@ -125,9 +127,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if(!alreadySetPersistence) {
+        try {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            alreadySetPersistence = true;
+        } catch (DatabaseException e) {
+            // If the persistence has already been set, it will throw an error.
+            // There is no way to determine if it has been set beforehand.
         }
 
         // Set up the side drawer layout containing the user's information and navigation items
@@ -142,6 +146,10 @@ public class MainActivity extends AppCompatActivity
         setupRemoteConfig();
 
         showRatingPrompt();
+
+        if(BuildConfig.DEBUG) {
+            FirebaseMessaging.getInstance().subscribeToTopic("debug");
+        }
     }
 
     /**
