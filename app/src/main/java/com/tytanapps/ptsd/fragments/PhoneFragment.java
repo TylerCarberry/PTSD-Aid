@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,9 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-
 
 /**
  * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
@@ -52,7 +48,23 @@ public class PhoneFragment extends AnalyticsFragment {
     @Override
     public void onResume() {
         super.onResume();
+        insertDefaultPhoneNumbers();
         loadPhoneNumbersFromFirebase();
+    }
+
+    private void insertDefaultPhoneNumbers() {
+        View rootView = getView();
+
+        if(rootView != null) {
+            LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+            insertPhoneCard(getString(R.string.veterans_crisis_line), getString(R.string.veterans_support_phone_details), getString(R.string.phone_veterans_crisis_line), inflater, phoneNumbersLinearLayout, R.drawable.veterans_crisis_line);
+            insertPhoneCard(getString(R.string.lifeline_for_vets), getString(R.string.veterans_foundation_phone_details), getString(R.string.phone_veterans_foundation_hotline), inflater, phoneNumbersLinearLayout, R.drawable.nvf);
+            insertPhoneCard(getString(R.string.suicice_lifeline), getString(R.string.suicide_lifeline_phone_details), getString(R.string.phone_suicide_lifeline), inflater, phoneNumbersLinearLayout, R.drawable.nspl);
+            insertPhoneCard(getString(R.string.ncaad), getString(R.string.alcohol_phone_details), getString(R.string.phone_alcoholism), inflater, phoneNumbersLinearLayout, R.drawable.ncadd);
+        }
+
     }
 
     /**
@@ -67,43 +79,6 @@ public class PhoneFragment extends AnalyticsFragment {
             }
         });
         t.start();
-    }
-
-    private void writeToDatabase(FirebaseDatabase database) {
-        DatabaseReference myRef = database.getReference("phone_support");
-        HashMap<String, HashMap<String, Object>> phones = new HashMap<>();
-
-        HashMap<String, Object> veteransCrisisLineHashmap = createPhoneHashMap("Veterans Crisis Line", getString(R.string.phone_veterans_crisis_line), getString(R.string.veterans_support_phone_details), R.drawable.veterans_crisis_line);
-        phones.put((String) veteransCrisisLineHashmap.get("name"), veteransCrisisLineHashmap);
-
-        HashMap<String, Object> suicideHashmap = createPhoneHashMap("Suicide Lifeline", getString(R.string.phone_suicide_lifeline), getString(R.string.suicide_lifeline_phone_details), R.drawable.nspl);
-        phones.put((String) suicideHashmap.get("name"), suicideHashmap);
-
-        HashMap<String, Object> ncaadHashmap = createPhoneHashMap("NCAAD", getString(R.string.phone_alcoholism), getString(R.string.alcohol_phone_details), R.drawable.ncadd);
-        phones.put((String) ncaadHashmap.get("name"), ncaadHashmap);
-
-        HashMap<String, Object> lifelineVetsHashmap = createPhoneHashMap("Lifeline for Vets", getString(R.string.phone_veterans_foundation_hotline), getString(R.string.veterans_foundation_phone_details), R.drawable.nvf);
-        phones.put((String) lifelineVetsHashmap.get("name"), lifelineVetsHashmap);
-
-        myRef.setValue(phones);
-    }
-
-    private HashMap<String, Object> createPhoneHashMap(String name, String phoneNumber, String description, int drawableId) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("name", name);
-        hashMap.put("description", description);
-        hashMap.put("phone_number", phoneNumber);
-
-        Bitmap bmp =  BitmapFactory.decodeResource(getResources(), drawableId);//your image
-        ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, bYtE);
-        bmp.recycle();
-        byte[] byteArray = bYtE.toByteArray();
-        String imageFile = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-        hashMap.put("icon", imageFile);
-
-        return hashMap;
     }
 
     /**
@@ -125,13 +100,11 @@ public class PhoneFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
-
                             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertPhoneCard(child, phoneNumbersLinearLayout, inflater);
+                                insertFirebasePhoneCard(child, phoneNumbersLinearLayout, inflater);
                             }
                         }
                     }
@@ -154,7 +127,7 @@ public class PhoneFragment extends AnalyticsFragment {
      * @param phoneNumbersLinearLayout The linear layout to add the phone number to
      * @param inflater The layout inflater to inflate the card from xml
      */
-    private void insertPhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
+    private void insertFirebasePhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -163,26 +136,44 @@ public class PhoneFragment extends AnalyticsFragment {
                 String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
                 String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
 
-                CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
-
-                TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
-                descTextView.setText(desc);
-
-                TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
-                phoneTextView.setText(phone);
-
-                if (bitmap_base64 != null) {
-                    ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
-
-                    byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
-                    Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-
-                    iconImageView.setImageBitmap(bmp);
-                }
+                insertPhoneCard(name, desc, phone, bitmap_base64, inflater, phoneNumbersLinearLayout);
             }
         });
 
         t.run();
+    }
+
+    private void insertPhoneCard(String name, String desc, String phone, String bitmap_base64, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout) {
+        byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
+        Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+
+        insertPhoneCard(name, desc, phone, inflater, phoneNumbersLinearLayout, bmp);
+    }
+
+    private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, Bitmap imageBitmap) {
+        CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
+
+        TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
+        descTextView.setText(desc);
+
+        TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
+        phoneTextView.setText(phone);
+
+        ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
+        iconImageView.setImageBitmap(imageBitmap);
+    }
+
+    private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, int imageResource) {
+        CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
+
+        TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
+        descTextView.setText(desc);
+
+        TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
+        phoneTextView.setText(phone);
+
+        ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
+        iconImageView.setImageResource(imageResource);
     }
 
     /**

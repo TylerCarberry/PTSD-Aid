@@ -86,12 +86,19 @@
     <string name="retry">Retry</string>
 
     <!-- Call -->
+    <string name="veterans_crisis_line">Veterans Crisis Line</string>
     <string name="phone_veterans_crisis_line">1-800-273-8255</string>
     <string name="veterans_support_phone_details">Veterans Press 1</string>
+
+    <string name="suicice_lifeline">Suicide Lifeline</string>
     <string name="phone_suicide_lifeline">1-800-273-8255</string>
     <string name="suicide_lifeline_phone_details">It is common to feel anxious after incidents of mass violence. You are not alone.</string>
+    
+    <string name="lifeline_for_vets">Lifeline for Vets</string>
     <string name="phone_veterans_foundation_hotline">1-888-777-4443</string>
     <string name="veterans_foundation_phone_details">We help veterans and their families who are enduring a crisis or who have a critical need for help. Veterans of any era can call for assistance.</string>
+    
+    <string name="ncaad">NCAAD</string>
     <string name="phone_alcoholism">1-800-622-2255</string>
     <string name="alcohol_phone_details">Addiction is a Disease\nTreatment is Available\nRecovery Brings Joy</string>
 
