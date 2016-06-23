@@ -222,8 +222,7 @@ public class MainFragment extends AnalyticsFragment {
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
             if(firebaseDatabaseLoaded) {
-                final String finalEmotionName = emotionName;
-                getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), finalEmotionName, emotionPressed.getId());
+                getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
                 fadeOutAllEmojiExcept(emotionPressed.getId());
@@ -242,7 +241,7 @@ public class MainFragment extends AnalyticsFragment {
         DatabaseReference myRef = database.getReference("recommendations").child(emotion);
 
         // Read from the database
-        myRef.orderByChild("order").addValueEventListener(new ValueEventListener() {
+        myRef.orderByChild("order").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
