@@ -160,16 +160,20 @@ public class MainFragment extends AnalyticsFragment {
                 case R.id.happy_face:
                     emotionName = "happy";
 
-                    //recommendationsLinearLayout.addView(getSuggestionVAWebsite());
-                    //recommendationsLinearLayout.addView(getSuggestionVisitResources());
+                    recommendationsLinearLayout.addView(getSuggestionVAWebsite());
+                    recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     break;
 
                 case R.id.ok_face:
+                    emotionName = "ok";
+
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
                     break;
 
                 case R.id.sad_face:
+                    emotionName = "sad";
+
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
@@ -177,6 +181,8 @@ public class MainFragment extends AnalyticsFragment {
                     break;
 
                 case R.id.sick_face:
+                    emotionName = "sick";
+
                     recommendationsLinearLayout.addView(getSuggestionFindFacility());
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
@@ -184,6 +190,8 @@ public class MainFragment extends AnalyticsFragment {
                     break;
 
                 case R.id.poop_emoji:
+                    emotionName = "poop";
+
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionCallVeteransCrisisLine());
