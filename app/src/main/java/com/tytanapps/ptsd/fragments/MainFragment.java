@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
@@ -133,10 +139,11 @@ public class MainFragment extends AnalyticsFragment {
      * When an emotion icon is tapped, show the corresponding recommendations and hide the other icons
      * @param emotionPressed The emotion icon that was tapped
      */
-    private void emotionSelected(View emotionPressed) {
+    private void emotionSelected(final View emotionPressed) {
         View fragmentView = getView();
         if(fragmentView != null) {
-            ViewGroup parentFrameLayout = (ViewGroup) fragmentView.findViewById(R.id.recommendations_container);
+            final ViewGroup parentFrameLayout = (ViewGroup) fragmentView.findViewById(R.id.recommendations_container);
+            parentFrameLayout.setVisibility(View.INVISIBLE);
 
             LinearLayout recommendationsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.recommendations_linear_layout);
             recommendationsLinearLayout.removeAllViews();
@@ -147,14 +154,14 @@ public class MainFragment extends AnalyticsFragment {
                 public void onClick(View v) {}
             });
 
-            fadeOutAllEmojiExcept(emotionPressed.getId());
-            animateOutEmotionPrompt();
-
+            String emotionName = "";
             // Show the suggestions for each emotion
             switch (emotionPressed.getId()) {
                 case R.id.happy_face:
-                    recommendationsLinearLayout.addView(getSuggestionVAWebsite());
-                    recommendationsLinearLayout.addView(getSuggestionVisitResources());
+                    emotionName = "happy";
+
+                    //recommendationsLinearLayout.addView(getSuggestionVAWebsite());
+                    //recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     break;
 
                 case R.id.ok_face:
@@ -187,8 +194,68 @@ public class MainFragment extends AnalyticsFragment {
             if (!trustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-            animateInRecommendations(parentFrameLayout);
+
+            final String finalEmotionName = emotionName;
+            if(emotionName.length() > 0) {
+                getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), finalEmotionName, emotionPressed.getId());
+            }
+            else {
+                fadeOutAllEmojiExcept(emotionPressed.getId());
+                animateOutEmotionPrompt();
+                animateInRecommendations(parentFrameLayout);
+            }
         }
+    }
+
+    /**
+     * Read the phone numbers from a Firebase database
+     * @param database The database containing the phone number information
+     * @param id
+     */
+    private void getRecommendationsFromDatabase(final FirebaseDatabase database, String emotion, final int id) {
+        DatabaseReference myRef = database.getReference("recommendations").child(emotion);
+
+        // Read from the database
+        myRef.orderByChild("order").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        View rootView = getView();
+                        if(rootView != null) {
+
+                            //rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
+
+                            LinearLayout recommendationsLinearLayout = (LinearLayout) rootView.findViewById(R.id.recommendations_linear_layout);
+                            //LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                recommendationsLinearLayout.addView(getSuggestionFromDatabase(child));
+                            }
+
+                            animateOutEmotionPrompt();
+                            fadeOutAllEmojiExcept(id);
+
+                            ViewGroup parentFrameLayout = (ViewGroup) rootView.findViewById(R.id.recommendations_container);
+                            animateInRecommendations(parentFrameLayout);
+
+                        }
+                    }
+                });
+
+                t.run();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(LOG_TAG, "Failed to read value.", error.toException());
+            }
+        });
     }
 
     /**
@@ -302,6 +369,45 @@ public class MainFragment extends AnalyticsFragment {
                 openDialerIntent(phoneNumber);
             }
         });
+    }
+
+    private RelativeLayout getSuggestionFromDatabase(DataSnapshot dataSnapshot) {
+        String message = (String) dataSnapshot.child("text").getValue();
+
+        try {
+            final String url = (String) dataSnapshot.child("url").getValue();
+
+            if (url != null && url.length() > 0) {
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openBrowserIntent(url);
+                    }
+                };
+                return createSuggestionLayout(message, onClickListener);
+            }
+
+        } catch (Exception e) {}
+
+
+        try {
+            final String phoneNumber = (String) dataSnapshot.child("phone_number").getValue();
+
+            if (phoneNumber != null && phoneNumber.length() > 0) {
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openDialerIntent(phoneNumber);
+                    }
+                };
+                return createSuggestionLayout(message, onClickListener);
+            }
+
+        } catch (Exception e) {}
+
+
+
+        return null;
     }
 
     /**
