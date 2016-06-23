@@ -24,8 +24,6 @@ public class ResourcesFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
-    private boolean firebaseDatabaseLoaded = false;
-
     public ResourcesFragment() {
         // Required empty public constructor
     }
@@ -116,6 +114,13 @@ public class ResourcesFragment extends AnalyticsFragment {
         insertResource(title, desc, inflater, resourcesLinearLayout);
     }
 
+    /**
+     * Insert a resource
+     * @param title The title of the resource
+     * @param desc The information about the resource
+     * @param inflater The inflater to inflate the layouts
+     * @param resourcesLinearLayout The linear layout to add the resource to
+     */
     private void insertResource(String title, String desc, LayoutInflater inflater, LinearLayout resourcesLinearLayout) {
         LinearLayout resourceHeaderView = getResourceView(inflater, resourcesLinearLayout, title);
 
@@ -127,21 +132,6 @@ public class ResourcesFragment extends AnalyticsFragment {
 
         TextView descTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_desc);
         descTextView.setText(desc);
-    }
-
-    private void determineIfFirebaseDatabaseLoaded() {
-        FirebaseDatabase myRef = FirebaseDatabase.getInstance();
-        myRef.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                firebaseDatabaseLoaded = true;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                firebaseDatabaseLoaded = false;
-            }
-        });
     }
 
     /**

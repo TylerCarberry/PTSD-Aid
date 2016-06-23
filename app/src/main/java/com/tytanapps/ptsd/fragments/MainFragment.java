@@ -62,16 +62,12 @@ public class MainFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
 
+        // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
         determineIfFirebaseDatabaseLoaded();
 
         // Hide the sign in button if the user is already signed in
         if(isUserSignedIn()) {
-            View rootView = getView();
-            if(rootView != null) {
-                View signInButton = rootView.findViewById(R.id.button_sign_in);
-                if (signInButton != null)
-                    signInButton.setVisibility(View.INVISIBLE);
-            }
+            hideSignInButton();
         }
     }
 
@@ -130,6 +126,18 @@ public class MainFragment extends AnalyticsFragment {
     }
 
     /**
+     * Hide the sign in button on the navigation drawer
+     */
+    private void hideSignInButton() {
+        View rootView = getView();
+        if(rootView != null) {
+            View signInButton = rootView.findViewById(R.id.button_sign_in);
+            if (signInButton != null)
+                signInButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    /**
      * Determine whether the user is signed in to their Google account
      * Precondition: MainFragment is contained in of MainActivity
      * @return Whether the user is signed in
@@ -138,7 +146,13 @@ public class MainFragment extends AnalyticsFragment {
         return ((MainActivity) getActivity()).isUserSignedIn();
     }
 
+    /**
+     * If the Firebase database is loaded, set firebaseDatabaseLoaded to true
+     */
     private void determineIfFirebaseDatabaseLoaded() {
+
+        // Attempt to load a value from the database. If it cannot be loaded, then the listener
+        // will never be called and firebaseDatabaseLoaded will remain false
         FirebaseDatabase myRef = FirebaseDatabase.getInstance();
         myRef.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -152,7 +166,6 @@ public class MainFragment extends AnalyticsFragment {
             }
         });
     }
-
 
     /**
      * When an emotion icon is tapped, show the corresponding recommendations and hide the other icons
@@ -178,21 +191,18 @@ public class MainFragment extends AnalyticsFragment {
             switch (emotionPressed.getId()) {
                 case R.id.happy_face:
                     emotionName = "happy";
-
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     break;
 
                 case R.id.ok_face:
                     emotionName = "ok";
-
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
                     break;
 
                 case R.id.sad_face:
                     emotionName = "sad";
-
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
@@ -201,7 +211,6 @@ public class MainFragment extends AnalyticsFragment {
 
                 case R.id.sick_face:
                     emotionName = "sick";
-
                     recommendationsLinearLayout.addView(getSuggestionFindFacility());
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
@@ -210,7 +219,6 @@ public class MainFragment extends AnalyticsFragment {
 
                 case R.id.poop_emoji:
                     emotionName = "poop";
-
                     if (trustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionCallVeteransCrisisLine());
@@ -235,7 +243,7 @@ public class MainFragment extends AnalyticsFragment {
     /**
      * Read the phone numbers from a Firebase database
      * @param database The database containing the phone number information
-     * @param id
+     * @param id The id of the
      */
     private void getRecommendationsFromDatabase(final FirebaseDatabase database, String emotion, final int id) {
         DatabaseReference myRef = database.getReference("recommendations").child(emotion);
@@ -252,11 +260,7 @@ public class MainFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-
-                            //rootView.findViewById(R.id.loading_progress_bar).setVisibility(View.GONE);
-
                             LinearLayout recommendationsLinearLayout = (LinearLayout) rootView.findViewById(R.id.recommendations_linear_layout);
-                            //LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
                                 recommendationsLinearLayout.addView(getSuggestionFromDatabase(child));
@@ -267,7 +271,6 @@ public class MainFragment extends AnalyticsFragment {
 
                             ViewGroup parentFrameLayout = (ViewGroup) rootView.findViewById(R.id.recommendations_container);
                             animateInRecommendations(parentFrameLayout);
-
                         }
                     }
                 });
@@ -411,10 +414,11 @@ public class MainFragment extends AnalyticsFragment {
                 };
                 return createSuggestionLayout(message, onClickListener);
             }
-
+        // If an exception is thrown, there is no phone number associated with the recommendation
         } catch (Exception e) {}
 
 
+        // If an exception is thrown, there is no website associated with the recommendation
         try {
             final String phoneNumber = (String) dataSnapshot.child("phone_number").getValue();
 
@@ -431,8 +435,13 @@ public class MainFragment extends AnalyticsFragment {
         } catch (Exception e) {}
 
 
-
-        return null;
+        // There is no website or phone number associated with the recommendation
+        return createSuggestionLayout(message, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do nothing when tapped
+            }
+        });
     }
 
     /**

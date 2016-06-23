@@ -88,9 +88,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
-
         setupRefreshLayout(rootView);
-
         return rootView;
     }
 
@@ -209,7 +207,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
 
                         // Add each PTSD program to the correct VA facility
                         for (int i = 1; i < numberOfResults; i++) {
-                            JSONObject ptsdProgramJson = rootJson.getJSONObject("" + i);
+                            JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
                             addPTSDProgram(ptsdProgramJson);
                         }
                     } catch (JSONException e) {
@@ -249,7 +247,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
             });
 
             // Set a longer Volley timeout policy
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -538,14 +536,21 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
             t.run();
         }
 
+        enableRefreshLayout();
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Enable the refresh layout and stop the refreshing animation
+     */
+    private void enableRefreshLayout() {
         View rootView = getView();
         if(rootView != null) {
             SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
             swipeRefreshLayout.setRefreshing(false);
             swipeRefreshLayout.setEnabled(true);
         }
-
-        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -579,15 +584,14 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                    // Permission was granted
                     loadPTSDPrograms();
 
                 } else {
                     // Permission denied
                     errorLoadingResults(getString(R.string.error_location_permission));
                 }
-                return;
+                break;
             }
 
             // Other 'case' lines to check for other permissions this app might request

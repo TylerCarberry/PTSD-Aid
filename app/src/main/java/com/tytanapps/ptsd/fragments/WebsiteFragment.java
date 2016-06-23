@@ -56,6 +56,9 @@ public class WebsiteFragment extends AnalyticsFragment {
         }).start();
     }
 
+    /**
+     * Add the default websites to be used offline
+     */
     private void insertDefaultWebsites() {
         View rootView = getView();
         if(rootView != null) {
@@ -71,6 +74,10 @@ public class WebsiteFragment extends AnalyticsFragment {
 
     }
 
+    /**
+     * Read websites from Firebase and add them to the list
+     * @param database The firebase database containing the websites
+     */
     private void readFirebaseWebsites(final FirebaseDatabase database) {
         DatabaseReference myRef = database.getReference("web_support");
 

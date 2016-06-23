@@ -78,14 +78,14 @@ import angtrim.com.fivestarslibrary.ReviewListener;
  * between them using the navigation view.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
+        implements  NavigationView.OnNavigationItemSelectedListener,
+                    GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     // The connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
-
     // Whether the user is signed in to the app with their Google Account
     private boolean isUserSignedIn = false;
 
@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity
     private static final int PICK_CONTACT_REQUEST = 2;
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private boolean alreadySetPersistence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +147,7 @@ public class MainActivity extends AppCompatActivity
         showRatingPrompt();
 
         if(BuildConfig.DEBUG) {
+            Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
             FirebaseMessaging.getInstance().subscribeToTopic("debug");
         }
     }
@@ -194,6 +194,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Get the device debug information
+     * @return Debug information about the phone and app
+     */
     private String getDeviceInformation() {
         String deviceInformation = "";
 
@@ -276,6 +280,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Setup Firebase remote configuration
+     */
     private void setupRemoteConfig() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
@@ -307,6 +314,10 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
+    /**
+     *
+     * @return The Firebase remote configuration for the activity
+     */
     public FirebaseRemoteConfig getRemoteConfig() {
         return mFirebaseRemoteConfig;
     }
@@ -565,12 +576,17 @@ public class MainActivity extends AppCompatActivity
             showCreateTrustedContactDialog();
     }
 
+    /**
+     * @return Whether the user has granted the READ_CONTACTS permission
+     */
     private boolean contactsPermissionGranted() {
-        // Assume thisActivity is the current activity
         return ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Request the contacts permission if it has not been granted
+     */
     @TargetApi(Build.VERSION_CODES.M)
     private void requestContactsPermission() {
         if (!contactsPermissionGranted()) {
@@ -583,18 +599,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
-
         switch (requestCode) {
             case PERMISSION_CONTACT_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission was granted
                     pickTrustedContact();
-
-                } else {
+                }
+                else {
                     // Permission denied
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                     alertDialog.setTitle(R.string.contacts_permission_title);
@@ -602,7 +614,6 @@ public class MainActivity extends AppCompatActivity
                     alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            
                         }
                     });
                     alertDialog.create().show();
@@ -649,7 +660,6 @@ public class MainActivity extends AppCompatActivity
             requestContactsPermission();
         }
         else {
-
             try {
                 Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);

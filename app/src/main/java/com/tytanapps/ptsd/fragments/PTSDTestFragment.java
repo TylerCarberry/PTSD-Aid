@@ -41,9 +41,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
-
         setupQuestionsLayout(rootView);
-
         return rootView;
     }
 
@@ -154,15 +152,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
      * Calculate the total score and notify the user appropriately
      */
     private void submit() {
-        // Obtain the shared Tracker instance.
-        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-
-        mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("Action")
-                .setAction("Submit Test")
-                .build());
-
+        sendAnalyticsEvent("Action", "Submit Test");
         int score = getScore();
         showResults(score);
     }
@@ -344,6 +334,22 @@ public class PTSDTestFragment extends AnalyticsFragment {
         }
 
         return score;
+    }
+
+    /**
+     * Send an analytics event to Google Analytics
+     * @param category The category of the event
+     * @param action The action of the event
+     */
+    private void sendAnalyticsEvent(String category, String action) {
+        // Obtain the shared Tracker instance.
+        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory(category)
+                .setAction(action)
+                .build());
     }
 
 }

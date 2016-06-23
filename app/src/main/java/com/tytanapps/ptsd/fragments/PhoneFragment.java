@@ -138,16 +138,21 @@ public class PhoneFragment extends AnalyticsFragment {
         String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
         String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
 
-        insertPhoneCard(name, desc, phone, bitmap_base64, inflater, phoneNumbersLinearLayout);
-    }
-
-    private void insertPhoneCard(String name, String desc, String phone, String bitmap_base64, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout) {
         byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
         Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
 
         insertPhoneCard(name, desc, phone, inflater, phoneNumbersLinearLayout, bmp);
     }
 
+    /**
+     * Insert a phone card
+     * @param name The name of the phone hotline
+     * @param desc The description of the phone number
+     * @param phone The phone number
+     * @param inflater The inflater to inflate the cardview with
+     * @param phoneNumbersLinearLayout The linear layout containing the phone numbers
+     * @param imageBitmap The logo as a bitmap
+     */
     private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, Bitmap imageBitmap) {
         CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
@@ -161,6 +166,15 @@ public class PhoneFragment extends AnalyticsFragment {
         iconImageView.setImageBitmap(imageBitmap);
     }
 
+    /**
+     * Insert a phone card
+     * @param name The name of the phone hotline
+     * @param desc The description of the phone number
+     * @param phone The phone number
+     * @param inflater The inflater to inflate the cardview with
+     * @param phoneNumbersLinearLayout The linear layout containing the phone numbers
+     * @param imageResource The resource id of the logo drawable
+     */
     private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, int imageResource) {
         CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
