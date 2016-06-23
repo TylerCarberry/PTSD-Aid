@@ -52,7 +52,7 @@
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:src="@drawable/happy_emoji"
+                        android:src="@drawable/happy"
                         android:gravity="center"
                         android:contentDescription="@string/happy_face_content_description"/>
 
@@ -63,7 +63,7 @@
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:src="@drawable/ok_emoji"
+                        android:src="@drawable/ok"
                         android:gravity="center"
                         android:contentDescription="@string/ok_face_content_description"/>
 
@@ -71,7 +71,7 @@
                         android:id="@+id/sad_face"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/single_tear_emoji"
+                        android:src="@drawable/tear"
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -101,7 +101,7 @@
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:src="@drawable/sick_emoji"
+                        android:src="@drawable/sick"
                         android:gravity="center"
                         android:contentDescription="@string/sick_emoji_content_description"/>
 
@@ -109,7 +109,7 @@
                         android:id="@+id/poop_emoji"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/poop_emoji"
+                        android:src="@drawable/poop"
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -117,13 +117,9 @@
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:gravity="center"
                         android:contentDescription="@string/poop_emoji_content_description"/>
-
                 </LinearLayout>
 
-
             </RelativeLayout>
-
-
 
 
             <FrameLayout
