@@ -21,7 +21,6 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="35sp"
         android:background="@color/colorPrimary"
-        android:fontFamily="sans-serif-medium"
         android:textColor="@color/white"/>
 
     <TextView
@@ -34,7 +33,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
-        android:fontFamily="sans-serif-light"
         android:textSize="25sp"/>
 
 </RelativeLayout>

@@ -30,7 +30,8 @@
                 android:text="@string/stress_prompt"
                 android:textSize="@dimen/medium_text_size"
                 android:background="@color/colorPrimary"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium" />
 
         </LinearLayout>
 

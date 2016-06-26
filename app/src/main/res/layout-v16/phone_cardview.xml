@@ -27,6 +27,7 @@
             android:layout_below="@+id/phone_icon_imageview"
             android:gravity="center_horizontal"
             android:text="@string/phone_veterans_foundation_hotline"
+            android:fontFamily="sans-serif-medium"
             android:textSize="@dimen/large_text_size" />
 
         <TextView
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/phone_number_textview"
             android:text="@string/veterans_foundation_phone_details"
+            android:fontFamily="sans-serif-light"
             android:textSize="@dimen/small_text_size"/>
 
     </RelativeLayout>
