@@ -27,6 +27,6 @@
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:gravity="start"
         android:fontFamily="sans-serif-light"
-        android:textSize="27sp"/>
+        android:textSize="@dimen/medium_text_size"/>
 
 </RelativeLayout>
