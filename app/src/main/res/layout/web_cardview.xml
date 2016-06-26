@@ -27,7 +27,7 @@
             android:layout_below="@+id/website_icon_imageview"
             android:gravity="center_horizontal"
             android:fontFamily="sans-serif-medium"
-            android:textSize="30sp" />
+            android:textSize="@dimen/medium_text_size" />
 
         <TextView
             android:id="@+id/website_details_textview"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/website_name_textview"
             android:fontFamily="sans-serif-light"
-            android:textSize="20sp"/>
+            android:textSize="@dimen/small_text_size"/>
 
     </RelativeLayout>
 

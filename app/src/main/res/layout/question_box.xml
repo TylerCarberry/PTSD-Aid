@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:fontFamily="sans-serif-light"
-        android:textSize="20sp"/>
+        android:textSize="@dimen/small_text_size"/>
 
     <io.techery.progresshint.addition.widget.SeekBar
         android:id="@+id/result_seekbar"
