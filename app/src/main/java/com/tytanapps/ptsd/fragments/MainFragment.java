@@ -470,7 +470,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    ((MainActivity)getActivity()).switchFragment(new NearbyFacilitiesFragment());
+                    ((MainActivity)getActivity()).switchFragment(new FacilitiesFragment());
                 } catch(Exception e) {
                     FirebaseCrash.report(e);
                     openDrawer();

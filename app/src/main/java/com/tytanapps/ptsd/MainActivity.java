@@ -62,8 +62,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.tytanapps.ptsd.fragments.FacilitiesFragment;
 import com.tytanapps.ptsd.fragments.MainFragment;
-import com.tytanapps.ptsd.fragments.NearbyFacilitiesFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
@@ -781,7 +781,7 @@ public class MainActivity extends AppCompatActivity
                 newFragment = new WebsiteFragment();
                 break;
             case R.id.nav_nearby:
-                newFragment = new NearbyFacilitiesFragment();
+                newFragment = new FacilitiesFragment();
                 break;
         }
 

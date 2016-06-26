@@ -211,14 +211,14 @@ public class PTSDTestFragment extends AnalyticsFragment {
     }
 
     /**
-     * Switch to the NearbyFacilitiesFragment and show a list of nearby facilities
+     * Switch to the FacilitiesFragment and show a list of nearby facilities
      */
     private void findProfessional() {
-        NearbyFacilitiesFragment nearbyFacilitiesFragment = new NearbyFacilitiesFragment();
+        FacilitiesFragment facilitiesFragment = new FacilitiesFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment
-        transaction.replace(R.id.fragment_container, nearbyFacilitiesFragment);
+        transaction.replace(R.id.fragment_container, facilitiesFragment);
         transaction.addToBackStack(null);
 
         // Commit the transaction

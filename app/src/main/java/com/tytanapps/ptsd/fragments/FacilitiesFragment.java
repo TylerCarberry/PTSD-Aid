@@ -62,9 +62,9 @@ import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
  * Displays the address, phone number, programs, and an image for each facility.
  * You can call them, get directions, or load the website for each VA facility.
  */
-public class NearbyFacilitiesFragment extends AnalyticsFragment {
+public class FacilitiesFragment extends AnalyticsFragment {
 
-    private static final String LOG_TAG = NearbyFacilitiesFragment.class.getSimpleName();
+    private static final String LOG_TAG = FacilitiesFragment.class.getSimpleName();
 
     private static final int PERMISSION_LOCATION_REQUEST = 3;
 
@@ -79,7 +79,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
     private List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
-    public NearbyFacilitiesFragment() {
+    public FacilitiesFragment() {
         // Required default constructor
     }
 
@@ -839,7 +839,7 @@ public class NearbyFacilitiesFragment extends AnalyticsFragment {
 
     /**
      * Get the request queue and create it if necessary
-     * Precondition: NearbyFacilitiesFragment is a member of MainActivity
+     * Precondition: FacilitiesFragment is a member of MainActivity
      * @return The request queue
      */
     private RequestQueue getRequestQueue() {
