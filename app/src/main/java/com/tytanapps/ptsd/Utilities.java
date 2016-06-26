@@ -27,6 +27,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -327,4 +329,47 @@ public class Utilities {
             context.startActivity(intent);
         }
     }
+
+    /**
+     * Open the maps app to a specified location
+     * @param geoLocation The uri of the location to open
+     */
+    public static void openMapIntent(Fragment fragment, Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(fragment.getActivity().getPackageManager()) != null) {
+            fragment.startActivity(intent);
+        }
+    }
+
+    /**
+     * Get the url for the Google Maps Api
+     * @param name The street address
+     * @param town The town
+     * @param state The state. Can be initials or full name
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
+    public static Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
+        // Encode the address
+        String location = name + ", " + town + ", " + state;
+        location = URLEncoder.encode(location, "UTF-8");
+
+        return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    /**
+     * Get the url for the Google Maps Api
+     * @param location The location to encode
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
+    public static Uri getMapUri(String location) throws UnsupportedEncodingException {
+        // Encode the address
+        location = URLEncoder.encode(location, "UTF-8");
+
+        return Uri.parse("geo:0,0?q=" + location);
+    }
+
+
 }

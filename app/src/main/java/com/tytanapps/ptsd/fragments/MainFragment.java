@@ -26,6 +26,8 @@ import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
+import java.io.UnsupportedEncodingException;
+
 
 /**
  * The main fragment displayed when you launch the app. Prompts the user for their emotion
@@ -44,6 +46,9 @@ public class MainFragment extends AnalyticsFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
+        determineIfFirebaseDatabaseLoaded();
     }
 
     @Override
@@ -58,8 +63,6 @@ public class MainFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
 
-        // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
-        determineIfFirebaseDatabaseLoaded();
 
         // Hide the sign in button if the user is already signed in
         if(isUserSignedIn()) {
@@ -429,6 +432,30 @@ public class MainFragment extends AnalyticsFragment {
             }
 
         } catch (Exception e) {}
+
+        // If an exception is thrown, there is no website associated with the recommendation
+        try {
+            final String location = (String) dataSnapshot.child("map").getValue();
+
+            if (location != null && location.length() > 0) {
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        try {
+                            Utilities.openMapIntent(MainFragment.this, Utilities.getMapUri(location));
+                        } catch (UnsupportedEncodingException e) {
+                            FirebaseCrash.report(e);
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                return createSuggestionLayout(message, onClickListener);
+            }
+
+        } catch (Exception e) {
+            FirebaseCrash.report(e);
+        }
 
 
         // There is no website or phone number associated with the recommendation

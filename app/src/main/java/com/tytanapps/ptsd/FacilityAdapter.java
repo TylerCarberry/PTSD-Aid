@@ -3,7 +3,6 @@ package com.tytanapps.ptsd;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 
 public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyViewHolder> {
@@ -86,7 +84,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     try {
-                        Utilities.openMapIntent(context, getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        Utilities.openMapIntent(context, Utilities.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -126,20 +124,5 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         return facilityList.size();
     }
 
-    /**
-     * Get the url for the Google Maps Api
-     * @param name The street address
-     * @param town The town
-     * @param state The state. Can be initials or full name
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    private Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
-        // Encode the address
-        String location = name + ", " + town + ", " + state;
-        location = URLEncoder.encode(location, "UTF-8");
-
-        return Uri.parse("geo:0,0?q=" + location);
-    }
 
 }
