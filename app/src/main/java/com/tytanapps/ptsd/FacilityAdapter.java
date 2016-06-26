@@ -1,8 +1,6 @@
 package com.tytanapps.ptsd;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -13,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -63,7 +60,6 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final Facility facility = facilityList.get(position);
 
-
         // If the facility does not have all of its information, do not show it
         if(facility.getName() != null && facility.getDescription() != null && facility.getPhoneNumber() != null) {
             TextView nameTextView = holder.nameTextView;
@@ -75,7 +71,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openDialer(Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
+                    Utilities.openDialer(context, Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
                 }
             };
 
@@ -90,7 +86,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     try {
-                        openMapIntent(getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        Utilities.openMapIntent(context, getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -119,7 +115,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                    openUrl(url);
+                    Utilities.openBrowserIntent(context, url);
                 }
             });
         }
@@ -128,35 +124,6 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     @Override
     public int getItemCount() {
         return facilityList.size();
-    }
-
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    private void openDialer(String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            context.startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(context, R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Open the maps app to a specified location
-     * @param geoLocation The uri of the location to open
-     */
-    private void openMapIntent(Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-        }
     }
 
     /**
@@ -175,14 +142,4 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         return Uri.parse("geo:0,0?q=" + location);
     }
 
-    /**
-     * Opens the browser to the specified url
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    private void openUrl(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        context.startActivity(intent);
-    }
 }

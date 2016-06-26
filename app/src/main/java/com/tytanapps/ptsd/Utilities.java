@@ -257,9 +257,25 @@ public class Utilities {
         return firebaseRemoteConfig.getDouble(fragment.getString(resId));
     }
 
-    public static String getRemoteConfigString(@NonNull Fragment fragment, @NonNull int resId) {
+    public static String getRemoteConfigString(@NonNull Fragment fragment, int resId) {
         FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
         return firebaseRemoteConfig.getString(fragment.getString(resId));
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    public static void openDialer(Context context, String phoneNumber) {
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(context.getApplicationContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -283,9 +299,32 @@ public class Utilities {
      * Precondition: url is a valid url
      * @param url The url to open
      */
+    public static void openBrowserIntent(Context context, String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        context.startActivity(i);
+    }
+
+    /**
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
+     */
     public static void openBrowserIntent(Fragment fragment, String url) {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         fragment.startActivity(i);
+    }
+
+    /**
+     * Open the maps app to a specified location
+     * @param geoLocation The uri of the location to open
+     */
+    public static void openMapIntent(Context context, Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        }
     }
 }

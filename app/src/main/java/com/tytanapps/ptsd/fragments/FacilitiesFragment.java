@@ -363,20 +363,14 @@ public class FacilitiesFragment extends AnalyticsFragment {
         String zip = ""+locationJson.get("ZIP");
         double locationLat = locationJson.getDouble("LATITUDE");
         double locationLong = locationJson.getDouble("LONGITUDE");
-
         String description = "";
+        String url = getFacilityUrl(locationJson);
 
-        // For some reason the facility urls start with vaww. instead of www.
-        // These cannot be loaded on my phone so use www. instead.
-        String url = (String) locationJson.get("FANDL_URL");
-        url = url.replace("vaww", "www");
 
         double userLocation[] = Utilities.getGPSLocation(getActivity());
-        double distance = 0;
-
         // The description contains the distance and all PTSD programs located there
         if(userLocation[0] != 0 && userLocation[1] != 0) {
-            distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+            double distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
             facilityToUpdate.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
@@ -396,6 +390,20 @@ public class FacilitiesFragment extends AnalyticsFragment {
         facilityToUpdate.setLongitude(locationLong);
 
         return facilityToUpdate;
+    }
+
+    /**
+     * Get the website of the VA facility
+     * @param locationJson The JSON object representing the facility
+     * @return The url of the facility
+     * @throws JSONException The facility json is not valid
+     */
+    private String getFacilityUrl(JSONObject locationJson) throws JSONException {
+        // For some reason the facility urls start with vaww. instead of www.
+        // These cannot be loaded on my phone so use www. instead.
+        String url = (String) locationJson.get("FANDL_URL");
+        url = url.replace("vaww", "www");
+        return url;
     }
 
     /**

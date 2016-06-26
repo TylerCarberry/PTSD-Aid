@@ -9,7 +9,7 @@ import com.tytanapps.ptsd.PTSDApplication;
 /**
  * Created by Tyler on 6/17/16.
  */
-public abstract class AnalyticsFragment extends Fragment{
+public abstract class AnalyticsFragment extends Fragment {
 
     @Override
     public void onResume() {
@@ -17,6 +17,8 @@ public abstract class AnalyticsFragment extends Fragment{
 
         // Obtain the shared Tracker instance.
         PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+
+        // Send a screen hit to Google Analytics with the name of the current activity
         Tracker mTracker = application.getDefaultTracker();
         mTracker.setScreenName(getClass().getSimpleName());
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
