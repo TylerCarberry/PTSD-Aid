@@ -146,8 +146,17 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             text = text.toLowerCase();
             for(Facility item: facilityListAll) {
 
-                if(item.getName().toLowerCase().contains(text)) {
+                if(item.getName().toLowerCase().contains(text) ||
+                        item.getPhoneNumber().toLowerCase().contains(text) ||
+                        item.getFullAddress().toLowerCase().contains(text)) {
                     result.add(item);
+                } else {
+                    for (String program : item.getPrograms()) {
+                        if(program.toLowerCase().contains(text)) {
+                            result.add(item);
+                            break;
+                        }
+                    }
                 }
             }
             facilityList.clear();
