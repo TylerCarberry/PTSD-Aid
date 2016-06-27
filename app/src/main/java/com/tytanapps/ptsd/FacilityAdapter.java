@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +45,12 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     }
 
     public FacilityAdapter(List<Facility> facilityList, Context context) {
-        this.facilityList = facilityList;
-        this.facilityListAll = new ArrayList<>();
+        this.facilityList = new ArrayList<>();
+        this.facilityListAll = facilityList;
 
-        for(Facility facility : facilityList) {
-            this.facilityListAll.add(facility);
+        for(int i = 0; i < 10; i++) {
+            Facility facility = facilityList.get(i);
+            this.facilityList.add(facility);
         }
         this.context = context;
     }
@@ -148,7 +148,10 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 }
             }
             facilityList.clear();
-            facilityList.addAll(result);
+
+            for(int i = 0; i < 10 && i < result.size(); i++) {
+                facilityList.add(result.get(i));
+            }
         }
         notifyDataSetChanged();
     }

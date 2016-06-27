@@ -560,10 +560,15 @@ public class FacilitiesFragment extends AnalyticsFragment {
         Collections.sort(facilities);
 
         // Display the facilities
+        /*
         for(int i = 0; i < Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display); i++) {
             final Facility facility = facilities.get(i);
             facilityList.add(facility);
         }
+        */
+
+        for(Facility facility : facilities)
+            facilityList.add(facility);
 
         setupRecyclerView();
 
@@ -578,6 +583,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
                     loadFacilityImage(facility);
                 }
             });
+            t.setPriority(Thread.MIN_PRIORITY);
             t.run();
         }
     }
