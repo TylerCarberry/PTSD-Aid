@@ -23,6 +23,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     private List<Facility> facilityList;
     private List<Facility> facilityListAll;
 
+    private int facilitiesToDisplay;
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
         public ImageView facilityImageView, callIcon, addressIcon;
@@ -44,14 +46,22 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     }
 
     public FacilityAdapter(List<Facility> facilityList, Fragment fragment) {
+        // Display 10 facilities by default
+        this(facilityList, fragment, 10);
+    }
+
+    public FacilityAdapter(List<Facility> facilityList, Fragment fragment, int facilitiesToDisplay) {
+        this.fragment = fragment;
+        this.facilitiesToDisplay = facilitiesToDisplay;
+
         this.facilityList = new ArrayList<>();
         this.facilityListAll = facilityList;
 
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < facilitiesToDisplay; i++) {
             Facility facility = facilityList.get(i);
             this.facilityList.add(facility);
         }
-        this.fragment = fragment;
+
         loadFacilityImages();
     }
 
@@ -138,7 +148,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         if(text.isEmpty()){
             facilityList.clear();
 
-            for(int i = 0; i < 10 && i < facilityListAll.size(); i++) {
+            for(int i = 0; i < facilitiesToDisplay && i < facilityListAll.size(); i++) {
                 facilityList.add(facilityListAll.get(i));
             }
         } else {
@@ -161,7 +171,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             }
             facilityList.clear();
 
-            for(int i = 0; i < 10 && i < result.size(); i++) {
+            for(int i = 0; i < facilitiesToDisplay && i < result.size(); i++) {
                 facilityList.add(result.get(i));
             }
         }
@@ -185,7 +195,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             }
         };
 
-        for(int i = 0; i < 10 && i < facilityList.size(); i++) {
+        for(int i = 0; i < facilitiesToDisplay && i < facilityList.size(); i++) {
             Facility facility = facilityList.get(i);
             if(facility.getFacilityImage() == null)
                 facilityLoader.loadFacilityImage(facilityList.get(i), callback);

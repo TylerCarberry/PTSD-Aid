@@ -56,96 +56,93 @@ public abstract class FacilityLoader {
         this.fragment = fragment;
     }
 
+    public abstract void errorLoadingResults(String errorMessage);
+    public abstract void onSuccess(List<Facility> loadedFacilities);
+
     /**
      * Load all PTSD programs and the facility id where they are located.
      * There are multiple PTSD programs per VA facility.
      */
     public void loadPTSDPrograms() {
-        // Request the location permission if it has not been granted
-        //if (!locationPermissionGranted()) {
-        //    requestLocationPermission();
-        //} else {
-            String url = calculateVaAPIUrl();
+        String url = calculateVaAPIUrl();
 
-            StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // The JSON that the sever responds starts with //
-                    // Trim the first two characters to create valid JSON.
-                    response = response.substring(2);
+        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // The JSON that the sever responds starts with //
+                // Trim the first two characters to create valid JSON.
+                response = response.substring(2);
 
-                    // Load the initial JSON request. This this is a program name and the
-                    // facility ID where it is located.
-                    try {
-                        JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                        int numberOfResults = new JSONObject(response).getInt("MATCHES");
+                // Load the initial JSON request. This this is a program name and the
+                // facility ID where it is located.
+                try {
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
-                        if (numberOfResults == 0) {
-                            errorLoadingResults("Error");
-                            return;
-                        }
-
-                        double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
-                        // If the user's GPS location cannot be found
-                        if (userLocation[0] == 0 && userLocation[1] == 0) {
-                            errorLoadingResults("Error");
-                            //errorLoadingResults(fragment.getString(R.string.gps_error));
-                            return;
-                        }
-
-                        // Add each PTSD program to the correct VA facility
-                        for (int i = 1; i < numberOfResults; i++) {
-                            JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-                            addPTSDProgram(ptsdProgramJson);
-                        }
-                    } catch (JSONException e) {
-                        FirebaseCrash.report(e);
-                        e.printStackTrace();
+                    if (numberOfResults == 0) {
+                        errorLoadingResults("Error");
+                        return;
                     }
 
-                    // We only have the id of each facility. Load the rest of the information
-                    // about that location such as phone number and address.
-                    if (knownFacilities != null && knownFacilities.size() > 0) {
-                        for (int facilityId : knownFacilities.keySet()) {
-                            Facility facility = knownFacilities.get(facilityId);
+                    double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
+                    // If the user's GPS location cannot be found
+                    if (userLocation[0] == 0 && userLocation[1] == 0) {
+                        errorLoadingResults(fragment.getString(R.string.gps_error));
+                        return;
+                    }
 
-                            // Try to load the facility from cache
-                            Facility cachedFacility = readCachedFacility(facilityId);
-                            if (cachedFacility != null) {
-                                facility = cachedFacility;
-                                knownFacilities.put(facilityId, facility);
-                                numberOfLoadedFacilities++;
+                    // Add each PTSD program to the correct VA facility
+                    for (int i = 1; i < numberOfResults; i++) {
+                        JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
+                        addPTSDProgram(ptsdProgramJson);
+                    }
+                } catch (JSONException e) {
+                    FirebaseCrash.report(e);
+                    e.printStackTrace();
+                }
 
-                                // When all facilities have loaded, sort them by distance and show them to the user
-                                if (numberOfLoadedFacilities == knownFacilities.size())
-                                    allFacilitiesHaveLoaded();
-                            }
-                            // Load the facility using the api. Display them after they all load
-                            else
-                                loadFacility(facility, knownFacilities.size());
+                // We only have the id of each facility. Load the rest of the information
+                // about that location such as phone number and address.
+                if (knownFacilities != null && knownFacilities.size() > 0) {
+                    for (int facilityId : knownFacilities.keySet()) {
+                        Facility facility = knownFacilities.get(facilityId);
+
+                        // Try to load the facility from cache
+                        Facility cachedFacility = readCachedFacility(facilityId);
+                        if (cachedFacility != null) {
+                            facility = cachedFacility;
+                            knownFacilities.put(facilityId, facility);
+                            numberOfLoadedFacilities++;
+
+                            // When all facilities have loaded, sort them by distance and show them to the user
+                            if (numberOfLoadedFacilities == knownFacilities.size())
+                                allFacilitiesHaveLoaded();
                         }
+                        // Load the facility using the api. Display them after they all load
+                        else
+                            loadFacility(facility, knownFacilities.size());
                     }
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(LOG_TAG, error.toString());
-                    errorLoadingResults("Error");
-                }
-            });
-
-            // Set a longer Volley timeout policy
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            // Start loading the PTSD programs in the background
-            RequestQueue requestQueue = getRequestQueue();
-            if (requestQueue != null)
-                requestQueue.add(stringRequest);
-            else
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(LOG_TAG, error.toString());
                 errorLoadingResults("Error");
-        //}
+            }
+        });
+
+        // Set a longer Volley timeout policy
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Start loading the PTSD programs in the background
+        RequestQueue requestQueue = getRequestQueue();
+        if (requestQueue != null)
+            requestQueue.add(stringRequest);
+        else
+            errorLoadingResults("Error");
     }
 
     /**
@@ -168,8 +165,6 @@ public abstract class FacilityLoader {
         facility.addProgram(programName);
         knownFacilities.put(facilityID, facility);
     }
-
-    public abstract void errorLoadingResults(String errorMessage);
 
     /**
      * Fully load a single facility
@@ -416,6 +411,27 @@ public abstract class FacilityLoader {
     }
 
     /**
+     * Called when all facilities have loaded and knownValues is fully populated
+     */
+    public void allFacilitiesHaveLoaded() {
+        ArrayList<Facility> facilitiesList = new ArrayList<>();
+        for(Facility facility : knownFacilities.values()) {
+            facilitiesList.add(facility);
+        }
+
+        // Sort the facilities by distance
+        Collections.sort(facilitiesList);
+
+        onSuccess(facilitiesList);
+    };
+
+    public void refresh() {
+        numberOfLoadedFacilities = 0;
+        knownFacilities.clear();
+        loadPTSDPrograms();
+    }
+
+    /**
      * Save the Google Maps image of the facility to a file. This file will then be used instead
      * of loading it from Google every time
      * @param bitmap The image of the facility
@@ -610,23 +626,4 @@ public abstract class FacilityLoader {
         return null;
     }
 
-    public void allFacilitiesHaveLoaded() {
-        ArrayList<Facility> facilitiesList = new ArrayList<>();
-        for(Facility facility : knownFacilities.values()) {
-            facilitiesList.add(facility);
-        }
-
-        // Sort the facilities by distance
-        Collections.sort(facilitiesList);
-
-        onSuccess(facilitiesList);
-    };
-
-    public abstract void onSuccess(List<Facility> loadedFacilities);
-
-    public void refresh() {
-        numberOfLoadedFacilities = 0;
-        knownFacilities.clear();
-        loadPTSDPrograms();
-    }
 }

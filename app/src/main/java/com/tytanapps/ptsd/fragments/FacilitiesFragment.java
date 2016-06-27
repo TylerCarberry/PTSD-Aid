@@ -29,6 +29,7 @@ import com.tytanapps.ptsd.Facility;
 import com.tytanapps.ptsd.FacilityAdapter;
 import com.tytanapps.ptsd.FacilityLoader;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,10 +89,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
         // Load the VA facilities if they have not yet been loaded
         if(facilityList.size() == 0) {
-            if (locationPermissionGranted())
-                facilityLoader.loadPTSDPrograms();
-            else
-                requestLocationPermission();
+            loadFacilities();
         }
     }
 
@@ -109,7 +107,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
             public boolean onQueryTextSubmit(String query) {
                 if(mAdapter != null)
                     mAdapter.filter(query);
-                scrollListToTop();
+                scrollFacilityListToTop();
                 return true;
             }
 
@@ -117,7 +115,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
             public boolean onQueryTextChange(String newText) {
                 if(mAdapter != null)
                     mAdapter.filter(newText);
-                scrollListToTop();
+                scrollFacilityListToTop();
                 return true;
             }
         });
@@ -129,7 +127,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
         dismissKeyboard();
     }
 
-    private void scrollListToTop() {
+    /**
+     * Scroll the facility recycler view to the top
+     */
+    private void scrollFacilityListToTop() {
         View rootView = getView();
         if(rootView != null) {
             RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -158,7 +159,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
         if(rootView != null) {
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new FacilityAdapter(facilityList, this);
+            mAdapter = new FacilityAdapter(facilityList, this, Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -295,10 +296,12 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
             Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
             if(retryButton != null) {
+                retryButton.setVisibility(View.VISIBLE);
+
                 retryButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        v.setVisibility(View.INVISIBLE);
+                    public void onClick(View retryButton) {
+                        retryButton.setVisibility(View.INVISIBLE);
 
                         if(loadingTextview != null) {
                             loadingTextview.setText("");
@@ -307,16 +310,19 @@ public class FacilitiesFragment extends AnalyticsFragment {
                         if(loadingProgressbar != null)
                             loadingProgressbar.setVisibility(View.VISIBLE);
 
-
-                        if(!locationPermissionGranted())
-                            requestLocationPermission();
-                        else
-                            facilityLoader.loadPTSDPrograms();
+                        loadFacilities();
                     }
                 });
-                retryButton.setVisibility(View.VISIBLE);
+
             }
         }
+    }
+
+    private void loadFacilities() {
+        if(locationPermissionGranted())
+            facilityLoader.loadPTSDPrograms();
+        else
+            requestLocationPermission();
     }
 
     /**
@@ -335,6 +341,9 @@ public class FacilitiesFragment extends AnalyticsFragment {
         }
     }
 
+    /**
+     * Close the on screen keyboard
+     */
     private void dismissKeyboard() {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
