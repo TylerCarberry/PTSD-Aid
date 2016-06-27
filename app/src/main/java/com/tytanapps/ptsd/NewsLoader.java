@@ -192,7 +192,7 @@ public abstract class NewsLoader {
 
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
         Log.d(LOG_TAG, "parseJSONNews() called with: " + "rootJson = [" + rootJson + "]");
-        return new News(rootJson.getString("PRESS_TITLE"), rootJson.getString("PRESS_TEXT"), rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
+        return new News(rootJson.getString("PRESS_TITLE"), Utilities.htmlToText(rootJson.getString("PRESS_TEXT")), rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
     }
 
     /**

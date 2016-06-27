@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tytanapps.ptsd.News;
@@ -57,10 +56,10 @@ public class NewsFragment extends AnalyticsFragment {
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
 
 
-        if(mParam1 != null) {
-            TextView messageTextView = (TextView) rootView.findViewById(R.id.news_textview);
-            messageTextView.setText(mParam1);
-        }
+        //if(mParam1 != null) {
+        //    TextView messageTextView = (TextView) rootView.findViewById(R.id.news_textview);
+        //    messageTextView.setText(mParam1);
+        //}
 
         return rootView;
     }

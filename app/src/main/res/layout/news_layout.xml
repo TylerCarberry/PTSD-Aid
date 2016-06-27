@@ -19,13 +19,16 @@
             <TextView
                 android:id="@+id/news_title_textview"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="@dimen/medium_text_size"/>
 
             <TextView
                 android:id="@+id/news_message_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/news_title_textview"/>
+                android:layout_below="@id/news_title_textview"
+                android:textSize="@dimen/small_text_size"/>
 
             </RelativeLayout>
 

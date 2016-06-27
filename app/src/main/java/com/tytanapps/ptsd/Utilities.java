@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
+import org.jsoup.Jsoup;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -369,6 +371,10 @@ public class Utilities {
         location = URLEncoder.encode(location, "UTF-8");
 
         return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    public static String htmlToText(String html) {
+        return Jsoup.parse(html).text();
     }
 
 
