@@ -3,6 +3,7 @@ package com.tytanapps.ptsd;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     private int facilitiesToDisplay;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
+        public CardView rootCardView;
         public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
         public ImageView facilityImageView, callIcon, addressIcon;
         public Button moreInfoButton;
@@ -33,6 +35,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         public MyViewHolder(View view) {
             super(view);
 
+            rootCardView = (CardView) view.findViewById(R.id.facility_cardview);
             facilityImageView = (ImageView) view.findViewById(R.id.facility_imageview);
             nameTextView = (TextView) view.findViewById(R.id.facility_name_textview);
             phoneTextView = (TextView) view.findViewById(R.id.facility_phone_textview);
@@ -66,15 +69,35 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.facility_layout, parent, false);
+
+        /*
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alternateCardExpansion(parent);
+            }
+        });
+        */
 
         return new MyViewHolder(itemView);
     }
 
+    public void alternateCardExpansion(ViewGroup parent) {
+        if(parent.findViewById(R.id.facility_details).getVisibility() == View.GONE)
+            parent.findViewById(R.id.facility_details).setVisibility(View.VISIBLE);
+        else
+            parent.findViewById(R.id.facility_details).setVisibility(View.GONE);
+    }
+
+    public void expandCard(ViewGroup parent) {
+        parent.findViewById(R.id.facility_details).setVisibility(View.VISIBLE);
+    }
+
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Facility facility = facilityList.get(position);
 
         // If the facility does not have all of its information, do not show it
@@ -131,10 +154,18 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             moreInfoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                    Utilities.openBrowserIntent(fragment, url);
+                    expandCard(holder.rootCardView);
+                    ((Button)v).setText(fragment.getString(R.string.open_website));
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String url = Utilities.getFirstPhoneNumber(facility.getUrl());
+                            Utilities.openBrowserIntent(fragment, url);
+                        }
+                    });
                 }
             });
+
         }
     }
 

@@ -149,5 +149,6 @@
     <string name="gps_error">Your GPS location cannot be determined</string>
     <string name="share_results_chooser">Share with</string>
     <string name="action_search">Search</string>
+    <string name="open_website">Open Website</string>
 
 </resources>

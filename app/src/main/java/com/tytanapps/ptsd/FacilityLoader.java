@@ -260,12 +260,12 @@ public abstract class FacilityLoader {
             facilityToUpdate.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
-            description = "Distance: " + df.format(distance) + " miles\n\n";
+            description = "Distance: " + df.format(distance) + " miles\n";
         }
 
         Set<String> programs = facilityToUpdate.getPrograms();
         for(String program : programs)
-            description += program + "\n";
+            description += "\n" + program;
 
         facilityToUpdate.setName(name);
         facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
@@ -506,12 +506,12 @@ public abstract class FacilityLoader {
                 facility.setDistance(distance);
 
                 DecimalFormat df = new DecimalFormat("#.##");
-                description = "Distance: " + df.format(distance) + " miles\n\n";
+                description = "Distance: " + df.format(distance) + " miles\n";
             }
 
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
-                description += program + "\n";
+                description += "\n" + program;
 
             facility.setDescription(description);
 
