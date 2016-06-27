@@ -133,15 +133,25 @@ public class FacilitiesFragment extends AnalyticsFragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mAdapter.filter(query);
+                scrollListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 mAdapter.filter(newText);
+                scrollListToTop();
                 return true;
             }
         });
+    }
+
+    private void scrollListToTop() {
+        View rootView = getView();
+        if(rootView != null) {
+            RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+            recyclerView.scrollToPosition(0);
+        }
     }
 
     /**
