@@ -148,5 +148,6 @@
     <string name="contacts_permission_message">Grant the contacts permission to continue</string>
     <string name="gps_error">Your GPS location cannot be determined</string>
     <string name="share_results_chooser">Share with</string>
+    <string name="action_search">Search</string>
 
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyViewHolder> {
@@ -20,6 +22,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
     private Context context;
     private List<Facility> facilityList;
+    private List<Facility> facilityListAll;
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
@@ -43,6 +47,11 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
     public FacilityAdapter(List<Facility> facilityList, Context context) {
         this.facilityList = facilityList;
+        this.facilityListAll = new ArrayList<>();
+
+        for(Facility facility : facilityList) {
+            this.facilityListAll.add(facility);
+        }
         this.context = context;
     }
 
@@ -122,6 +131,26 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     @Override
     public int getItemCount() {
         return facilityList.size();
+    }
+
+    public void filter(String text) {
+
+        if(text.isEmpty()){
+            facilityList.clear();
+            facilityList.addAll(facilityListAll);
+        } else{
+            ArrayList<Facility> result = new ArrayList<>();
+            text = text.toLowerCase();
+            for(Facility item: facilityListAll) {
+
+                if(item.getName().toLowerCase().contains(text)) {
+                    result.add(item);
+                }
+            }
+            facilityList.clear();
+            facilityList.addAll(result);
+        }
+        notifyDataSetChanged();
     }
 
 

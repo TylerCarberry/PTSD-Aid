@@ -10,12 +10,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -85,6 +90,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
         setupRefreshLayout(rootView);
@@ -97,7 +103,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
     @Override
     public void onStart() {
         super.onStart();
-        setupRecyclerView();
+        //setupRecyclerView();
 
         // Load the VA facilities if they have not yet been loaded
         if(knownFacilities.size() == 0) {
@@ -109,6 +115,30 @@ public class FacilitiesFragment extends AnalyticsFragment {
             });
             t.run();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.facilities_menu, menu);
+
+        final MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.filter(newText);
+                return true;
+            }
+        });
     }
 
     /**
@@ -533,6 +563,14 @@ public class FacilitiesFragment extends AnalyticsFragment {
         for(int i = 0; i < Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display); i++) {
             final Facility facility = facilities.get(i);
             facilityList.add(facility);
+        }
+
+        setupRecyclerView();
+
+        enableRefreshLayout();
+        mAdapter.notifyDataSetChanged();
+
+        for(final Facility facility : facilityList) {
 
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -542,9 +580,6 @@ public class FacilitiesFragment extends AnalyticsFragment {
             });
             t.run();
         }
-
-        enableRefreshLayout();
-        mAdapter.notifyDataSetChanged();
     }
 
     /**
