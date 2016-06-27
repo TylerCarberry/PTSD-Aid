@@ -1,6 +1,6 @@
 package com.tytanapps.ptsd;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -19,10 +19,9 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
     private static final String LOG_TAG = FacilityAdapter.class.getSimpleName();
 
-    private Context context;
+    private Fragment fragment;
     private List<Facility> facilityList;
     private List<Facility> facilityListAll;
-
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
@@ -44,7 +43,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
     }
 
-    public FacilityAdapter(List<Facility> facilityList, Context context) {
+    public FacilityAdapter(List<Facility> facilityList, Fragment fragment) {
         this.facilityList = new ArrayList<>();
         this.facilityListAll = facilityList;
 
@@ -52,7 +51,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             Facility facility = facilityList.get(i);
             this.facilityList.add(facility);
         }
-        this.context = context;
+        this.fragment = fragment;
+        loadFacilityImages();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utilities.openDialer(context, Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
+                    Utilities.openDialer(fragment, Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
                 }
             };
 
@@ -93,7 +93,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     try {
-                        Utilities.openMapIntent(context, Utilities.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        Utilities.openMapIntent(fragment, Utilities.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -112,7 +112,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             if(facilityImage != null)
                 facilityImageView.setImageBitmap(facility.getFacilityImage());
             else
-                facilityImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.default_facility_image));
+                facilityImageView.setImageBitmap(BitmapFactory.decodeResource(fragment.getResources(), R.drawable.default_facility_image));
 
             facilityImageView.setOnClickListener(mapOnClick);
 
@@ -122,7 +122,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                    Utilities.openBrowserIntent(context, url);
+                    Utilities.openBrowserIntent(fragment, url);
                 }
             });
         }
@@ -156,7 +156,31 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 facilityList.add(result.get(i));
             }
         }
+
+        loadFacilityImages();
         notifyDataSetChanged();
+    }
+
+    private void loadFacilityImages() {
+        FacilityLoader facilityLoader = new FacilityLoader(fragment) {
+            @Override
+            public void errorLoadingResults(String errorMessage) {}
+            @Override
+            public void onSuccess(List<Facility> loadedFacilities) {}
+        };
+
+        Runnable callback = new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        };
+
+        for(int i = 0; i < 10 && i < facilityList.size(); i++) {
+            Facility facility = facilityList.get(i);
+            if(facility.getFacilityImage() == null)
+                facilityLoader.loadFacilityImage(facilityList.get(i), callback);
+        }
     }
 
 

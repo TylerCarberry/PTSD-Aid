@@ -2,6 +2,7 @@ package com.tytanapps.ptsd.fragments;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,8 +31,6 @@ import com.tytanapps.ptsd.FacilityLoader;
 import com.tytanapps.ptsd.R;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,13 +64,8 @@ public class FacilitiesFragment extends AnalyticsFragment {
             }
 
             @Override
-            public void onSuccess(Collection<Facility> loadedFacilities) {
-                ArrayList<Facility> facilitiesList = new ArrayList<>();
-                for(Facility facility : loadedFacilities) {
-                    facilitiesList.add(facility);
-                }
-
-                FacilitiesFragment.this.allFacilitiesHaveLoaded(facilitiesList);
+            public void onSuccess(List<Facility> loadedFacilities) {
+                FacilitiesFragment.this.allFacilitiesHaveLoaded(loadedFacilities);
             }
         };
     }
@@ -90,24 +85,14 @@ public class FacilitiesFragment extends AnalyticsFragment {
     @Override
     public void onStart() {
         super.onStart();
-        //setupRecyclerView();
-
-        facilityLoader.loadPTSDPrograms();
-
-        /*
 
         // Load the VA facilities if they have not yet been loaded
-        if(knownFacilities.size() == 0) {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    facilityLoader.loadPTSDPrograms();
-                }
-            });
-            t.run();
+        if(facilityList.size() == 0) {
+            if (locationPermissionGranted())
+                facilityLoader.loadPTSDPrograms();
+            else
+                requestLocationPermission();
         }
-
-        */
     }
 
     @Override
@@ -122,18 +107,26 @@ public class FacilitiesFragment extends AnalyticsFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mAdapter.filter(query);
+                if(mAdapter != null)
+                    mAdapter.filter(query);
                 scrollListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.filter(newText);
+                if(mAdapter != null)
+                    mAdapter.filter(newText);
                 scrollListToTop();
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        dismissKeyboard();
     }
 
     private void scrollListToTop() {
@@ -165,7 +158,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
         if(rootView != null) {
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new FacilityAdapter(facilityList, getActivity());
+            mAdapter = new FacilityAdapter(facilityList, this);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -184,15 +177,13 @@ public class FacilitiesFragment extends AnalyticsFragment {
             @Override
             public void onRefresh() {
                 // Refresh items
-                //numberOfLoadedFacilities = 0;
-                //knownFacilities.clear();
                 facilityList.clear();
                 mAdapter.notifyDataSetChanged();
 
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        facilityLoader.loadPTSDPrograms();
+                        facilityLoader.refresh();
                     }
                 });
                 t.run();
@@ -204,46 +195,20 @@ public class FacilitiesFragment extends AnalyticsFragment {
     /**
      * When all of the facilities have fully loaded, sort them by distance and display them to the user
      */
-    private void allFacilitiesHaveLoaded(final ArrayList<Facility> facilities) {
+    private void allFacilitiesHaveLoaded(final List<Facility> facilities) {
 
         hideLoadingBar();
 
-        // Sort the facilities by distance
-        Collections.sort(facilities);
-
-        // Display the facilities
-        /*
-        for(int i = 0; i < Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display); i++) {
-            final Facility facility = facilities.get(i);
+        facilityList.clear();
+        for(Facility facility : facilities) {
             facilityList.add(facility);
         }
-        */
-
-        for(Facility facility : facilities)
-            facilityList.add(facility);
 
         setupRecyclerView();
-
         enableRefreshLayout();
-        mAdapter.notifyDataSetChanged();
 
-        for(final Facility facility : facilityList) {
-
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            facilityLoader.loadFacilityImage(facility);
-                        }
-                    }).run();
-
-                }
-            });
-            t.setPriority(Thread.MIN_PRIORITY);
-            t.run();
-        }
+        if(mAdapter != null)
+            mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -360,6 +325,11 @@ public class FacilitiesFragment extends AnalyticsFragment {
             if (loadingProgressbar != null)
                 loadingProgressbar.setVisibility(View.GONE);
         }
+    }
+
+    private void dismissKeyboard() {
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
     }
     
 }

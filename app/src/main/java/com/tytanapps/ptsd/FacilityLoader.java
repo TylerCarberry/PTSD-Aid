@@ -28,8 +28,10 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
@@ -295,24 +297,31 @@ public abstract class FacilityLoader {
         return url;
     }
 
+    public void loadFacilityImage(Facility facility) {
+        loadFacilityImage(facility, new Runnable() {
+            @Override
+            public void run() {}
+        });
+    }
+
     /**
      * Load the facility image and place it into facilityImageView.
      * Try the street view image first, then the map image, then the default image.
      * @param facility The facility
      */
-    public void loadFacilityImage(Facility facility) {
+    public void loadFacilityImage(Facility facility, Runnable callback) {
         Bitmap cachedBitmap = loadCacheFacilityImage(facility.getFacilityId());
 
-        if(cachedBitmap != null)
+        if(cachedBitmap != null) {
             facility.setFacilityImage(cachedBitmap);
+            callback.run();
+        }
         else {
             int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
             int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
 
-            loadStreetViewImage(facility, imageWidth, imageHeight);
+            loadStreetViewImage(facility, imageWidth, imageHeight, callback);
         }
-
-        //mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -321,7 +330,7 @@ public abstract class FacilityLoader {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
+    private void loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight, final Runnable callback) {
         String url = "";
 
         // If the street view url cannot be created, load the map view instead
@@ -329,7 +338,7 @@ public abstract class FacilityLoader {
             url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
         } catch (UnsupportedEncodingException e) {
             FirebaseCrash.report(e);
-            loadMapImage(facility, imageWidth, imageHeight);
+            loadMapImage(facility, imageWidth, imageHeight, callback);
             return;
         }
 
@@ -342,9 +351,10 @@ public abstract class FacilityLoader {
                         if(validStreetViewBitmap(bitmap)) {
                             facility.setFacilityImage(bitmap);
                             saveFacilityImage(bitmap, facility.getFacilityId());
+                            callback.run();
                         }
                         else
-                            loadMapImage(facility, imageWidth, imageHeight);
+                            loadMapImage(facility, imageWidth, imageHeight, callback);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -352,7 +362,7 @@ public abstract class FacilityLoader {
                         Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
 
                         // Load the map view instead
-                        loadMapImage(facility, imageWidth, imageHeight);
+                        loadMapImage(facility, imageWidth, imageHeight, callback);
                     }
                 });
 
@@ -368,7 +378,7 @@ public abstract class FacilityLoader {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadMapImage(final Facility facility, int imageWidth, int imageHeight) {
+    private void loadMapImage(final Facility facility, int imageWidth, int imageHeight, final Runnable callback) {
         final int defaultImageId = R.drawable.default_facility_image;
 
         String url;
@@ -388,12 +398,14 @@ public abstract class FacilityLoader {
                     public void onResponse(Bitmap bitmap) {
                         facility.setFacilityImage(bitmap);
                         saveFacilityImage(bitmap, facility.getFacilityId());
+                        callback.run();
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d(LOG_TAG, "IMAGE errorListener " + error.toString());
                         facility.setFacilityImage(BitmapFactory.decodeResource(fragment.getResources(), defaultImageId));
+                        callback.run();
                     }
                 });
 
@@ -599,9 +611,22 @@ public abstract class FacilityLoader {
     }
 
     public void allFacilitiesHaveLoaded() {
-        onSuccess(knownFacilities.values());
+        ArrayList<Facility> facilitiesList = new ArrayList<>();
+        for(Facility facility : knownFacilities.values()) {
+            facilitiesList.add(facility);
+        }
+
+        // Sort the facilities by distance
+        Collections.sort(facilitiesList);
+
+        onSuccess(facilitiesList);
     };
 
-    public abstract void onSuccess(Collection<Facility> loadedFacilities);
+    public abstract void onSuccess(List<Facility> loadedFacilities);
 
+    public void refresh() {
+        numberOfLoadedFacilities = 0;
+        knownFacilities.clear();
+        loadPTSDPrograms();
+    }
 }
