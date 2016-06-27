@@ -23,7 +23,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public CardView rootCardView;
-        public TextView titleTextView, messageTextView;
+        public TextView titleTextView, dateTextView, messageTextView;
 
         //public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
         //public ImageView facilityImageView, callIcon, addressIcon;
@@ -35,13 +35,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             rootCardView = (CardView) view.findViewById(R.id.news_cardview);
             titleTextView = (TextView) view.findViewById(R.id.news_title_textview);
             messageTextView = (TextView) view.findViewById(R.id.news_message_textview);
+            dateTextView = (TextView) view.findViewById(R.id.news_date_textview);
+
         }
 
     }
 
     public NewsAdapter(List<News> newsList, Fragment fragment) {
         // Display 10 news by default
-        this(newsList, fragment, 10);
+        this(newsList, fragment, 7);
     }
 
     public NewsAdapter(List<News> newsList, Fragment fragment, int newsToDisplay) {
@@ -87,6 +89,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
             TextView messageTextView = holder.messageTextView;
             messageTextView.setText(news.getMessage());
+
+            TextView dateTextViewTextView = holder.dateTextView;
+            dateTextViewTextView.setText(news.getPressDate());
+
+
 
         }
     }

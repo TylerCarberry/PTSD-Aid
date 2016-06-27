@@ -48,6 +48,11 @@
     </entry>
 
     <entry>
+        <key>news_to_display</key>
+        <value>7</value>
+    </entry>
+
+    <entry>
         <key>check_recommendations_database</key>
         <value>false</value>
     </entry>

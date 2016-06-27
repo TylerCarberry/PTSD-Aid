@@ -316,7 +316,7 @@ public abstract class NewsLoader {
      */
     private String calculateNewsUrl() {
         Log.d(LOG_TAG, "calculateNewsUrl() called with: " + "");
-        return "http://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=10/01/2015&EndDate=10/01/2020&MaxRecords=5&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
+        return "http://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2016&EndDate=01/01/2020&MaxRecords=10&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {

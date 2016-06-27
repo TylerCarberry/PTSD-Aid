@@ -51,6 +51,6 @@ public class News implements Comparable<News>{
 
     @Override
     public int compareTo(News another) {
-        return ((Integer)this.getPressId()).compareTo(another.getPressId());
+        return 0-((Integer)this.getPressId()).compareTo(another.getPressId());
     }
 }
