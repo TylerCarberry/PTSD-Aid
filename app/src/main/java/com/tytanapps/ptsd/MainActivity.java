@@ -64,6 +64,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.fragments.FacilitiesFragment;
 import com.tytanapps.ptsd.fragments.MainFragment;
+import com.tytanapps.ptsd.fragments.NewsFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
@@ -782,6 +783,13 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_nearby:
                 newFragment = new FacilitiesFragment();
+                break;
+            case R.id.nav_news:
+                newFragment = new NewsFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("param1", "From Activity");
+                newFragment.setArguments(bundle);
                 break;
         }
 

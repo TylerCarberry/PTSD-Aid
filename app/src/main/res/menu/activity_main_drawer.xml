@@ -10,6 +10,9 @@
             android:title="@string/Resources" />
         <item android:id="@+id/nav_nearby" android:icon="@android:drawable/ic_menu_compass"
             android:title="@string/nav_nearby" />
+        <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_manage"
+            android:title="@string/nav_news" />
+
     </group>
 
     <item android:title="@string/nav_support">
