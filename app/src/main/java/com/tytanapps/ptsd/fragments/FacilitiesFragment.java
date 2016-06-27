@@ -283,8 +283,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
         View rootView = getView();
         if(rootView != null) {
             final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
-            if(loadingTextview != null)
+            if(loadingTextview != null) {
+                loadingTextview.setVisibility(View.VISIBLE);
                 loadingTextview.setText(errorMessage);
+            }
 
             final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
             if(loadingProgressbar != null) {
@@ -298,12 +300,18 @@ public class FacilitiesFragment extends AnalyticsFragment {
                     public void onClick(View v) {
                         v.setVisibility(View.INVISIBLE);
 
-                        if(loadingTextview != null)
-                            loadingTextview.setText(R.string.loading);
+                        if(loadingTextview != null) {
+                            loadingTextview.setText("");
+                            loadingTextview.setVisibility(View.INVISIBLE);
+                        }
                         if(loadingProgressbar != null)
                             loadingProgressbar.setVisibility(View.VISIBLE);
 
-                        facilityLoader.loadPTSDPrograms();
+
+                        if(!locationPermissionGranted())
+                            requestLocationPermission();
+                        else
+                            facilityLoader.loadPTSDPrograms();
                     }
                 });
                 retryButton.setVisibility(View.VISIBLE);
