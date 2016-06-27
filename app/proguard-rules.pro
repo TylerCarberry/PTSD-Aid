@@ -16,7 +16,11 @@
 #   public *;
 #}
 
+
+# Proguard removes files from the support library that I am using. Keep them
 -keep class android.support.v7.widget.LinearLayoutManager { *; }
+-keep class android.support.v7.widget.SearchView { *; }
+
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
 -printmapping out.map
