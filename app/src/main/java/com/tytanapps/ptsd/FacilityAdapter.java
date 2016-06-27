@@ -184,7 +184,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             }
         } else {
             ArrayList<Facility> result = new ArrayList<>();
-            text = text.toLowerCase();
+            text = text.toLowerCase().trim();
             for(Facility item: facilityListAll) {
 
                 if(item.getName().toLowerCase().contains(text) ||
