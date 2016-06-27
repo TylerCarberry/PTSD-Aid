@@ -1,8 +1,8 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:animateLayoutChanges="true"
     tools:context=".fragments.MainFragment"
     android:clipChildren="false"
@@ -51,7 +51,7 @@
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:src="@drawable/happy"
+                        app:srcCompat="@drawable/happy"
                         android:gravity="center"
                         android:contentDescription="@string/happy_face_content_description"/>
 
@@ -62,7 +62,7 @@
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:src="@drawable/ok"
+                        app:srcCompat="@drawable/ok"
                         android:gravity="center"
                         android:contentDescription="@string/ok_face_content_description"/>
 
@@ -70,7 +70,7 @@
                         android:id="@+id/sad_face"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/tear"
+                        app:srcCompat="@drawable/tear"
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -100,7 +100,7 @@
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:src="@drawable/sick"
+                        app:srcCompat="@drawable/sick"
                         android:gravity="center"
                         android:contentDescription="@string/sick_emoji_content_description"/>
 
@@ -108,7 +108,7 @@
                         android:id="@+id/poop_emoji"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/poop"
+                        app:srcCompat="@drawable/poop"
                         android:layout_weight="1"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
