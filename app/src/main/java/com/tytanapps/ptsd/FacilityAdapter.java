@@ -137,8 +137,11 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
         if(text.isEmpty()){
             facilityList.clear();
-            facilityList.addAll(facilityListAll);
-        } else{
+
+            for(int i = 0; i < 10 && i < facilityListAll.size(); i++) {
+                facilityList.add(facilityListAll.get(i));
+            }
+        } else {
             ArrayList<Facility> result = new ArrayList<>();
             text = text.toLowerCase();
             for(Facility item: facilityListAll) {
