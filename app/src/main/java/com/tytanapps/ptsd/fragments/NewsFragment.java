@@ -4,13 +4,16 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tytanapps.ptsd.News;
 import com.tytanapps.ptsd.NewsAdapter;
+import com.tytanapps.ptsd.NewsLoader;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
@@ -19,6 +22,8 @@ import java.util.List;
 
 
 public class NewsFragment extends AnalyticsFragment {
+
+    private static final String LOG_TAG = NewsFragment.class.getSimpleName();
 
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
@@ -64,17 +69,30 @@ public class NewsFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
 
-        News news1 = new News("Title 1", "Message 1");
-        News news2 = new News("Title 2", "Message 2");
-        News news3 = new News("Title 3", "Message 3");
+        final NewsLoader newsLoader = new NewsLoader(this) {
+            @Override
+            public void errorLoadingResults(String errorMessage) {
+                Log.d(LOG_TAG, "errorLoadingResults() called with: " + "errorMessage = [" + errorMessage + "]");
+                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+            }
 
-        newsList.add(news1);
-        newsList.add(news2);
-        newsList.add(news3);
+            @Override
+            public void onSuccess(List<News> loadedFacilities) {
+                Log.d(LOG_TAG, "onSuccess() called with: " + "loadedFacilities = [" + loadedFacilities + "]");
+                newsList.clear();
+                for(News news : loadedFacilities) {
+                    newsList.add(news);
+                }
+                setupRecyclerView(getView());
+                mAdapter.notifyDataSetChanged();
+            }
+        };
 
-        setupRecyclerView(getView());
+        newsLoader.loadNews();
 
-        mAdapter.notifyDataSetChanged();
+
+
+
     }
 
     /**
