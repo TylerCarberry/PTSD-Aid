@@ -44,6 +44,8 @@ public abstract class NewsLoader {
     // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
+    private static final int NEWS_TO_LOAD = 50;
+
 
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
@@ -191,6 +193,7 @@ public abstract class NewsLoader {
 
         String pressDate = rootJson.getString("PRESS_DATE");
         pressDate = pressDate.substring(0, pressDate.length() - 8);
+        pressDate = pressDate.replace(",", "");
 
         return new News(title, article, rootJson.getInt("PRESS_ID"), pressDate);
     }
@@ -269,7 +272,7 @@ public abstract class NewsLoader {
      * @return The url for the PTSD Programs API
      */
     private String calculateNewsUrl() {
-        return "http://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2016&EndDate=01/01/2020&MaxRecords=10&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
+        return "http://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2015&EndDate=01/01/2025&MaxRecords=" + NEWS_TO_LOAD + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {

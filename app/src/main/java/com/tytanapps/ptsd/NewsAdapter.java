@@ -90,7 +90,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         return newsList.size();
     }
 
-    /*
+
     public void filter(String text) {
 
         if(text.isEmpty()){
@@ -100,21 +100,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
                 newsList.add(newsListAll.get(i));
             }
         } else {
-            ArrayList<Facility> result = new ArrayList<>();
+            ArrayList<News> result = new ArrayList<>();
             text = text.toLowerCase().trim();
-            for(Facility item: newsListAll) {
+            for(News item: newsListAll) {
 
-                if(item.getName().toLowerCase().contains(text) ||
-                        item.getPhoneNumber().toLowerCase().contains(text) ||
-                        item.getFullAddress().toLowerCase().contains(text)) {
+                if(item.getTitle().toLowerCase().contains(text) ||
+                        item.getMessage().toLowerCase().contains(text) ||
+                        item.getPressDate().toLowerCase().contains(text)) {
                     result.add(item);
-                } else {
-                    for (String program : item.getPrograms()) {
-                        if(program.toLowerCase().contains(text)) {
-                            result.add(item);
-                            break;
-                        }
-                    }
                 }
             }
             newsList.clear();
@@ -123,33 +116,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
                 newsList.add(result.get(i));
             }
         }
-
-        loadFacilityImages();
         notifyDataSetChanged();
     }
-
-    private void loadFacilityImages() {
-        FacilityLoader facilityLoader = new FacilityLoader(fragment) {
-            @Override
-            public void errorLoadingResults(String errorMessage) {}
-            @Override
-            public void onSuccess(List<Facility> loadedFacilities) {}
-        };
-
-        Runnable callback = new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        };
-
-        for(int i = 0; i < newsToDisplay && i < newsList.size(); i++) {
-            Facility facility = newsList.get(i);
-            if(facility.getFacilityImage() == null)
-                facilityLoader.loadFacilityImage(newsList.get(i), callback);
-        }
-    }
-    */
 
 
 }

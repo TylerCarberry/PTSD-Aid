@@ -1,13 +1,20 @@
 package com.tytanapps.ptsd.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,8 +60,9 @@ public class NewsFragment extends AnalyticsFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
 
@@ -72,9 +80,51 @@ public class NewsFragment extends AnalyticsFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.facilities_menu, menu);
+
+        final MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(mAdapter != null)
+                    mAdapter.filter(query);
+                scrollFacilityListToTop();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(mAdapter != null)
+                    mAdapter.filter(newText);
+                scrollFacilityListToTop();
+                return true;
+            }
+        });
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         newsLoader.loadNews();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        dismissKeyboard();
+    }
+
+    /**
+     * Close the on screen keyboard
+     */
+    private void dismissKeyboard() {
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
     }
 
     private NewsLoader setupNewsLoader(final View rootView) {
@@ -153,6 +203,17 @@ public class NewsFragment extends AnalyticsFragment {
             }
         });
         swipeRefreshLayout.setEnabled(false);
+    }
+
+    /**
+     * Scroll the facility recycler view to the top
+     */
+    private void scrollFacilityListToTop() {
+        View rootView = getView();
+        if(rootView != null) {
+            RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+            recyclerView.scrollToPosition(0);
+        }
     }
 
     /**
