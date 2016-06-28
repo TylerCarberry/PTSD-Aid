@@ -35,12 +35,13 @@ public abstract class NewsLoader {
 
     private Fragment fragment;
 
-    // The number of VA facilities that have already loaded, either by API or from cache
+    // The number of news articles that have already loaded, either by API or from cache
     // This number is still incremented when the API load fails
     private int numberOfLoadedArticles = 0;
 
-    // Stores the facilities that have already loaded
-    // Key: VA Id, Value: The facility with the given id
+    // Stores the news that have already loaded
+    // Key: Press id
+    // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
 
@@ -53,20 +54,16 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
-        Log.d(LOG_TAG, "loadNews() called with: " + "");
-
         String url = calculateNewsUrl();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(LOG_TAG, "onResponse() called with: " + "response = [" + response + "]");
                 // The JSON that the sever responds starts with //
                 // Trim the first two characters to create valid JSON.
                 response = response.substring(2);
 
-                // Load the initial JSON request. This this is a program name and the
-                // facility ID where it is located.
+                // Load the initial JSON request
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
                     int numberOfResults = new JSONObject(response).getInt("MATCHES");
@@ -76,7 +73,6 @@ public abstract class NewsLoader {
                         return;
                     }
 
-                    // Add each PTSD program to the correct VA facility
                     for (int i = 1; i <= numberOfResults; i++) {
                         JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
                         int pressId = ptsdProgramJson.getInt("PRESS_ID");
@@ -111,16 +107,10 @@ public abstract class NewsLoader {
     }
 
     private void loadArticle(final int news_id, final int numberOfNews) {
-        Log.d(LOG_TAG, "loadArticle() called with: " + "news_id = [" + news_id + "], numberOfNews = [" + numberOfNews + "]");
-
         News cachedNews = readCachedNews(news_id);
         if(cachedNews != null) {
             knownNews.put(news_id, cachedNews);
-            numberOfLoadedArticles++;
-
-            // When all facilities have loaded, sort them by distance and show them to the user
-            if(numberOfLoadedArticles == numberOfNews)
-                allNewsHaveLoaded();
+            incrementLoadedArticleCount(numberOfNews);
             return;
         }
 
@@ -129,38 +119,28 @@ public abstract class NewsLoader {
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(LOG_TAG, "onResponse() called with: " + "response = [" + response + "]");
-
                 // The JSON that the sever responds starts with //
                 // I am cropping the first two characters to create valid JSON.
                 response = response.substring(2);
 
                 try {
-                    // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
                     News news = parseJSONNews(rootJson);
 
                     knownNews.put(news_id, news);
 
-                    // Save the facility to a file so it doesn't need to be loaded next time
+                    // Save the news to a file so it doesn't need to be loaded next time
                     cacheNews(news);
 
                     numberOfLoadedArticles++;
 
-                    Log.d(LOG_TAG, "onResponse: LOADED/ALL " + numberOfLoadedArticles + "/" + numberOfNews);
-
-                    // When all facilities have loaded, sort them by distance and show them to the user
                     if(numberOfLoadedArticles == numberOfNews)
                         allNewsHaveLoaded();
 
                 } catch (JSONException e) {
                     FirebaseCrash.report(e);
                     e.printStackTrace();
-                    numberOfLoadedArticles++;
-
-                    // When all facilities have loaded, sort them by distance and show them to the user
-                    if(numberOfLoadedArticles == numberOfNews)
-                        allNewsHaveLoaded();
+                    incrementLoadedArticleCount(numberOfNews);
                 }
 
             }
@@ -168,11 +148,7 @@ public abstract class NewsLoader {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, error.toString());
-                numberOfLoadedArticles++;
-
-                // When all facilities have loaded, sort them by distance and show them to the user
-                if(numberOfLoadedArticles == numberOfNews)
-                    allNewsHaveLoaded();
+                incrementLoadedArticleCount(numberOfNews);
             }
         });
 
@@ -188,6 +164,13 @@ public abstract class NewsLoader {
             requestQueue.add(stringRequest);
         else
             numberOfLoadedArticles++;
+    }
+
+    private void incrementLoadedArticleCount(int numberOfNews) {
+        numberOfLoadedArticles++;
+
+        if(numberOfLoadedArticles == numberOfNews)
+            allNewsHaveLoaded();
     }
 
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
@@ -213,17 +196,15 @@ public abstract class NewsLoader {
     }
 
     /**
-     * Called when all facilities have loaded and knownValues is fully populated
+     * Called when all news have loaded and knownValues is fully populated
      */
     public void allNewsHaveLoaded() {
-        Log.d(LOG_TAG, "allNewsHaveLoaded() called with: " + "");
-
         ArrayList<News> newsArrayList = new ArrayList<>();
         for(News news : knownNews.values()) {
             newsArrayList.add(news);
         }
 
-        // Sort the facilities by distance
+        // Sort the news by date (newest first)
         Collections.sort(newsArrayList);
 
         onSuccess(newsArrayList);
@@ -262,7 +243,7 @@ public abstract class NewsLoader {
             input.close();
         } catch (FileNotFoundException e) {
             // If the file was not found, nothing is wrong.
-            // It just means that the facility has not yet been cached.
+            // It just means that the news has not yet been cached.
         } catch (IOException | ClassNotFoundException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
@@ -272,9 +253,9 @@ public abstract class NewsLoader {
     }
 
     /**
-     * Get the file path of the facility
-     * @param pressId The id of the facility
-     * @return The file path of the facility
+     * Get the file path of the news
+     * @param pressId The press id of the news
+     * @return The file path of the news
      */
     private File getNewsFile(int pressId) {
         String fileName = "news" + pressId;
@@ -288,18 +269,16 @@ public abstract class NewsLoader {
      * @return The url for the PTSD Programs API
      */
     private String calculateNewsUrl() {
-        Log.d(LOG_TAG, "calculateNewsUrl() called with: " + "");
         return "http://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2016&EndDate=01/01/2020&MaxRecords=10&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {
-        Log.d(LOG_TAG, "calculateArticleURL() called with: " + "pressId = [" + pressId + "]");
         return "http://www.va.gov/webservices/press/releases.cfc?method=getPressDetail_array&press_id=" + pressId + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     /**
      * Get the request queue and create it if necessary
-     * Precondition: FacilitiesFragment is a member of MainActivity
+     * Precondition: fragment is a member of MainActivity
      * @return The request queue
      */
     private RequestQueue getRequestQueue() {

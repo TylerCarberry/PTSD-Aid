@@ -5,14 +5,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tytanapps.ptsd.News;
 import com.tytanapps.ptsd.NewsAdapter;
@@ -79,39 +77,45 @@ public class NewsFragment extends AnalyticsFragment {
         newsLoader.loadNews();
     }
 
-    private NewsLoader setupNewsLoader(final View roorView) {
+    private NewsLoader setupNewsLoader(final View rootView) {
         return new NewsLoader(this) {
             @Override
             public void errorLoadingResults(String errorMessage) {
-                Log.d(LOG_TAG, "errorLoadingResults() called with: " + "errorMessage = [" + errorMessage + "]");
-                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
-
                 NewsFragment.this.errorLoadingResults(errorMessage);
             }
 
             @Override
-            public void onSuccess(List<News> loadedFacilities) {
-                Log.d(LOG_TAG, "onSuccess() called with: " + "loadedFacilities = [" + loadedFacilities + "]");
-                newsList.clear();
-                for(News news : loadedFacilities) {
-                    newsList.add(news);
-                }
-                setupRecyclerView(getView());
-
-                SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) roorView.findViewById(R.id.swipeRefreshLayout);
-                swipeRefreshLayout.setRefreshing(false);
-                swipeRefreshLayout.setEnabled(true);
-
-                roorView.findViewById(R.id.news_progressbar).setVisibility(View.GONE);
-
-                if(mAdapter != null)
-                    mAdapter.notifyDataSetChanged();
+            public void onSuccess(List<News> loadedNews) {
+                NewsFragment.this.onSuccess(loadedNews, rootView);
             }
         };
     }
 
     /**
-     * Setup the RecyclerView and link it to the FacilityAdapter
+     * When all of the news have loaded, add them to the recycler view and display them
+     * @param loadedNews The loaded news
+     * @param rootView The root view of the fragment
+     */
+    private void onSuccess(List<News> loadedNews, View rootView) {
+        newsList.clear();
+        for(News news : loadedNews) {
+            newsList.add(news);
+        }
+        setupRecyclerView(getView());
+
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(true);
+
+        // Hide the progress bar
+        rootView.findViewById(R.id.news_progressbar).setVisibility(View.GONE);
+
+        if(mAdapter != null)
+            mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Setup the RecyclerView and link it to the NewsAdapter
      */
     private void setupRecyclerView(View rootView) {
         if(rootView != null) {
@@ -152,7 +156,7 @@ public class NewsFragment extends AnalyticsFragment {
     }
 
     /**
-     * There was an error loading the VA facilities. Display a message and a retry button.
+     * There was an error loading the news. Display a message and a retry button.
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {

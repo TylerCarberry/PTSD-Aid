@@ -72,7 +72,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final News news = newsList.get(position);
 
-        // If the facility does not have all of its information, do not show it
+        // If the news does not have all of its information, do not show it
         if(news.getTitle() != null && news.getMessage() != null) {
             TextView titleTextView = holder.titleTextView;
             titleTextView.setText(news.getTitle());
