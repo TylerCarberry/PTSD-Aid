@@ -195,11 +195,14 @@ public abstract class NewsLoader {
 
         String title = rootJson.getString("PRESS_TITLE");
 
-        String article = Utilities.htmlToText(rootJson.getString("PRESS_TEXT"));
+        String article = rootJson.getString("PRESS_TEXT");
+        //article = article.replace("&nbsp;", "\n\n");
+        article = Utilities.htmlToText(article);
         article = article.substring(article.indexOf("–") + 1).trim();
 
         // The two spaces are different symbols. Do not simplify these lines
         while(article.charAt(article.length() - 1) == '#' ||
+                article.charAt(article.length() - 1) == '\n' ||
                 article.charAt(article.length() - 1) == ' ' ||
                 article.charAt(article.length() - 1) == ' ') {
             article = article.substring(0, article.length() - 1);

@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ms.square.android.expandabletextview.ExpandableTextView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public CardView rootCardView;
-        public TextView titleTextView, dateTextView, messageTextView;
+        public TextView titleTextView, dateTextView;
+        public ExpandableTextView messageTextView;
 
         //public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
         //public ImageView facilityImageView, callIcon, addressIcon;
@@ -34,7 +37,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
             rootCardView = (CardView) view.findViewById(R.id.news_cardview);
             titleTextView = (TextView) view.findViewById(R.id.news_title_textview);
-            messageTextView = (TextView) view.findViewById(R.id.news_message_textview);
+            messageTextView = (ExpandableTextView) view.findViewById(R.id.news_message_textview);
             dateTextView = (TextView) view.findViewById(R.id.news_date_textview);
 
         }
@@ -87,7 +90,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             TextView titleTextView = holder.titleTextView;
             titleTextView.setText(news.getTitle());
 
-            TextView messageTextView = holder.messageTextView;
+            ExpandableTextView messageTextView = holder.messageTextView;
             messageTextView.setText(news.getMessage());
 
             TextView dateTextViewTextView = holder.dateTextView;

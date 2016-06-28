@@ -23,8 +23,6 @@ import android.widget.Toast;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
-import org.jsoup.Jsoup;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -374,7 +372,7 @@ public class Utilities {
     }
 
     public static String htmlToText(String html) {
-        return Jsoup.parse(html).text();
+        return android.text.Html.fromHtml(html).toString();
     }
 
 
