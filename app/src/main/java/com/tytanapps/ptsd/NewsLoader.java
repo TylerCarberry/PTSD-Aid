@@ -192,7 +192,19 @@ public abstract class NewsLoader {
 
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
         Log.d(LOG_TAG, "parseJSONNews() called with: " + "rootJson = [" + rootJson + "]");
-        return new News(rootJson.getString("PRESS_TITLE"), Utilities.htmlToText(rootJson.getString("PRESS_TEXT")), rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
+
+        String article = Utilities.htmlToText(rootJson.getString("PRESS_TEXT").trim());
+
+        // The two spaces are different symbols. Do not simplify these lines
+        while(article.charAt(article.length() - 1) == '#' ||
+                article.charAt(article.length() - 1) == ' ' ||
+                article.charAt(article.length() - 1) == ' ') {
+            article = article.substring(0, article.length() - 1);
+        }
+
+        //Log.d(LOG_TAG, "parseJSONNews: " + article.charAt(article.length() - 1));
+
+        return new News(rootJson.getString("PRESS_TITLE"), article, rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
     }
 
     /**
