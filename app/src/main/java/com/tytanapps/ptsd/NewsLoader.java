@@ -193,7 +193,10 @@ public abstract class NewsLoader {
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
         Log.d(LOG_TAG, "parseJSONNews() called with: " + "rootJson = [" + rootJson + "]");
 
-        String article = Utilities.htmlToText(rootJson.getString("PRESS_TEXT").trim());
+        String title = rootJson.getString("PRESS_TITLE");
+
+        String article = Utilities.htmlToText(rootJson.getString("PRESS_TEXT"));
+        article = article.substring(article.indexOf("–") + 1).trim();
 
         // The two spaces are different symbols. Do not simplify these lines
         while(article.charAt(article.length() - 1) == '#' ||
@@ -204,7 +207,7 @@ public abstract class NewsLoader {
 
         //Log.d(LOG_TAG, "parseJSONNews: " + article.charAt(article.length() - 1));
 
-        return new News(rootJson.getString("PRESS_TITLE"), article, rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
+        return new News(title, article, rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
     }
 
     /**
