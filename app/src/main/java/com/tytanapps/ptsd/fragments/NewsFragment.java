@@ -97,6 +97,8 @@ public class NewsFragment extends AnalyticsFragment {
                 swipeRefreshLayout.setRefreshing(false);
                 swipeRefreshLayout.setEnabled(true);
 
+                roorView.findViewById(R.id.news_progressbar).setVisibility(View.GONE);
+
                 if(mAdapter != null)
                     mAdapter.notifyDataSetChanged();
             }
