@@ -17,11 +17,14 @@
 
     <item android:title="@string/nav_support">
         <menu>
-            <item android:id="@+id/nav_hotline" android:icon="@android:drawable/ic_menu_share"
-                android:title="@string/nav_call" />
-            <item android:id="@+id/nav_websites" android:icon="@android:drawable/ic_menu_send"
-                android:title="@string/nav_website" />
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/nav_hotline" android:icon="@android:drawable/ic_menu_share"
+                    android:title="@string/nav_call" />
+                <item android:id="@+id/nav_websites" android:icon="@android:drawable/ic_menu_send"
+                    android:title="@string/nav_website" />
+            </group>
         </menu>
+
     </item>
 
 </menu>

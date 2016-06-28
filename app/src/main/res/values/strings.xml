@@ -2,13 +2,14 @@
     <string name="app_name">PTSD Aid</string>
 
     <!-- Navigation Items in the Drawer Layout -->
-    <string name="nav_simple_test">Home</string>
+    <string name="nav_simple_test">Recommendations</string>
     <string name="nav_test">PTSD Test</string>
     <string name="Resources">Resources</string>
     <string name="nav_nearby">VA Facilities</string>
+    <string name="nav_news">News</string>
     <string name="nav_support">Support</string>
     <string name="nav_call">Call</string>
-    <string name="nav_website">Website</string>
+    <string name="nav_website">Websites</string>
 
     <!-- Main Fragment -->
     <string name="main_header">Welcome!</string>
@@ -150,6 +151,5 @@
     <string name="share_results_chooser">Share with</string>
     <string name="action_search">Search</string>
     <string name="open_website">Open Website</string>
-    <string name="nav_news">News</string>
 
 </resources>
