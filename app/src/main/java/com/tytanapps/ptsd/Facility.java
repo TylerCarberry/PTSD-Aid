@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class Facility implements Comparable<Facility>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     // Every VA facility has a unique id
     private final int FACILITY_ID;
