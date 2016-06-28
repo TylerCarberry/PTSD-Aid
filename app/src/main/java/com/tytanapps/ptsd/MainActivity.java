@@ -32,6 +32,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -151,6 +153,9 @@ public class MainActivity extends AppCompatActivity
             ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
             //Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
             FirebaseMessaging.getInstance().subscribeToTopic("debug");
+        }
+        else {
+            FirebaseMessaging.getInstance().subscribeToTopic("release");
         }
     }
 
@@ -397,6 +402,24 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        CheckBox newsNotification = (CheckBox) navigationHeader.findViewById(R.id.drawer_news_notification_checkbox);
+        newsNotification.setChecked(getSharedPreferenceBoolean("news_notification", false));
+
+        newsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSharedPreference("news_notification", isChecked);
+                if(isChecked) {
+                    FirebaseMessaging.getInstance().subscribeToTopic("news");
+                    Log.d(LOG_TAG, "onCheckedChanged: subscribed");
+                }
+                else {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+                    Log.d(LOG_TAG, "onCheckedChanged: unsubscribed");
+                }
+            }
+        });
+
         // The navigation view is contained within the drawer layout
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if(navigationView != null) {
@@ -630,16 +653,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
-    }
-
-    /**
      * Open the dialer with a phone number entered
      * This does not call the number directly, the user needs to press the call button
      * @param phoneNumber The phone number to call
@@ -717,6 +730,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Read a shared preference string from memory
+     * @param prefKey The key of the shared preference
+     * @param defaultValue The value to return if the key does not exist
+     * @return The shared preference with the given key
+     */
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
+    }
+
+    /**
+     * Read a shared preference string from memory
+     * @param prefKey The key of the shared preference
+     * @param defaultValue The value to return if the key does not exist
+     * @return The shared preference with the given key
+     */
+    private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
+        return getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
+    }
+
+    /**
      * Save a String to a SharedPreference
      * @param prefKey The key of the shared preference
      * @param value The value to save in the shared preference
@@ -725,6 +758,18 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(prefKey, value);
+        editor.apply();
+    }
+
+    /**
+     * Save a String to a SharedPreference
+     * @param prefKey The key of the shared preference
+     * @param value The value to save in the shared preference
+     */
+    private void saveSharedPreference(String prefKey, boolean value) {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(prefKey, value);
         editor.apply();
     }
 
