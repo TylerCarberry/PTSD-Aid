@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,7 @@ public class NewsFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = NewsFragment.class.getSimpleName();
 
+    final NewsLoader newsLoader;
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
@@ -38,6 +40,7 @@ public class NewsFragment extends AnalyticsFragment {
 
     public NewsFragment() {
         // Required empty public constructor
+        newsLoader = setupNewsLoader();
     }
 
     @Override
@@ -60,15 +63,20 @@ public class NewsFragment extends AnalyticsFragment {
         //    TextView messageTextView = (TextView) rootView.findViewById(R.id.news_textview);
         //    messageTextView.setText(mParam1);
         //}
+        //
 
+        setupRefreshLayout(rootView);
         return rootView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        newsLoader.loadNews();
+    }
 
-        final NewsLoader newsLoader = new NewsLoader(this) {
+    private NewsLoader setupNewsLoader() {
+        return new NewsLoader(this) {
             @Override
             public void errorLoadingResults(String errorMessage) {
                 Log.d(LOG_TAG, "errorLoadingResults() called with: " + "errorMessage = [" + errorMessage + "]");
@@ -83,15 +91,14 @@ public class NewsFragment extends AnalyticsFragment {
                     newsList.add(news);
                 }
                 setupRecyclerView(getView());
+
+                SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setEnabled(true);
+
                 mAdapter.notifyDataSetChanged();
             }
         };
-
-        newsLoader.loadNews();
-
-
-
-
     }
 
     /**
@@ -107,5 +114,31 @@ public class NewsFragment extends AnalyticsFragment {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(mAdapter);
         }
+    }
+
+    /**
+     * Setup the refresh layout to refresh on swipe down past the first item
+     * @param rootView The root view of the fragment containing the refresh layout
+     */
+    private void setupRefreshLayout(View rootView) {
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                newsList.clear();
+                mAdapter.notifyDataSetChanged();
+
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        newsLoader.refresh();
+                    }
+                });
+                t.run();
+            }
+        });
+        swipeRefreshLayout.setEnabled(false);
     }
 }

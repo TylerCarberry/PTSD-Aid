@@ -103,24 +103,6 @@ public abstract class NewsLoader {
             errorLoadingResults("Error");
     }
 
-    /*
-    private void addPTSDProgram(JSONObject ptsdProgramJson) throws JSONException {
-        int facilityID = ptsdProgramJson.getInt("FAC_ID");
-        String programName = (String) ptsdProgramJson.get("PROGRAM");
-
-        // There are multiple programs at the same facility.
-        // Combine them if necessary.
-        Facility facility;
-        if (knownFacilities.containsKey(facilityID))
-            facility = knownFacilities.get(facilityID);
-        else
-            facility = new Facility(facilityID);
-
-        facility.addProgram(programName);
-        knownFacilities.put(facilityID, facility);
-    }
-    */
-
     private void loadArticle(final int news_id, final int numberOfNews) {
         Log.d(LOG_TAG, "loadArticle() called with: " + "news_id = [" + news_id + "], numberOfNews = [" + numberOfNews + "]");
 
@@ -191,24 +173,20 @@ public abstract class NewsLoader {
     }
 
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
-        Log.d(LOG_TAG, "parseJSONNews() called with: " + "rootJson = [" + rootJson + "]");
-
         String title = rootJson.getString("PRESS_TITLE");
 
         String article = rootJson.getString("PRESS_TEXT");
-        //article = article.replace("&nbsp;", "\n\n");
         article = Utilities.htmlToText(article);
         article = article.substring(article.indexOf("–") + 1).trim();
 
-        // The two spaces are different symbols. Do not simplify these lines
+        // Remove the extra space at the end of the text
         while(article.charAt(article.length() - 1) == '#' ||
                 article.charAt(article.length() - 1) == '\n' ||
+                // The two spaces below are different symbols. Do not simplify these lines
                 article.charAt(article.length() - 1) == ' ' ||
                 article.charAt(article.length() - 1) == ' ') {
             article = article.substring(0, article.length() - 1);
         }
-
-        //Log.d(LOG_TAG, "parseJSONNews: " + article.charAt(article.length() - 1));
 
         return new News(title, article, rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
     }
@@ -229,6 +207,12 @@ public abstract class NewsLoader {
 
         onSuccess(newsArrayList);
     };
+
+    public void refresh() {
+        numberOfLoadedArticles = 0;
+        knownNews.clear();
+        loadNews();
+    }
 
     /*
     public void refresh() {
