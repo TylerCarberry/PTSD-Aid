@@ -15,6 +15,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,6 +113,17 @@ public abstract class NewsLoader {
     private void loadArticle(final int news_id, final int numberOfNews) {
         Log.d(LOG_TAG, "loadArticle() called with: " + "news_id = [" + news_id + "], numberOfNews = [" + numberOfNews + "]");
 
+        News cachedNews = readCachedNews(news_id);
+        if(cachedNews != null) {
+            knownNews.put(news_id, cachedNews);
+            numberOfLoadedArticles++;
+
+            // When all facilities have loaded, sort them by distance and show them to the user
+            if(numberOfLoadedArticles == numberOfNews)
+                allNewsHaveLoaded();
+            return;
+        }
+
         String url = calculateArticleURL(news_id);
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
@@ -125,7 +143,7 @@ public abstract class NewsLoader {
                     knownNews.put(news_id, news);
 
                     // Save the facility to a file so it doesn't need to be loaded next time
-                    //cacheFacility(facility);
+                    cacheNews(news);
 
                     numberOfLoadedArticles++;
 
@@ -214,79 +232,29 @@ public abstract class NewsLoader {
         loadNews();
     }
 
-    /*
-    public void refresh() {
-        numberOfLoadedFacilities = 0;
-        knownFacilities.clear();
-        loadNews();
-    }
-    */
-
-    /**
-     * Save the Google Maps image of the facility to a file. This file will then be used instead
-     * of loading it from Google every time
-     * @param bitmap The image of the facility
-     * @param facilityId The id of the facility
-     */
-    /*
-    public void saveFacilityImage(Bitmap bitmap, int facilityId) {
-        File file = getFacilityImageFile(facilityId);
-        Utilities.saveBitmapToFile(file, bitmap);
-    }
-    */
-
-    /**
-     * Save the facility to a file instead of loading every time
-     * @param facility The facility to cache
-     */
-    /*private void cacheFacility(Facility facility) {
-        File file = getFacilityFile(facility.getFacilityId());
+    private void cacheNews(News news) {
+        File file = getNewsFile(news.getPressId());
         ObjectOutput out;
 
         try {
             out = new ObjectOutputStream(new FileOutputStream(file));
-            out.writeObject(facility);
+            out.writeObject(news);
             out.close();
         } catch (IOException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
         }
-    }*/
+    }
 
-    /**
-     * Load the facility from the saved file
-     * @param facilityId The id of the facility
-     * @return The facility with the given id. Null if the facility is not saved
-     */
-    /*private Facility readCachedFacility(int facilityId) {
+    private News readCachedNews(int pressId) {
         ObjectInputStream input;
-        File file = getFacilityFile(facilityId);
+        File file = getNewsFile(pressId);
 
-        Facility facility = null;
+        News news = null;
 
         try {
             input = new ObjectInputStream(new FileInputStream(file));
-            facility = (Facility) input.readObject();
-
-            double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
-            double distance = 0;
-
-            String description = "";
-
-            // The description contains the distance and all PTSD programs located there
-            if(userLocation[0] != 0 && userLocation[1] != 0) {
-                distance = Utilities.distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1], "M");
-                facility.setDistance(distance);
-
-                DecimalFormat df = new DecimalFormat("#.##");
-                description = "Distance: " + df.format(distance) + " miles\n";
-            }
-
-            Set<String> programs = facility.getPrograms();
-            for(String program : programs)
-                description += "\n" + program;
-
-            facility.setDescription(description);
+            news = (News) input.readObject();
 
             input.close();
         } catch (FileNotFoundException e) {
@@ -297,16 +265,16 @@ public abstract class NewsLoader {
             e.printStackTrace();
         }
 
-        return facility;
-    }*/
+        return news;
+    }
 
     /**
      * Get the file path of the facility
-     * @param facilityId The id of the facility
+     * @param pressId The id of the facility
      * @return The file path of the facility
      */
-    private File getFacilityFile(int facilityId) {
-        String fileName = "facility" + facilityId;
+    private File getNewsFile(int pressId) {
+        String fileName = "news" + pressId;
         return new File(fragment.getActivity().getFilesDir(), fileName);
     }
 

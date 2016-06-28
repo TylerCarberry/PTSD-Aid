@@ -1,9 +1,13 @@
 package com.tytanapps.ptsd;
 
+import java.io.Serializable;
+
 /**
  * Created by Tyler on 6/27/16.
  */
-public class News implements Comparable<News>{
+public class News implements Comparable<News>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String title;
     private String message;
