@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tytanapps.ptsd.News;
@@ -82,6 +85,8 @@ public class NewsFragment extends AnalyticsFragment {
             public void errorLoadingResults(String errorMessage) {
                 Log.d(LOG_TAG, "errorLoadingResults() called with: " + "errorMessage = [" + errorMessage + "]");
                 Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+
+                NewsFragment.this.errorLoadingResults(errorMessage);
             }
 
             @Override
@@ -144,5 +149,47 @@ public class NewsFragment extends AnalyticsFragment {
             }
         });
         swipeRefreshLayout.setEnabled(false);
+    }
+
+    /**
+     * There was an error loading the VA facilities. Display a message and a retry button.
+     * @param errorMessage The message to show to the user
+     */
+    private void errorLoadingResults(String errorMessage) {
+        View rootView = getView();
+        if(rootView != null) {
+            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.news_loading_textview);
+            if(loadingTextview != null) {
+                loadingTextview.setVisibility(View.VISIBLE);
+                loadingTextview.setText(errorMessage);
+            }
+
+            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.news_progressbar);
+            if(loadingProgressbar != null) {
+                loadingProgressbar.setVisibility(View.INVISIBLE);
+            }
+
+            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
+            if(retryButton != null) {
+                retryButton.setVisibility(View.VISIBLE);
+
+                retryButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View retryButton) {
+                        retryButton.setVisibility(View.INVISIBLE);
+
+                        if(loadingTextview != null) {
+                            loadingTextview.setText("");
+                            loadingTextview.setVisibility(View.INVISIBLE);
+                        }
+                        if(loadingProgressbar != null)
+                            loadingProgressbar.setVisibility(View.VISIBLE);
+
+                        newsLoader.loadNews();
+                    }
+                });
+
+            }
+        }
     }
 }

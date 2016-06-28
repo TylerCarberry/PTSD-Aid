@@ -72,7 +72,7 @@ public abstract class NewsLoader {
                     int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
                     if (numberOfResults == 0) {
-                        errorLoadingResults("Error");
+                        errorLoadingResults("Unable to load the news. Check you internet connection.");
                         return;
                     }
 
@@ -93,7 +93,7 @@ public abstract class NewsLoader {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, error.toString());
-                errorLoadingResults("Error");
+                errorLoadingResults("Unable to load the news. Check you internet connection.");
             }
         });
 
@@ -107,7 +107,7 @@ public abstract class NewsLoader {
         if (requestQueue != null)
             requestQueue.add(stringRequest);
         else
-            errorLoadingResults("Error");
+            errorLoadingResults("Unable to load the news. Check you internet connection.");
     }
 
     private void loadArticle(final int news_id, final int numberOfNews) {

@@ -11,6 +11,29 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
 
+    <TextView
+        android:id="@+id/news_loading_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:layout_above="@id/news_progressbar"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/retry_load_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/button"
+        android:layout_below="@id/news_loading_textview"
+        android:layout_centerHorizontal="true"
+        android:text="@string/retry"
+        android:visibility="invisible"/>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
