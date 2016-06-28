@@ -206,7 +206,10 @@ public abstract class NewsLoader {
             article = article.substring(0, article.length() - 1);
         }
 
-        return new News(title, article, rootJson.getInt("PRESS_ID"), rootJson.getString("PRESS_DATE"));
+        String pressDate = rootJson.getString("PRESS_DATE");
+        pressDate = pressDate.substring(0, pressDate.length() - 8);
+
+        return new News(title, article, rootJson.getInt("PRESS_ID"), pressDate);
     }
 
     /**

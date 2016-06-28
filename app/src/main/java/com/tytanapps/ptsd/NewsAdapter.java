@@ -28,10 +28,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         public TextView titleTextView, dateTextView;
         public ExpandableTextView messageTextView;
 
-        //public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
-        //public ImageView facilityImageView, callIcon, addressIcon;
-        //public Button moreInfoButton;
-
         public MyViewHolder(View view) {
             super(view);
 
@@ -69,15 +65,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_layout, parent, false);
 
-        /*
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alternateCardExpansion(parent);
-            }
-        });
-        */
-
         return new MyViewHolder(itemView);
     }
 
@@ -95,9 +82,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
             TextView dateTextViewTextView = holder.dateTextView;
             dateTextViewTextView.setText(news.getPressDate());
-
-
-
         }
     }
 
