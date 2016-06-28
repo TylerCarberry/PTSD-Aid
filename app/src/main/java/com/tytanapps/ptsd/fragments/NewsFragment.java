@@ -25,7 +25,7 @@ public class NewsFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = NewsFragment.class.getSimpleName();
 
-    final NewsLoader newsLoader;
+    private NewsLoader newsLoader;
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
@@ -39,8 +39,7 @@ public class NewsFragment extends AnalyticsFragment {
     private String mParam2;
 
     public NewsFragment() {
-        // Required empty public constructor
-        newsLoader = setupNewsLoader();
+
     }
 
     @Override
@@ -65,6 +64,8 @@ public class NewsFragment extends AnalyticsFragment {
         //}
         //
 
+        // Required empty public constructor
+        newsLoader = setupNewsLoader(rootView);
         setupRefreshLayout(rootView);
         return rootView;
     }
@@ -75,7 +76,7 @@ public class NewsFragment extends AnalyticsFragment {
         newsLoader.loadNews();
     }
 
-    private NewsLoader setupNewsLoader() {
+    private NewsLoader setupNewsLoader(final View roorView) {
         return new NewsLoader(this) {
             @Override
             public void errorLoadingResults(String errorMessage) {
@@ -92,11 +93,12 @@ public class NewsFragment extends AnalyticsFragment {
                 }
                 setupRecyclerView(getView());
 
-                SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+                SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) roorView.findViewById(R.id.swipeRefreshLayout);
                 swipeRefreshLayout.setRefreshing(false);
                 swipeRefreshLayout.setEnabled(true);
 
-                mAdapter.notifyDataSetChanged();
+                if(mAdapter != null)
+                    mAdapter.notifyDataSetChanged();
             }
         };
     }
