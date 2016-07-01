@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -25,9 +24,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Log.d(LOG_TAG, "onMessageReceived() called with: " + "remoteMessage = [" + remoteMessage + "]");
 
-        Bundle bundle = new Bundle();
-        bundle.putString("param1", "From Activity");
-
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("notification_action", "unsubscribe");
         // use System.currentTimeMillis() to have a unique ID for the pending intent
@@ -36,7 +32,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .addAction(R.drawable.ic_notifications_off_black_24px, "Unsubscribe", pIntent)
+                        .addAction(R.drawable.ic_notifications_off_black_24px, getString(R.string.unsubscribe_news_notifications), pIntent)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getData().get("message")))
                         .setAutoCancel(true)
                         .setContentTitle(remoteMessage.getData().get("title"))
@@ -66,7 +62,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // mId allows you to update the notification later on.
         mNotificationManager.notify(1234, mBuilder.build());
 
-
-        //remoteMessage.getNotification().
     }
 }
