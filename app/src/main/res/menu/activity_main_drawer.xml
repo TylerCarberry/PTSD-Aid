@@ -4,13 +4,13 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_simple_test" android:icon="@drawable/ic_account_circle_black_24px"
             android:title="@string/nav_simple_test" />
-        <item android:id="@+id/nav_test" android:icon="@drawable/ic_assignment_black_24px"
+        <item android:id="@+id/nav_test" android:icon="@drawable/ic_assessment_black_24px"
             android:title="@string/nav_test" />
-        <item android:id="@+id/nav_resources" android:icon="@android:drawable/ic_menu_slideshow"
+        <item android:id="@+id/nav_resources" android:icon="@drawable/ic_subject_black_24px"
             android:title="@string/Resources" />
         <item android:id="@+id/nav_nearby" android:icon="@drawable/ic_local_pharmacy_black_24px"
             android:title="@string/nav_nearby" />
-        <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_manage"
+        <item android:id="@+id/nav_news" android:icon="@drawable/ic_library_books_black_24px"
             android:title="@string/nav_news" />
 
     </group>
@@ -20,7 +20,7 @@
             <group android:checkableBehavior="single">
                 <item android:id="@+id/nav_hotline" android:icon="@drawable/ic_call_black_24px"
                     android:title="@string/nav_call" />
-                <item android:id="@+id/nav_websites" android:icon="@android:drawable/ic_menu_send"
+                <item android:id="@+id/nav_websites" android:icon="@drawable/ic_explore_black_24px"
                     android:title="@string/nav_website" />
             </group>
         </menu>
