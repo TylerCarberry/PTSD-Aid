@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/resource_header"
-        android:theme="@style/LargeText"
+        android:textSize="@dimen/large_text_size"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/activity_vertical_margin"
@@ -14,15 +14,18 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:gravity="center_horizontal"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif"/>
 
     <TextView
         android:id="@+id/resource_desc"
-        android:theme="@style/SmallText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin" />
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="@dimen/small_text_size"
+        android:fontFamily="sans-serif"/>
 
 </LinearLayout>

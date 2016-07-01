@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
             if(value != null && value.equals("unsubscribe")) {
                 saveSharedPreference("news_notification", false);
                 FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
-                Toast.makeText(MainActivity.this, "Unsubscribed from news notifications", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.unsubscribed_news_message, Toast.LENGTH_LONG).show();
             }
             //The key argument here must match that used in the other activity
         }
