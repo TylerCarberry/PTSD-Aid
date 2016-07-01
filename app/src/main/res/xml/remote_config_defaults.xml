@@ -72,6 +72,11 @@
         <value>Hello! I would like to give feedback on PTSD Aid!^^What I liked:^^What I didn\'t like:^^^Device Information:^</value>
     </entry>
 
+    <entry>
+        <key>show_va_programs</key>
+        <value>false</value>
+    </entry>
+
 
 </defaultsMap>
 <!-- END xml_defaults -->

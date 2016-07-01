@@ -260,12 +260,15 @@ public abstract class FacilityLoader {
             facilityToUpdate.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
-            description = "Distance: " + df.format(distance) + " miles\n";
+            description = "Distance: " + df.format(distance) + " miles";
         }
 
-        Set<String> programs = facilityToUpdate.getPrograms();
-        for(String program : programs)
-            description += "\n" + program;
+        if(Utilities.getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+            description += "\n";
+            Set<String> programs = facilityToUpdate.getPrograms();
+            for(String program : programs)
+                description += "\n" + program;
+        }
 
         facilityToUpdate.setName(name);
         facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
@@ -506,12 +509,15 @@ public abstract class FacilityLoader {
                 facility.setDistance(distance);
 
                 DecimalFormat df = new DecimalFormat("#.##");
-                description = "Distance: " + df.format(distance) + " miles\n";
+                description = "Distance: " + df.format(distance) + " miles";
             }
 
-            Set<String> programs = facility.getPrograms();
-            for(String program : programs)
-                description += "\n" + program;
+            if(Utilities.getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+                description += "\n";
+                Set<String> programs = facility.getPrograms();
+                for (String program : programs)
+                    description += "\n" + program;
+            }
 
             facility.setDescription(description);
 

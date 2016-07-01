@@ -73,27 +73,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.facility_layout, parent, false);
 
-        /*
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alternateCardExpansion(parent);
-            }
-        });
-        */
-
         return new MyViewHolder(itemView);
-    }
-
-    public void alternateCardExpansion(ViewGroup parent) {
-        if(parent.findViewById(R.id.facility_details).getVisibility() == View.GONE)
-            parent.findViewById(R.id.facility_details).setVisibility(View.VISIBLE);
-        else
-            parent.findViewById(R.id.facility_details).setVisibility(View.GONE);
-    }
-
-    public void expandCard(ViewGroup parent) {
-        parent.findViewById(R.id.facility_details).setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -154,15 +134,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             moreInfoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    expandCard(holder.rootCardView);
-                    ((Button)v).setText(fragment.getString(R.string.open_website));
-                    v.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                            Utilities.openBrowserIntent(fragment, url);
-                        }
-                    });
+                    String url = Utilities.getFirstPhoneNumber(facility.getUrl());
+                    Utilities.openBrowserIntent(fragment, url);
                 }
             });
 

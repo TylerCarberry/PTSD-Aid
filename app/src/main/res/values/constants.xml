@@ -20,6 +20,7 @@
     <string name="rc_news_to_display">news_to_display</string>
     <string name="rc_check_recommendations_database">check_recommendations_database</string>
     <string name="rc_resource_sticky">resource_sticky</string>
+    <string name="rc_show_va_programs">show_va_programs</string>
 
 
 </resources>
