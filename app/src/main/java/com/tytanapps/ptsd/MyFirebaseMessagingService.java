@@ -38,6 +38,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .addAction(R.drawable.ic_notifications_off_black_24px, "Unsubscribe", pIntent)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getData().get("message")))
+                        .setAutoCancel(true)
                         .setContentTitle(remoteMessage.getData().get("title"))
                         .setContentText(remoteMessage.getData().get("message"));
         // Creates an explicit intent for an Activity in your app
