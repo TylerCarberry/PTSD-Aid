@@ -18,6 +18,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -313,9 +314,16 @@ public class Utilities {
      * @param url The url to open
      */
     public static void openBrowserIntent(Fragment fragment, String url) {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(fragment.getResources().getColor(R.color.colorPrimary));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
+
+        /*
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         fragment.startActivity(i);
+        */
     }
 
     /**
