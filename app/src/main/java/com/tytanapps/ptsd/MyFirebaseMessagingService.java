@@ -36,7 +36,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .addAction(R.drawable.web_icon, "Unsubscribe", pIntent)
+                        .addAction(R.drawable.ic_notifications_off_black_24px, "Unsubscribe", pIntent)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getData().get("message")))
                         .setContentTitle(remoteMessage.getData().get("title"))
                         .setContentText(remoteMessage.getData().get("message"));
