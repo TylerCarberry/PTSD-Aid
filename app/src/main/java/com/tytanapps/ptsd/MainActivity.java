@@ -108,6 +108,28 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String value = extras.getString("notification_action");
+            if(value != null && value.equals("unsubscribe")) {
+                saveSharedPreference("news_notification", false);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+                Toast.makeText(MainActivity.this, "Unsubscribed from news notifications", Toast.LENGTH_SHORT).show();
+            }
+            //The key argument here must match that used in the other activity
+        }
+
+        // Set up the side drawer layout containing the user's information and navigation items
+        setupDrawerLayout();
+
+        // Set up the trusted contact button
+        setupFAB();
+
+        // Set up the connection to the Google API Client. This does not sign in the user.
+        setupGoogleSignIn();
+
+        setupRemoteConfig();
+
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fragment_container) != null) {
@@ -116,8 +138,41 @@ public class MainActivity extends AppCompatActivity
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
             if (savedInstanceState == null) {
-                // Create a new Fragment to be placed in the activity layout
-                MainFragment firstFragment = new MainFragment();
+
+                Fragment firstFragment;
+
+                if (extras != null && extras.getString("fragment") != null) {
+                    switch (extras.getString("fragment")) {
+                        case "main":
+                            firstFragment = new MainFragment();
+                            break;
+                        case "test":
+                            firstFragment = new PTSDTestFragment();
+                            break;
+                        case "resources":
+                            firstFragment = new ResourcesFragment();
+                            break;
+                        case "facilities":
+                            firstFragment = new FacilitiesFragment();
+                            break;
+                        case "news":
+                            firstFragment = new NewsFragment();
+                            break;
+                        case "phone":
+                            firstFragment = new PhoneFragment();
+                            break;
+                        case "website":
+                            firstFragment = new WebsiteFragment();
+                            break;
+                        default:
+                            firstFragment = new MainFragment();
+                            break;
+                    }
+                }
+                else {
+                    firstFragment = new MainFragment();
+                    showRatingPrompt();
+                }
 
                 // In case this activity was started with special instructions from an
                 // Intent, pass the Intent's extras to the fragment as arguments
@@ -135,19 +190,6 @@ public class MainActivity extends AppCompatActivity
             // If the persistence has already been set, it will throw an error.
             // There is no way to determine if it has been set beforehand.
         }
-
-        // Set up the side drawer layout containing the user's information and navigation items
-        setupDrawerLayout();
-
-        // Set up the trusted contact button
-        setupFAB();
-
-        // Set up the connection to the Google API Client. This does not sign in the user.
-        setupGoogleSignIn();
-
-        setupRemoteConfig();
-
-        showRatingPrompt();
 
         if(BuildConfig.DEBUG) {
             ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
