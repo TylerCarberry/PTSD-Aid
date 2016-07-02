@@ -45,6 +45,7 @@ public class SettingsFragment extends PreferenceFragment {
         setupEnableTrustedContactPref();
         setupChangeTrustedContactPref();
         setupFeedbackButton();
+        setupLicensesButton();
         setupInfoButton();
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
@@ -112,6 +113,18 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 ((MainActivity)getActivity()).provideFeedback();
+
+                return true;
+            }
+        });
+    }
+
+    private void setupLicensesButton() {
+        Preference provideFeedback = findPreference("licenses");
+        provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
 
                 return true;
             }

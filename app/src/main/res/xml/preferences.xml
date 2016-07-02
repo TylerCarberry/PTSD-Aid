@@ -70,6 +70,12 @@
         </PreferenceScreen>
 
         <PreferenceScreen
+            android:key="licenses"
+            android:title="View licenses"
+            android:summary="View the licenses used">
+        </PreferenceScreen>
+
+        <PreferenceScreen
             android:key="app_info"
             android:title="PTSD Aid"
             android:summary="Version: #">
