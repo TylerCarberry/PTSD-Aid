@@ -32,8 +32,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -112,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         if (extras != null) {
             String value = extras.getString("notification_action");
             if(value != null && value.equals("unsubscribe")) {
-                saveSharedPreference("news_notification", false);
+                saveSharedPreference(getString(R.string.pref_news_notification), false);
                 FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
                 Toast.makeText(MainActivity.this, R.string.unsubscribed_news_message, Toast.LENGTH_LONG).show();
             }
@@ -441,24 +439,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 signIn();
-            }
-        });
-
-        CheckBox newsNotification = (CheckBox) navigationHeader.findViewById(R.id.drawer_news_notification_checkbox);
-        newsNotification.setChecked(getSharedPreferenceBoolean("news_notification", false));
-
-        newsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                saveSharedPreference("news_notification", isChecked);
-                if(isChecked) {
-                    FirebaseMessaging.getInstance().subscribeToTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: subscribed");
-                }
-                else {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: unsubscribed");
-                }
             }
         });
 
@@ -868,6 +848,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_websites:
                 newFragment = new WebsiteFragment();
                 break;
+            case R.id.nav_settings:
+                newFragment = new SettingsFragment();
+                break;
             case R.id.nav_nearby:
                 newFragment = new FacilitiesFragment();
                 break;
@@ -878,6 +861,8 @@ public class MainActivity extends AppCompatActivity
                 bundle.putString("param1", "From Activity");
                 newFragment.setArguments(bundle);
                 break;
+
+
         }
 
         if(newFragment != null) {

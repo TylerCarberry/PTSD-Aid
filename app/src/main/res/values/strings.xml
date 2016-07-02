@@ -153,5 +153,7 @@
     <string name="open_website">Open Website</string>
     <string name="unsubscribe_news_notifications">Unsubscribe</string>
     <string name="unsubscribed_news_message">You have unsubscribed from news notifications</string>
+    <string name="pref_news_notification">news_notification</string>
+    <string name="nav_settings">Settings</string>
 
 </resources>
