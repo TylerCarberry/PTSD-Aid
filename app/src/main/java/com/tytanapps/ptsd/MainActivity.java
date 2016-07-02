@@ -199,6 +199,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        findViewById(R.id.fab).setVisibility(getSharedPreferenceBoolean("enable_trusted_contact", true) ? View.VISIBLE : View.INVISIBLE);
+    }
+
     /**
      * Prompt the user to rate the app on Google Play
      * If the user selects 4/5 stars they are brought to the Play Store
@@ -692,7 +699,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Open an intent to allow the user to pick one of their contacts
      */
-    protected void pickTrustedContact() {
+    public void pickTrustedContact() {
         if(!contactsPermissionGranted()) {
             requestContactsPermission();
         }
