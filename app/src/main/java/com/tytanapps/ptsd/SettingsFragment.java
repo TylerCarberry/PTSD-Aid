@@ -6,6 +6,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -34,6 +35,14 @@ public class SettingsFragment extends PreferenceFragment {
                     Log.d(LOG_TAG, "onCheckedChanged: unsubscribed");
                 }
 
+                return true;
+            }
+        });
+
+        (findPreference("change_trusted_contact")).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getActivity(), "ON PREF CLICK", Toast.LENGTH_SHORT).show();
                 return true;
             }
         });

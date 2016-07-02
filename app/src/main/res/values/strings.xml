@@ -155,5 +155,6 @@
     <string name="unsubscribed_news_message">You have unsubscribed from news notifications</string>
     <string name="pref_news_notification">news_notification</string>
     <string name="nav_settings">Settings</string>
+    <string name="pref_daily_notification">daily_notification</string>
 
 </resources>
