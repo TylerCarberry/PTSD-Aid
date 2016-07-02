@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -113,6 +115,10 @@ public class MainActivity extends AppCompatActivity
                 saveSharedPreference(getString(R.string.pref_news_notification), false);
                 FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
                 Toast.makeText(MainActivity.this, R.string.unsubscribed_news_message, Toast.LENGTH_LONG).show();
+
+                // Dismiss the notification
+                NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+                manager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID);
             }
             //The key argument here must match that used in the other activity
         }
@@ -197,6 +203,11 @@ public class MainActivity extends AppCompatActivity
         else {
             FirebaseMessaging.getInstance().subscribeToTopic("release");
         }
+
+        if(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true))
+            FirebaseMessaging.getInstance().subscribeToTopic("news");
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
     }
 
     @Override

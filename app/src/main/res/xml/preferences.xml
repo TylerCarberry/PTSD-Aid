@@ -21,6 +21,7 @@
 
         <CheckBoxPreference
             android:key="enable_trusted_contact"
+            android:defaultValue="true"
             android:title="Enable trusted contact"
             android:summary="Show the trusted contact button" />
 

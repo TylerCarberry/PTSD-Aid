@@ -17,6 +17,7 @@ import com.google.firebase.messaging.RemoteMessage;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String LOG_TAG = MyFirebaseMessagingService.class.getSimpleName();
+    public static final int NOTIFICATION_ID = 5000;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -60,7 +61,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(1234, mBuilder.build());
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
     }
 }
