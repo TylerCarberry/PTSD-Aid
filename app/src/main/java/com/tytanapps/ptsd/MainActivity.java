@@ -70,6 +70,7 @@ import com.tytanapps.ptsd.fragments.NewsFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
+import com.tytanapps.ptsd.fragments.SettingsFragment;
 import com.tytanapps.ptsd.fragments.WebsiteFragment;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;

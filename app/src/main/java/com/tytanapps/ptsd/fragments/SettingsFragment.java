@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
 
 import java.util.ArrayList;
 import java.util.List;
