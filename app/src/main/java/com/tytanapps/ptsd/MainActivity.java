@@ -215,12 +215,6 @@ public class MainActivity extends AppCompatActivity
         int ratingPromptShowAfter = (int) mFirebaseRemoteConfig.getDouble("rating_prompt_show_after");
         int ratingUpperBound = (int) mFirebaseRemoteConfig.getDouble("rating_upper_bound");
         final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
-        final String supportSubject = mFirebaseRemoteConfig.getString("support_subject");
-
-        // There is an issue with escape characters with Firebase. Instead use the ^ symbol for new line
-        final String supportMessage = mFirebaseRemoteConfig.getString("support_message").replace("^", "\n");
-
-        final String deviceInformation = getDeviceInformation();
 
         if(ratingPromptShowAfter > 0) {
             FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
@@ -231,11 +225,7 @@ public class MainActivity extends AppCompatActivity
                     .setNegativeReviewListener(new NegativeReviewListener() {
                         @Override
                         public void onNegativeReview(int i) {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                                    "mailto", supportEmailAddress, null));
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, supportSubject);
-                            emailIntent.putExtra(Intent.EXTRA_TEXT, supportMessage + deviceInformation);
-                            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                            provideFeedback();
                         }
                     }) // OVERRIDE mail intent for negative review
                     .setReviewListener(new ReviewListener() {
@@ -246,6 +236,22 @@ public class MainActivity extends AppCompatActivity
                     }) // Used to listen for reviews (if you want to track them )
                     .showAfter(ratingPromptShowAfter);
         }
+    }
+
+    public void provideFeedback() {
+        final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
+        final String supportSubject = mFirebaseRemoteConfig.getString("support_subject");
+
+        // There is an issue with escape characters with Firebase. Instead use the ^ symbol for new line
+        final String supportMessage = mFirebaseRemoteConfig.getString("support_message").replace("^", "\n");
+
+        final String deviceInformation = getDeviceInformation();
+
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto", supportEmailAddress, null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, supportSubject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, supportMessage + deviceInformation);
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
     /**

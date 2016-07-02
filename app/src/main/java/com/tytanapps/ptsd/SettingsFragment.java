@@ -30,6 +30,8 @@ public class SettingsFragment extends PreferenceFragment {
         setupNewsNotificationPref();
         setupEnableTrustedContactPref();
         setupChangeTrustedContactPref();
+        setupFeedbackButton();
+
     }
 
     private void setupNewsNotificationPref() {
@@ -81,6 +83,18 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 getActivity().findViewById(R.id.fab).setVisibility(((Boolean)newValue) ? View.VISIBLE : View.INVISIBLE);
                 saveSharedPreference("enable_trusted_contact", (Boolean) newValue);
+
+                return true;
+            }
+        });
+    }
+
+    private void setupFeedbackButton() {
+        Preference provideFeedback = findPreference("provide_feedback");
+        provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                ((MainActivity)getActivity()).provideFeedback();
 
                 return true;
             }

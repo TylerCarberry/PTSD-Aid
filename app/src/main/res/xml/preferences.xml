@@ -48,6 +48,12 @@
         </PreferenceScreen>
 
         <PreferenceScreen
+            android:key="provide_feedback"
+            android:title="Provide Feedback"
+            android:summary="Contact developer">
+        </PreferenceScreen>
+
+        <PreferenceScreen
             android:title="Enjoying the app?"
             android:summary="Please rate on Google Play">
 
