@@ -1,15 +1,26 @@
 package com.tytanapps.ptsd;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsFragment extends PreferenceFragment {
 
@@ -31,6 +42,7 @@ public class SettingsFragment extends PreferenceFragment {
         setupEnableTrustedContactPref();
         setupChangeTrustedContactPref();
         setupFeedbackButton();
+        setupInfoButton();
 
     }
 
@@ -99,6 +111,61 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
+    }
+
+    private void setupInfoButton() {
+        Preference appInfo = findPreference("app_info");
+        appInfo.setTitle("PTSD Aid");
+
+        try {
+            PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            String version = pInfo.versionName;
+            appInfo.setSummary("Version: " + version);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            appInfo.setSummary("Version: " + "unknown");
+        }
+
+        // Load database from Firebase
+        final List<String> responses = new ArrayList<>();
+        FirebaseDatabase.getInstance().getReference("responses").orderByChild("order")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren())
+                    responses.add(data.child("text").getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        appInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            int tapNumber = 0;
+            Toast toast = Toast.makeText(getActivity(), "", Toast.LENGTH_LONG);
+
+            @Override
+            public boolean onPreferenceClick(Preference z) {
+                if(responses.size() > 0) {
+                    tapNumber++;
+                    if (tapNumber % 5 == 0 && tapNumber / 5 - 1 < responses.size()) {
+                        String response = responses.get(tapNumber/5 - 1);
+                        if(response.length() > 0) {
+                            if(response.contains("zdrg")) {
+                                ProgressDialog.show(getActivity(),
+                                        response.substring(response.indexOf(">") + 1, response.indexOf("<")).trim(),
+                                        response.substring(response.indexOf("<") + 1).trim(), true);
+                            }
+                            else {
+                                toast.setText(response);
+                                toast.show();
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        });
+
     }
 
     /**

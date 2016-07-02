@@ -36,16 +36,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="About">
-
-        <PreferenceScreen
-            android:title="This app is open source"
-            android:summary="View the code on github">
-
-            <intent android:action="android.intent.action.VIEW"
-                android:data="http://www.github.com/TylerCarberry/PTSD-Aid" />
-
-        </PreferenceScreen>
+        android:title="Feedback">
 
         <PreferenceScreen
             android:key="provide_feedback"
@@ -60,6 +51,27 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="https://play.google.com/store/apps/details?id=com.tytanapps.ptsd" />
 
+        </PreferenceScreen>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="About">
+
+        <PreferenceScreen
+            android:title="This app is open source"
+            android:summary="View the code on github">
+
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://www.github.com/TylerCarberry/PTSD-Aid" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="app_info"
+            android:title="PTSD Aid"
+            android:summary="Version: #">
         </PreferenceScreen>
 
 
