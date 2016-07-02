@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -68,6 +69,9 @@ public class MainFragment extends AnalyticsFragment {
         if(isUserSignedIn()) {
             hideSignInButton();
         }
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);
     }
 
     /**

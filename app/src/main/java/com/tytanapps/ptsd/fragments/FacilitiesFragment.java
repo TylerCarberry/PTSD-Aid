@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -91,6 +92,9 @@ public class FacilitiesFragment extends AnalyticsFragment {
         if(facilityList.size() == 0) {
             loadFacilities();
         }
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_nearby).setChecked(true);
     }
 
     @Override

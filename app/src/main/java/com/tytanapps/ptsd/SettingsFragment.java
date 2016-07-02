@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -44,6 +45,8 @@ public class SettingsFragment extends PreferenceFragment {
         setupFeedbackButton();
         setupInfoButton();
 
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
     }
 
     private void setupNewsNotificationPref() {

@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,14 @@ public class PTSDTestFragment extends AnalyticsFragment {
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
         setupQuestionsLayout(rootView);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
     }
 
     /**

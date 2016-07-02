@@ -2,6 +2,7 @@ package com.tytanapps.ptsd.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -111,6 +112,9 @@ public class NewsFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
         newsLoader.loadNews();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_news).setChecked(true);
     }
 
     @Override

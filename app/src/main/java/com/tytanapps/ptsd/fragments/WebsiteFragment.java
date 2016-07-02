@@ -2,6 +2,7 @@ package com.tytanapps.ptsd.fragments;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +39,14 @@ public class WebsiteFragment extends AnalyticsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_website, container, false);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_websites).setChecked(true);
     }
 
     @Override

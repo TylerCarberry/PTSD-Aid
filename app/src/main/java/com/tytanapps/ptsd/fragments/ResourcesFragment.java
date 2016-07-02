@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,9 @@ public class ResourcesFragment extends AnalyticsFragment {
                 readResourcesFromFirebase(FirebaseDatabase.getInstance());
             }
         }).run();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_resources).setChecked(true);
 
     }
 
