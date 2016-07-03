@@ -76,6 +76,7 @@ import com.tytanapps.ptsd.fragments.WebsiteFragment;
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
+import io.doorbell.android.Doorbell;
 
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
@@ -251,6 +252,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void provideFeedback() {
+        Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
+        doorbell.addProperty("device", getDeviceInformation());
+        doorbell.setMessageHint("What would you like to tell me?");
+        doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
+        doorbell.show();
+
+        /*
         final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
         final String supportSubject = mFirebaseRemoteConfig.getString("support_subject");
 
@@ -264,6 +272,7 @@ public class MainActivity extends AppCompatActivity
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, supportSubject);
         emailIntent.putExtra(Intent.EXTRA_TEXT, supportMessage + deviceInformation);
         startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        */
     }
 
     /**

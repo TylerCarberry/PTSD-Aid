@@ -53,6 +53,7 @@ dependencies {
     compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
     compile 'com.github.techery.progresshint:library-addition:0.2.3'
     compile 'com.ms-square:expandableTextView:0.1.4'
+    compile 'io.doorbell:android-sdk:0.2.6@aar'
 
     testCompile 'junit:junit:4.12'
 
