@@ -114,15 +114,13 @@ public class MainActivity extends AppCompatActivity
         if (extras != null) {
             String value = extras.getString("notification_action");
             if(value != null && value.equals("unsubscribe")) {
-                saveSharedPreference(getString(R.string.pref_news_notification), false);
-                FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+                unsubscribeNewsNotifications();
                 Toast.makeText(MainActivity.this, R.string.unsubscribed_news_message, Toast.LENGTH_LONG).show();
 
                 // Dismiss the notification
                 NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
                 manager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID);
             }
-            //The key argument here must match that used in the other activity
         }
 
         // Set up the side drawer layout containing the user's information and navigation items
@@ -144,36 +142,10 @@ public class MainActivity extends AppCompatActivity
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
             if (savedInstanceState == null) {
-
                 Fragment firstFragment;
 
                 if (extras != null && extras.getString("fragment") != null) {
-                    switch (extras.getString("fragment")) {
-                        case "main":
-                            firstFragment = new MainFragment();
-                            break;
-                        case "test":
-                            firstFragment = new PTSDTestFragment();
-                            break;
-                        case "resources":
-                            firstFragment = new ResourcesFragment();
-                            break;
-                        case "facilities":
-                            firstFragment = new FacilitiesFragment();
-                            break;
-                        case "news":
-                            firstFragment = new NewsFragment();
-                            break;
-                        case "phone":
-                            firstFragment = new PhoneFragment();
-                            break;
-                        case "website":
-                            firstFragment = new WebsiteFragment();
-                            break;
-                        default:
-                            firstFragment = new MainFragment();
-                            break;
-                    }
+                    firstFragment = getFirstFragment(extras.getString("fragment"));
                 }
                 else {
                     firstFragment = new MainFragment();
@@ -190,12 +162,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        } catch (DatabaseException e) {
-            // If the persistence has already been set, it will throw an error.
-            // There is no way to determine if it has been set beforehand.
-        }
+        makeFirebaseDatabasePersistent();
 
         if(BuildConfig.DEBUG) {
             ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
@@ -206,10 +173,7 @@ public class MainActivity extends AppCompatActivity
             FirebaseMessaging.getInstance().subscribeToTopic("release");
         }
 
-        if(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true))
-            FirebaseMessaging.getInstance().subscribeToTopic("news");
-        else
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+        setupNewsNotifications();
     }
 
     @Override
@@ -217,6 +181,73 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
 
         findViewById(R.id.fab).setVisibility(getSharedPreferenceBoolean("enable_trusted_contact", true) ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    /**
+     * Unsubscribe the user from notifications regarding new va news
+     */
+    private void unsubscribeNewsNotifications() {
+        saveSharedPreference(getString(R.string.pref_news_notification), false);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+    }
+
+    /**
+     * Make the firebase database persistent and cache it for offline use
+     */
+    private void makeFirebaseDatabasePersistent() {
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        } catch (DatabaseException e) {
+            // If the persistence has already been set, it will throw an error.
+            // There is no way to determine if it has been set beforehand.
+        }
+    }
+
+    /**
+     * Get the first fragment that should be shown to the user when the app is opened
+     * @param extrasFragment The string extra that was passed in the intent
+     * @return The fragment to display on screen
+     */
+    @NonNull
+    private Fragment getFirstFragment(String extrasFragment) {
+        Fragment firstFragment;
+        switch (extrasFragment) {
+            case "main":
+                firstFragment = new MainFragment();
+                break;
+            case "test":
+                firstFragment = new PTSDTestFragment();
+                break;
+            case "resources":
+                firstFragment = new ResourcesFragment();
+                break;
+            case "facilities":
+                firstFragment = new FacilitiesFragment();
+                break;
+            case "news":
+                firstFragment = new NewsFragment();
+                break;
+            case "phone":
+                firstFragment = new PhoneFragment();
+                break;
+            case "website":
+                firstFragment = new WebsiteFragment();
+                break;
+            default:
+                firstFragment = new MainFragment();
+                break;
+        }
+        return firstFragment;
+    }
+
+    /**
+     * Subscribe or unsubscribe the user from news notifications depending on the shared preference
+     */
+    private void setupNewsNotifications() {
+        if(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true))
+            FirebaseMessaging.getInstance().subscribeToTopic("news");
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
     }
 
     /**
@@ -254,7 +285,7 @@ public class MainActivity extends AppCompatActivity
     public void provideFeedback() {
         Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
         doorbell.addProperty("device", getDeviceInformation());
-        doorbell.setMessageHint("What would you like to tell me?");
+        doorbell.setMessageHint(getString(R.string.feedback_message_hint));
         doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
         doorbell.show();
 
@@ -295,28 +326,28 @@ public class MainActivity extends AppCompatActivity
         }
         
         deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
-        //deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
-        //deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
-        //deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
-        //deviceInformation += "BOARD: " + Build.BOARD + "\n";
-        //deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
+        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
+        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
+        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
+        deviceInformation += "BOARD: " + Build.BOARD + "\n";
+        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
         deviceInformation += "BRAND: " + Build.BRAND + "\n";
         deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
-        //deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
+        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
         deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
-        //deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
-        //deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
-        //deviceInformation += "HOST: " + Build.HOST + "\n";
-        //deviceInformation += "ID: " + Build.ID + "\n";
+        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
+        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
+        deviceInformation += "HOST: " + Build.HOST + "\n";
+        deviceInformation += "ID: " + Build.ID + "\n";
         deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
         deviceInformation += "MODEL: " + Build.MODEL + "\n";
         deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
-        //deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
-        //deviceInformation += "TAGS: " + Build.TAGS + "\n";
-        //deviceInformation += "TYPE: " + Build.TYPE + "\n";
-        //deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
-        //deviceInformation += "USER: " + Build.USER + "\n";
-        //deviceInformation += "TIME: " + Build.TIME + "\n";
+        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
+        deviceInformation += "TAGS: " + Build.TAGS + "\n";
+        deviceInformation += "TYPE: " + Build.TYPE + "\n";
+        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
+        deviceInformation += "USER: " + Build.USER + "\n";
+        deviceInformation += "TIME: " + Build.TIME + "\n";
 
         return deviceInformation;
     }
