@@ -13,7 +13,7 @@
 
     <!-- Main Fragment -->
     <string name="main_header">Welcome!</string>
-    <string name="emotion_prompt">How are you feeling right now?</string>
+    <string name="emotion_prompt">How are you feeling?</string>
     <string name="recommendations_title">Recommendations</string>
     <string name="recommendation_resources">Look at the resources to learn about possible symptoms of Post Traumatic Stress Disorder</string>
     <string name="recommendation_test">Take the PTSD test to determine if you suffer from PTSD</string>

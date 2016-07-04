@@ -143,7 +143,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));
-        submitButton.setTextSize(20);
+        submitButton.setTextSize(getResources().getDimension(R.dimen.small_text_size));
         submitButton.setText(getString(R.string.submit_test));
 
         submitButton.setOnClickListener(new View.OnClickListener() {

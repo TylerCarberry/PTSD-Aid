@@ -5,11 +5,6 @@
         android:title="Notifications">
 
         <CheckBoxPreference
-            android:key="@string/pref_daily_notification"
-            android:title="Daily Recommendations"
-            android:summary="Not implemented yet" />
-
-        <CheckBoxPreference
             android:key="@string/pref_news_notification"
             android:title="News Articles"
             android:summary="Receive notifications for VA news" />
