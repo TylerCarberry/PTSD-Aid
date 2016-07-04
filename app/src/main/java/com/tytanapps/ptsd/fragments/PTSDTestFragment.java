@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,7 +144,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));
-        submitButton.setTextSize(getResources().getDimension(R.dimen.small_text_size));
+        submitButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         submitButton.setText(getString(R.string.submit_test));
 
         submitButton.setOnClickListener(new View.OnClickListener() {
