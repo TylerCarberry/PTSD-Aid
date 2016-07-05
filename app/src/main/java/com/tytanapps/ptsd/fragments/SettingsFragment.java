@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 
@@ -124,7 +125,14 @@ public class SettingsFragment extends PreferenceFragment {
         provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
+
+                EasyLicensesDialog easyLicensesDialog = new EasyLicensesDialog(getActivity());
+                easyLicensesDialog.setTitle(getString(R.string.licenses));
+                easyLicensesDialog.setCancelable(true);
+                easyLicensesDialog.show(); //show the dialog
+
+
+                // /Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
 
                 return true;
             }
