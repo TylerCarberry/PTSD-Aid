@@ -1,9 +1,11 @@
 package com.tytanapps.ptsd;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 /**
- * Created by Tyler on 6/27/16.
+ * A VA news article that has a title, message, pressId, and a published date
  */
 public class News implements Comparable<News>, Serializable {
 
@@ -14,6 +16,13 @@ public class News implements Comparable<News>, Serializable {
     private int pressId;
     private String pressDate;
 
+    /**
+     * Create a new news
+     * @param title The title of the article
+     * @param message The body of the article
+     * @param pressId Unique id of the article
+     * @param pressDate The date the article was published
+     */
     public News(String title, String message, int pressId, String pressDate) {
         this.title = title;
         this.message = message;
@@ -53,8 +62,14 @@ public class News implements Comparable<News>, Serializable {
         this.pressDate = pressDate;
     }
 
+    /**
+     * Compare the pressId's of two News
+     * The most recent one (News with the highest pressId) comes first
+     * @param another The news article to compare to
+     * @return -1 if this has a greater pressId, 0 if equal, 1 if less
+     */
     @Override
-    public int compareTo(News another) {
+    public int compareTo(@NonNull News another) {
         return 0-((Integer)this.getPressId()).compareTo(another.getPressId());
     }
 }

@@ -64,11 +64,9 @@ public class MainFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
 
-
         // Hide the sign in button if the user is already signed in
-        if(isUserSignedIn()) {
+        if(isUserSignedIn())
             hideSignInButton();
-        }
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);

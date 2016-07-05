@@ -7,7 +7,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.tytanapps.ptsd.PTSDApplication;
 
 /**
- * Created by Tyler on 6/17/16.
+ * A fragment that sends screen hits to Google Analytics
  */
 public abstract class AnalyticsFragment extends Fragment {
 
@@ -22,5 +22,21 @@ public abstract class AnalyticsFragment extends Fragment {
         Tracker mTracker = application.getDefaultTracker();
         mTracker.setScreenName(getClass().getSimpleName());
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
+    /**
+     * Send an analytics event to Google Analytics
+     * @param category The category of the event
+     * @param action The action of the event
+     */
+    public void sendAnalyticsEvent(String category, String action) {
+        // Obtain the shared Tracker instance.
+        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory(category)
+                .setAction(action)
+                .build());
     }
 }

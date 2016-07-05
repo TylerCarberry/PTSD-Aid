@@ -15,10 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.tytanapps.ptsd.MainActivity;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 
 import io.techery.progresshint.ProgressHintDelegate;
@@ -334,22 +331,6 @@ public class PTSDTestFragment extends AnalyticsFragment {
         }
 
         return score;
-    }
-
-    /**
-     * Send an analytics event to Google Analytics
-     * @param category The category of the event
-     * @param action The action of the event
-     */
-    private void sendAnalyticsEvent(String category, String action) {
-        // Obtain the shared Tracker instance.
-        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-
-        mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory(category)
-                .setAction(action)
-                .build());
     }
 
 }

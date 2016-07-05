@@ -175,7 +175,7 @@ public class NewsFragment extends AnalyticsFragment {
         if(rootView != null) {
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new NewsAdapter(newsList, this, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

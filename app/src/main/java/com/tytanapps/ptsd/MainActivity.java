@@ -86,11 +86,12 @@ public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
                     GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
 
+    // The tag used in log statements
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
-    private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     // The connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
+
     // Whether the user is signed in to the app with their Google Account
     private boolean isUserSignedIn = false;
 
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RC_SIGN_IN = 1;
     private static final int PICK_CONTACT_REQUEST = 2;
+    private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
@@ -286,28 +288,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Open a new Doorbell dialog asking the user for feedback
+     */
     public void provideFeedback() {
         Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
         doorbell.addProperty("device", getDeviceInformation());
         doorbell.setMessageHint(getString(R.string.feedback_message_hint));
         doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
         doorbell.show();
-
-        /*
-        final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
-        final String supportSubject = mFirebaseRemoteConfig.getString("support_subject");
-
-        // There is an issue with escape characters with Firebase. Instead use the ^ symbol for new line
-        final String supportMessage = mFirebaseRemoteConfig.getString("support_message").replace("^", "\n");
-
-        final String deviceInformation = getDeviceInformation();
-
-        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto", supportEmailAddress, null));
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, supportSubject);
-        emailIntent.putExtra(Intent.EXTRA_TEXT, supportMessage + deviceInformation);
-        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-        */
     }
 
     /**
@@ -728,13 +717,11 @@ public class MainActivity extends AppCompatActivity
                     alertDialog.setTitle(R.string.contacts_permission_title);
                     alertDialog.setMessage(R.string.contacts_permission_message);
                     alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        // When the ok button is pressed, dismiss the dialog and do not do anything
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
+                        public void onClick(DialogInterface dialog, int which) {}
                     });
                     alertDialog.create().show();
-
-                    //errorLoadingResults(getString(R.string.error_location_permission));
                 }
             }
 
@@ -936,11 +923,15 @@ public class MainActivity extends AppCompatActivity
             switchFragment(newFragment);
         }
 
-        // Close the drawer layout
+        closeDrawerLayout();
+
+        return true;
+    }
+
+    private void closeDrawerLayout() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if(drawer != null)
             drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     /**

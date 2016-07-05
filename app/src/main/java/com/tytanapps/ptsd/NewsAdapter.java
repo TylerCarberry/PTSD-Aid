@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd;
 
-import android.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,22 +12,21 @@ import com.ms.square.android.expandabletextview.ExpandableTextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 
     private static final String LOG_TAG = NewsAdapter.class.getSimpleName();
 
-    private Fragment fragment;
     private List<News> newsList;
     private List<News> newsListAll;
 
     private int newsToDisplay;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class NewsViewHolder extends RecyclerView.ViewHolder {
         public CardView rootCardView;
         public TextView titleTextView, dateTextView;
         public ExpandableTextView messageTextView;
 
-        public MyViewHolder(View view) {
+        public NewsViewHolder(View view) {
             super(view);
 
             rootCardView = (CardView) view.findViewById(R.id.news_cardview);
@@ -40,36 +38,38 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
     }
 
-    public NewsAdapter(List<News> newsList, Fragment fragment) {
+    public NewsAdapter(List<News> newsList) {
         // Display 10 news by default
-        this(newsList, fragment, 7);
+        this(newsList, 10);
     }
 
-    public NewsAdapter(List<News> newsList, Fragment fragment, int newsToDisplay) {
-        this.fragment = fragment;
+    /**
+     * Create a news adapter
+     * @param newsList List of news to display
+     * @param newsToDisplay Number of news to display on screen
+     */
+    public NewsAdapter(List<News> newsList, int newsToDisplay) {
         this.newsToDisplay = newsToDisplay;
 
         this.newsList = new ArrayList<>();
         this.newsListAll = newsList;
 
-        for(int i = 0; i < newsToDisplay; i++) {
+        for(int i = 0; i < newsToDisplay && i < newsList.size(); i++) {
             News news = newsList.get(i);
             this.newsList.add(news);
         }
-
-        //loadFacilityImages();
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+    public NewsViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_layout, parent, false);
 
-        return new MyViewHolder(itemView);
+        return new NewsViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final NewsViewHolder holder, int position) {
         final News news = newsList.get(position);
 
         // If the news does not have all of its information, do not show it
@@ -91,9 +91,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
     }
 
 
+    /**
+     * Only include a subset of News in the adapter
+     * @param text The text to search by
+     */
     public void filter(String text) {
-
-        if(text.isEmpty()){
+        // If the search message is empty, include everything
+        if(text == null || text.isEmpty()){
             newsList.clear();
 
             for(int i = 0; i < newsToDisplay && i < newsListAll.size(); i++) {
@@ -103,7 +107,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             ArrayList<News> result = new ArrayList<>();
             text = text.toLowerCase().trim();
             for(News item: newsListAll) {
-
+                // Search by the title, body, and press date
                 if(item.getTitle().toLowerCase().contains(text) ||
                         item.getMessage().toLowerCase().contains(text) ||
                         item.getPressDate().toLowerCase().contains(text)) {
