@@ -153,7 +153,9 @@ public class MainActivity extends AppCompatActivity
                 }
                 else {
                     firstFragment = new MainFragment();
-                    showRatingPrompt();
+
+                    if(!BuildConfig.DEBUG)
+                        showRatingPrompt();
                 }
 
                 // In case this activity was started with special instructions from an
