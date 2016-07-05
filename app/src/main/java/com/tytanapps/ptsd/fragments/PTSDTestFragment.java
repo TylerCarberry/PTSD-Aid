@@ -1,7 +1,6 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 
@@ -224,15 +224,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
      * Switch to the FacilitiesFragment and show a list of nearby facilities
      */
     private void findProfessional() {
-        FacilitiesFragment facilitiesFragment = new FacilitiesFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment
-        transaction.replace(R.id.fragment_container, facilitiesFragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        ((MainActivity)getActivity()).switchFragment(new FacilitiesFragment());
     }
 
     /**

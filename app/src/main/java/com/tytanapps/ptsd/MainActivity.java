@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
+    private Fragment currentFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +161,8 @@ public class MainActivity extends AppCompatActivity
                 // Add the fragment to the 'fragment_container' FrameLayout
                 getFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, firstFragment).commit();
+
+                currentFragment = firstFragment;
             }
         }
 
@@ -926,8 +930,6 @@ public class MainActivity extends AppCompatActivity
                 bundle.putString("param1", "From Activity");
                 newFragment.setArguments(bundle);
                 break;
-
-
         }
 
         if(newFragment != null) {
@@ -947,7 +949,8 @@ public class MainActivity extends AppCompatActivity
      * @param newFragment The fragment to switch to
      */
     public void switchFragment(Fragment newFragment) {
-        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if(!(newFragment.getClass().equals(currentFragment.getClass()))) {
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment
             transaction.replace(R.id.fragment_container, newFragment);
@@ -955,6 +958,8 @@ public class MainActivity extends AppCompatActivity
 
             // Commit the transaction
             transaction.commit();
+            currentFragment = newFragment;
+        }
     }
 
     /**
