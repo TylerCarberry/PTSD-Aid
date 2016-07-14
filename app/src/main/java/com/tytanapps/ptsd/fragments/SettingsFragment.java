@@ -10,6 +10,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
+import com.tytanapps.ptsd.BuildConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 
@@ -41,6 +43,11 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        if(BuildConfig.DEBUG) {
+            ((MainActivity)getActivity()).fetchRemoteConfig(0);
+            Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
+        }
 
         setupNewsNotificationPref();
         setupEnableTrustedContactPref();
