@@ -77,6 +77,11 @@
         <value>false</value>
     </entry>
 
+    <entry>
+        <key>newest_app_version</key>
+        <value>-1</value>
+    </entry>
+
 
 </defaultsMap>
 <!-- END xml_defaults -->

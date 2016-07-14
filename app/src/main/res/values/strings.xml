@@ -158,5 +158,6 @@
     <string name="pref_daily_notification">daily_notification</string>
     <string name="feedback_message_hint">What would you like to tell me?</string>
     <string name="licenses">Licenses</string>
+    <string name="recommendation_update_app">Update your app for the newest information and recommendations</string>
 
 </resources>

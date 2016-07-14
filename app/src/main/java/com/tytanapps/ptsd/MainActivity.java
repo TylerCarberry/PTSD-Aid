@@ -402,6 +402,10 @@ public class MainActivity extends AppCompatActivity
         if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
             cacheSeconds = 0;
 
+        fetchRemoteConfig(cacheSeconds);
+    }
+
+    public void fetchRemoteConfig(int cacheSeconds) {
         mFirebaseRemoteConfig.fetch(cacheSeconds)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

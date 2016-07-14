@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -194,6 +196,13 @@ public class MainFragment extends AnalyticsFragment {
                     emotionName = "happy";
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
+
+                    int newestAppVersion = Utilities.getRemoteConfigInt(this, R.string.rc_newest_app_version);
+                    int currentAppVersion = getApkVersion();
+                    if(newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
+                        recommendationsLinearLayout.addView(getSuggestionUpdateApp());
+                    }
+
                     break;
 
                 case R.id.ok_face:
@@ -510,6 +519,26 @@ public class MainFragment extends AnalyticsFragment {
     }
 
     /**
+     * Get the recommendation to look at the resources
+     * When tapped, open the drawer
+     * @return The Relative Layout containing the suggestion
+     */
+    private RelativeLayout getSuggestionUpdateApp() {
+        return createSuggestionLayout(getString(R.string.recommendation_update_app), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Utilities.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
+                } catch(Exception e) {
+                    FirebaseCrash.report(e);
+                    openDrawer();
+                }
+            }
+        });
+
+    }
+
+    /**
      * Create a suggestion layout to show the user
      * @param text The message to show in the recommendation
      * @param onClickListener The action to perform when the recommendation is tapped
@@ -522,6 +551,18 @@ public class MainFragment extends AnalyticsFragment {
         suggestionLayout.setOnClickListener(onClickListener);
 
         return suggestionLayout;
+    }
+
+    private int getApkVersion() {
+        try {
+            PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            return pInfo.versionCode;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            FirebaseCrash.report(e);
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**
