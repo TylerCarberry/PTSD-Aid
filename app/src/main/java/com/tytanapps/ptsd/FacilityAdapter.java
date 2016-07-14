@@ -190,19 +190,23 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             public void errorLoadingResults(String errorMessage) {}
             @Override
             public void onSuccess(List<Facility> loadedFacilities) {}
-        };
 
-        Runnable callback = new Runnable() {
             @Override
-            public void run() {
-                notifyDataSetChanged();
+            public void onLoadedImage(int facilityId) {
+
+                for(int i = 0; i < facilityList.size(); i++) {
+                    Facility facility = facilityList.get(i);
+                    if(facility.getFacilityId() == facilityId) {
+                        notifyItemChanged(i);
+                    }
+                }
             }
         };
 
         for(int i = 0; i < facilitiesToDisplay && i < facilityList.size(); i++) {
             Facility facility = facilityList.get(i);
             if(facility.getFacilityImage() == null)
-                facilityLoader.loadFacilityImage(facilityList.get(i), callback);
+                facilityLoader.loadFacilityImage(facilityList.get(i));
         }
     }
 

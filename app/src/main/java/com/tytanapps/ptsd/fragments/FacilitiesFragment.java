@@ -69,6 +69,11 @@ public class FacilitiesFragment extends AnalyticsFragment {
             public void onSuccess(List<Facility> loadedFacilities) {
                 FacilitiesFragment.this.allFacilitiesHaveLoaded(loadedFacilities);
             }
+
+            @Override
+            public void onLoadedImage(int facilityId) {
+
+            }
         };
     }
 
