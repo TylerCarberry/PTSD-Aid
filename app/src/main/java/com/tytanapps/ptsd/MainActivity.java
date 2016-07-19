@@ -23,6 +23,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,7 +38,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
             String value = extras.getString("notification_action");
             if(value != null && value.equals("unsubscribe")) {
                 unsubscribeNewsNotifications();
-                Toast.makeText(MainActivity.this, R.string.unsubscribed_news_message, Toast.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.fragment_container), R.string.unsubscribed_news_message, Snackbar.LENGTH_LONG).show();
 
                 // Dismiss the notification
                 NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
@@ -747,7 +747,7 @@ public class MainActivity extends AppCompatActivity
             intent.setData(Uri.parse("tel:" + phoneNumber));
             startActivity(intent);
         } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getBaseContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.fragment_container), R.string.error_open_dialer, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -764,7 +764,7 @@ public class MainActivity extends AppCompatActivity
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
                 startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
             } catch (ActivityNotFoundException activityNotFoundException) {
-                Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.fragment_container), R.string.error_choose_contact, Snackbar.LENGTH_LONG).show();
             }
         }
     }
