@@ -66,6 +66,8 @@ public class SettingsFragment extends PreferenceFragment {
         newsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+                saveSharedPreference(getString(R.string.pref_news_notification), (Boolean) newValue);
+
                 if((Boolean) newValue) {
                     FirebaseMessaging.getInstance().subscribeToTopic("news");
                     Log.d(LOG_TAG, "onCheckedChanged: subscribed");
