@@ -288,7 +288,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        enableRefreshLayout();
+        swipeRefreshLayout.setRefreshing(false);
         if(facilityList.size() > 0) {
             Snackbar.make(getView(), "Unable to refresh VA facilities", Snackbar.LENGTH_SHORT).show();
         } else {
