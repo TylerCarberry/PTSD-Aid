@@ -71,7 +71,7 @@ public abstract class NewsLoader {
                     int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
                     if (numberOfResults == 0) {
-                        errorLoadingResults("Unable to load the news. Check you internet connection.");
+                        errorLoadingResults(fragment.getString(R.string.error_load_news));
                         return;
                     }
 
