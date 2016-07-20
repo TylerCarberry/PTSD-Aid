@@ -3,6 +3,7 @@ package com.tytanapps.ptsd.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +30,11 @@ import com.tytanapps.ptsd.Utilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+
 
 public class NewsFragment extends AnalyticsFragment {
 
@@ -38,14 +44,12 @@ public class NewsFragment extends AnalyticsFragment {
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Unbinder unbinder;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.news_progressbar) ProgressBar loadingProgressBar;
+    @BindView(R.id.news_loading_textview) TextView loadingTextView;
+    @BindView(R.id.retry_load_button) Button retryLoadButton;
 
     public NewsFragment() {
 
@@ -54,10 +58,6 @@ public class NewsFragment extends AnalyticsFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -66,18 +66,17 @@ public class NewsFragment extends AnalyticsFragment {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
 
-
-        //if(mParam1 != null) {
-        //    TextView messageTextView = (TextView) rootView.findViewById(R.id.news_textview);
-        //    messageTextView.setText(mParam1);
-        //}
-        //
-
-        // Required empty public constructor
         newsLoader = setupNewsLoader(rootView);
-        setupRefreshLayout(rootView);
+        setupRefreshLayout();
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -155,46 +154,42 @@ public class NewsFragment extends AnalyticsFragment {
         for(News news : loadedNews) {
             newsList.add(news);
         }
-        setupRecyclerView(getView());
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setRefreshing(false);
-        swipeRefreshLayout.setEnabled(true);
+        setupRecyclerView();
+        enableRefreshLayout();
 
         // Hide the progress bar
-        rootView.findViewById(R.id.news_progressbar).setVisibility(View.GONE);
+        loadingProgressBar.setVisibility(View.GONE);
 
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }
 
+    private void enableRefreshLayout() {
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(true);
+    }
+
     /**
      * Setup the RecyclerView and link it to the NewsAdapter
      */
-    private void setupRecyclerView(View rootView) {
-        if(rootView != null) {
-            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(mAdapter);
-        }
+    private void setupRecyclerView() {
+        mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
     /**
      * Setup the refresh layout to refresh on swipe down past the first item
-     * @param rootView The root view of the fragment containing the refresh layout
      */
-    private void setupRefreshLayout(View rootView) {
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-
+    private void setupRefreshLayout() {
+        swipeRefreshLayout.setEnabled(false);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 // Refresh items
-                newsList.clear();
                 mAdapter.notifyDataSetChanged();
 
                 Thread t = new Thread(new Runnable() {
@@ -206,18 +201,13 @@ public class NewsFragment extends AnalyticsFragment {
                 t.run();
             }
         });
-        swipeRefreshLayout.setEnabled(false);
     }
 
     /**
      * Scroll the facility recycler view to the top
      */
     private void scrollFacilityListToTop() {
-        View rootView = getView();
-        if(rootView != null) {
-            RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-            recyclerView.scrollToPosition(0);
-        }
+        recyclerView.scrollToPosition(0);
     }
 
     /**
@@ -225,40 +215,24 @@ public class NewsFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        View rootView = getView();
-        if(rootView != null) {
-            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.news_loading_textview);
-            if(loadingTextview != null) {
-                loadingTextview.setVisibility(View.VISIBLE);
-                loadingTextview.setText(errorMessage);
-            }
+        swipeRefreshLayout.setRefreshing(false);
+        if (newsList.size() > 0) {
+            Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
+        } else {
+            loadingTextView.setVisibility(View.VISIBLE);
+        loadingTextView.setText(errorMessage);
+        loadingProgressBar.setVisibility(View.INVISIBLE);
+        retryLoadButton.setVisibility(View.VISIBLE);
+    }
+    }
 
-            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.news_progressbar);
-            if(loadingProgressbar != null) {
-                loadingProgressbar.setVisibility(View.INVISIBLE);
-            }
+    @OnClick(R.id.retry_load_button) public void retryLoadNews() {
+        retryLoadButton.setVisibility(View.INVISIBLE);
 
-            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
-            if(retryButton != null) {
-                retryButton.setVisibility(View.VISIBLE);
+        loadingTextView.setText("");
+        loadingTextView.setVisibility(View.INVISIBLE);
+        loadingProgressBar.setVisibility(View.VISIBLE);
 
-                retryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View retryButton) {
-                        retryButton.setVisibility(View.INVISIBLE);
-
-                        if(loadingTextview != null) {
-                            loadingTextview.setText("");
-                            loadingTextview.setVisibility(View.INVISIBLE);
-                        }
-                        if(loadingProgressbar != null)
-                            loadingProgressbar.setVisibility(View.VISIBLE);
-
-                        newsLoader.loadNews();
-                    }
-                });
-
-            }
-        }
+        newsLoader.loadNews();
     }
 }
