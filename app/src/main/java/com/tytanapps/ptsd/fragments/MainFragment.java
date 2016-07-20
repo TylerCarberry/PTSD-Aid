@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,16 +32,24 @@ import com.tytanapps.ptsd.Utilities;
 
 import java.io.UnsupportedEncodingException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+
 
 /**
  * The main fragment displayed when you launch the app. Prompts the user for their emotion
  * and gives them recommendations based on their answer.
  */
 public class MainFragment extends AnalyticsFragment {
-
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
-
     private boolean firebaseDatabaseLoaded = false;
+
+    private Unbinder unbinder;
+    @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
+    @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
+    @BindView(R.id.main_header_text_view) TextView headerTextView;
 
     public MainFragment() {
         // Required empty public constructor
@@ -58,6 +67,7 @@ public class MainFragment extends AnalyticsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
         setupEmotions(rootView);
         return rootView;
     }
@@ -72,6 +82,12 @@ public class MainFragment extends AnalyticsFragment {
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     /**
@@ -91,22 +107,7 @@ public class MainFragment extends AnalyticsFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        View.OnClickListener emotionSelectedListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emotionSelected(v);
-            }
-        };
-
-        rootView.findViewById(R.id.happy_face).setOnClickListener(emotionSelectedListener);
-        rootView.findViewById(R.id.ok_face).setOnClickListener(emotionSelectedListener);
-        rootView.findViewById(R.id.sad_face).setOnClickListener(emotionSelectedListener);
-
-        if(Utilities.getRemoteConfigBoolean(this, R.string.rc_show_extra_emoji)) {
-            rootView.findViewById(R.id.sick_face).setOnClickListener(emotionSelectedListener);
-            rootView.findViewById(R.id.poop_emoji).setOnClickListener(emotionSelectedListener);
-        }
-        else {
+        if(!Utilities.getRemoteConfigBoolean(this, R.string.rc_show_extra_emoji)) {
             rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
@@ -174,13 +175,12 @@ public class MainFragment extends AnalyticsFragment {
      * When an emotion icon is tapped, show the corresponding recommendations and hide the other icons
      * @param emotionPressed The emotion icon that was tapped
      */
-    private void emotionSelected(final View emotionPressed) {
+    @OnClick({R.id.happy_face, R.id.ok_face, R.id.sad_face, R.id.sick_face, R.id.poop_emoji})
+    public void emotionSelected(final View emotionPressed) {
         View fragmentView = getView();
         if(fragmentView != null) {
-            final ViewGroup parentFrameLayout = (ViewGroup) fragmentView.findViewById(R.id.recommendations_container);
-            parentFrameLayout.setVisibility(View.INVISIBLE);
+            recommendationsContainer.setVisibility(View.INVISIBLE);
 
-            LinearLayout recommendationsLinearLayout = (LinearLayout) fragmentView.findViewById(R.id.recommendations_linear_layout);
             recommendationsLinearLayout.removeAllViews();
 
             // Remove on click listener from the emoji
@@ -245,7 +245,7 @@ public class MainFragment extends AnalyticsFragment {
             else {
                 fadeOutAllEmojiExcept(emotionPressed.getId());
                 animateOutEmotionPrompt();
-                animateInRecommendations(parentFrameLayout);
+                animateInRecommendations(recommendationsContainer);
             }
         }
     }
@@ -270,8 +270,6 @@ public class MainFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            LinearLayout recommendationsLinearLayout = (LinearLayout) rootView.findViewById(R.id.recommendations_linear_layout);
-
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
                                 recommendationsLinearLayout.addView(getSuggestionFromDatabase(child));
                             }
@@ -279,8 +277,7 @@ public class MainFragment extends AnalyticsFragment {
                             animateOutEmotionPrompt();
                             fadeOutAllEmojiExcept(id);
 
-                            ViewGroup parentFrameLayout = (ViewGroup) rootView.findViewById(R.id.recommendations_container);
-                            animateInRecommendations(parentFrameLayout);
+                            animateInRecommendations(recommendationsContainer);
                         }
                     }
                 });
@@ -608,7 +605,6 @@ public class MainFragment extends AnalyticsFragment {
             p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
             emotionsLinearLayout.setLayoutParams(p);
 
-            TextView headerTextView = (TextView) rootView.findViewById(R.id.main_header_text_view);
             headerTextView.setText(R.string.recommendations_title);
         }
     }
