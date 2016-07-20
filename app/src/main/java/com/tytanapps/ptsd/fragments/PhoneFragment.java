@@ -24,6 +24,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 
 /**
  * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
@@ -33,6 +37,10 @@ public class PhoneFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = PhoneFragment.class.getSimpleName();
 
+    private Unbinder unbinder;
+    @BindView(R.id.phone_linear_layout) LinearLayout phoneNumbersLinearLayout;
+
+
     public PhoneFragment() {
         // Required empty public constructor
     }
@@ -40,7 +48,15 @@ public class PhoneFragment extends AnalyticsFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_phone, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -70,7 +86,6 @@ public class PhoneFragment extends AnalyticsFragment {
     private void insertDefaultPhoneNumbers() {
         View rootView = getView();
         if(rootView != null) {
-            LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             insertPhoneCard(getString(R.string.veterans_crisis_line), getString(R.string.veterans_support_phone_details), getString(R.string.phone_veterans_crisis_line), inflater, phoneNumbersLinearLayout, R.drawable.veterans_crisis_line);
@@ -113,7 +128,6 @@ public class PhoneFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.phone_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {

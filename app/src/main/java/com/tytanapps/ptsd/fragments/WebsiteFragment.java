@@ -22,6 +22,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 
 /**
  * Displays a list of websites to find more information about PTSD. Shows a brief description for
@@ -31,6 +35,9 @@ public class WebsiteFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 
+    private Unbinder unbinder;
+    @BindView(R.id.website_linear_layout) LinearLayout websitesLinearLayout;
+
     public WebsiteFragment() {
         // Required empty public constructor
     }
@@ -38,7 +45,15 @@ public class WebsiteFragment extends AnalyticsFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_website, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_website, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -69,7 +84,6 @@ public class WebsiteFragment extends AnalyticsFragment {
     private void insertDefaultWebsites() {
         View rootView = getView();
         if(rootView != null) {
-            LinearLayout websitesLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
@@ -100,11 +114,10 @@ public class WebsiteFragment extends AnalyticsFragment {
                     public void run() {
                         View rootView = getView();
                         if(rootView != null) {
-                            LinearLayout websiteLinearLayout = (LinearLayout) rootView.findViewById(R.id.website_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertFirebaseWebCard(child, websiteLinearLayout, inflater);
+                                insertFirebaseWebCard(child, websitesLinearLayout, inflater);
                             }
                         }
                     }

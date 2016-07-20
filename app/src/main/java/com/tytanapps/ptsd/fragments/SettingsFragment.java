@@ -1,5 +1,6 @@
 package com.tytanapps.ptsd.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -134,14 +135,10 @@ public class SettingsFragment extends PreferenceFragment {
         provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-
                 EasyLicensesDialog easyLicensesDialog = new EasyLicensesDialog(getActivity());
                 easyLicensesDialog.setTitle(getString(R.string.licenses));
                 easyLicensesDialog.setCancelable(true);
                 easyLicensesDialog.show(); //show the dialog
-
-
-                // /Toast.makeText(getActivity(), "TODO", Toast.LENGTH_SHORT).show();
 
                 return true;
             }
@@ -176,6 +173,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         appInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             int tapNumber = 0;
+
+            @SuppressLint("ShowToast")
             Toast toast = Toast.makeText(getActivity(), "", Toast.LENGTH_LONG);
 
             @Override

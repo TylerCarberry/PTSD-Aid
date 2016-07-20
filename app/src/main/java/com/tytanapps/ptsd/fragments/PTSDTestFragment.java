@@ -18,6 +18,9 @@ import android.widget.TextView;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.techery.progresshint.ProgressHintDelegate;
 
 import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
@@ -32,6 +35,10 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
 
+    private Unbinder unbinder;
+    @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
+
+
     public PTSDTestFragment() {
         // Required empty public constructor
     }
@@ -40,8 +47,15 @@ public class PTSDTestFragment extends AnalyticsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
-        setupQuestionsLayout(rootView);
+        unbinder = ButterKnife.bind(this, rootView);
+        setupQuestionsLayout();
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -65,11 +79,8 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
     /**
      * Add the prompt and the questions to the layout
-     * @param rootView The root view of the fragment containing the questions layout
      */
-    private void setupQuestionsLayout(View rootView) {
-        LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-
+    private void setupQuestionsLayout() {
         if(getRemoteConfigBoolean(this, R.string.rc_questions_sticky)) {
             TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
             headerTextView.setTag("sticky");
@@ -297,8 +308,6 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
         View rootView = getView();
         if(rootView != null) {
-            LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-
             for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
                 View childView = questionsLinearLayout.getChildAt(i);
 
