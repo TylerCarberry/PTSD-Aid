@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -35,6 +36,11 @@ import com.tytanapps.ptsd.Utilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+
 /**
  * Loads a list of nearby VA facilities that offer PTSD programs.
  * Displays the address, phone number, programs, and an image for each facility.
@@ -50,6 +56,13 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
     private List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
+
+    private Unbinder unbinder;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.facility_loading_textview) TextView loadingTextView;
+    @BindView(R.id.facility_progressbar) ProgressBar loadingProgressBar;
+    @BindView(R.id.retry_load_button) Button retryLoadButton;
 
     public FacilitiesFragment() {
         // Required default constructor
@@ -71,9 +84,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
             }
 
             @Override
-            public void onLoadedImage(int facilityId) {
-
-            }
+            public void onLoadedImage(int facilityId) {}
         };
     }
 
@@ -82,8 +93,15 @@ public class FacilitiesFragment extends AnalyticsFragment {
         setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
-        setupRefreshLayout(rootView);
+        unbinder = ButterKnife.bind(this, rootView);
+        swipeRefreshLayout.setEnabled(false);
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     /**
@@ -140,11 +158,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Scroll the facility recycler view to the top
      */
     private void scrollFacilityListToTop() {
-        View rootView = getView();
-        if(rootView != null) {
-            RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-            recyclerView.scrollToPosition(0);
-        }
+        recyclerView.scrollToPosition(0);
     }
 
     /**
@@ -164,49 +178,37 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        View rootView = getView();
-        if(rootView != null) {
-            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-
-            mAdapter = new FacilityAdapter(facilityList, this, Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(mAdapter);
-        }
-    }
-
-    /**
-     * Setup the refresh layout to refresh on swipe down past the first item
-     * @param rootView The root view of the fragment containing the refresh layout
-     */
-    private void setupRefreshLayout(View rootView) {
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-
+        mAdapter = new FacilityAdapter(facilityList, this, Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
-                facilityList.clear();
-                mAdapter.notifyDataSetChanged();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        facilityLoader.refresh();
-                    }
-                });
-                t.run();
+                refreshFacilities();
             }
         });
-        swipeRefreshLayout.setEnabled(false);
+
+    }
+
+    public void refreshFacilities() {
+        // Refresh items
+        mAdapter.notifyDataSetChanged();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                facilityLoader.refresh();
+            }
+        });
+        t.run();
     }
 
     /**
      * When all of the facilities have fully loaded, sort them by distance and display them to the user
      */
     private void allFacilitiesHaveLoaded(final List<Facility> facilities) {
-
         hideLoadingBar();
 
         facilityList.clear();
@@ -225,12 +227,8 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Enable the refresh layout and stop the refreshing animation
      */
     private void enableRefreshLayout() {
-        View rootView = getView();
-        if(rootView != null) {
-            SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-            swipeRefreshLayout.setRefreshing(false);
-            swipeRefreshLayout.setEnabled(true);
-        }
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(true);
     }
 
     /**
@@ -290,41 +288,24 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        View rootView = getView();
-        if(rootView != null) {
-            final TextView loadingTextview = (TextView) rootView.findViewById(R.id.facility_loading_textview);
-            if(loadingTextview != null) {
-                loadingTextview.setVisibility(View.VISIBLE);
-                loadingTextview.setText(errorMessage);
-            }
-
-            final ProgressBar loadingProgressbar = (ProgressBar) rootView.findViewById(R.id.facility_progressbar);
-            if(loadingProgressbar != null) {
-                loadingProgressbar.setVisibility(View.INVISIBLE);
-            }
-
-            Button retryButton = (Button) rootView.findViewById(R.id.retry_load_button);
-            if(retryButton != null) {
-                retryButton.setVisibility(View.VISIBLE);
-
-                retryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View retryButton) {
-                        retryButton.setVisibility(View.INVISIBLE);
-
-                        if(loadingTextview != null) {
-                            loadingTextview.setText("");
-                            loadingTextview.setVisibility(View.INVISIBLE);
-                        }
-                        if(loadingProgressbar != null)
-                            loadingProgressbar.setVisibility(View.VISIBLE);
-
-                        loadFacilities();
-                    }
-                });
-
-            }
+        enableRefreshLayout();
+        if(facilityList.size() > 0) {
+            Snackbar.make(getView(), "Unable to refresh VA facilities", Snackbar.LENGTH_SHORT).show();
+        } else {
+            loadingTextView.setVisibility(View.VISIBLE);
+            loadingTextView.setText(errorMessage);
+            retryLoadButton.setVisibility(View.VISIBLE);
+            loadingProgressBar.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @OnClick(R.id.retry_load_button) public void retryLoadFacilities() {
+        retryLoadButton.setVisibility(View.INVISIBLE);
+        loadingTextView.setText("");
+        loadingTextView.setVisibility(View.INVISIBLE);
+        loadingProgressBar.setVisibility(View.VISIBLE);
+
+        loadFacilities();
     }
 
     private void loadFacilities() {
@@ -338,16 +319,8 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Remove the loading progress bar and TextView
      */
     private void hideLoadingBar() {
-        View rootView = getView();
-        if(rootView != null) {
-            View loadingTextView = rootView.findViewById(R.id.facility_loading_textview);
-            if (loadingTextView != null)
-                loadingTextView.setVisibility(View.GONE);
-
-            View loadingProgressbar = rootView.findViewById(R.id.facility_progressbar);
-            if (loadingProgressbar != null)
-                loadingProgressbar.setVisibility(View.GONE);
-        }
+        loadingTextView.setVisibility(View.GONE);
+        loadingProgressBar.setVisibility(View.GONE);
     }
 
     /**
