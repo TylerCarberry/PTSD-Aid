@@ -1,6 +1,7 @@
 import com.android.ddmlib.DdmPreferences
 
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 24
@@ -58,6 +59,8 @@ dependencies {
     compile 'io.doorbell:android-sdk:0.2.6@aar'
     compile 'com.github.marcoscgdev.EasyLicensesDialog:appcompatversion:1.0.4'
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
+    compile 'com.jakewharton:butterknife:8.2.1'
+    apt 'com.jakewharton:butterknife-compiler:8.2.1'
 
     testCompile 'junit:junit:4.12'
 

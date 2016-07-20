@@ -21,7 +21,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -76,6 +75,9 @@ import com.tytanapps.ptsd.fragments.WebsiteFragment;
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
 import io.doorbell.android.Doorbell;
 
 /**
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -129,9 +132,6 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the side drawer layout containing the user's information and navigation items
         setupDrawerLayout();
-
-        // Set up the trusted contact button
-        setupFAB();
 
         // Set up the connection to the Google API Client. This does not sign in the user.
         setupGoogleSignIn();
@@ -434,37 +434,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Set up the floating action button in the bottom of the app
-     * When pressed, call the trusted contact if it exists. If not, show the create contact dialog
-     */
-    private void setupFAB() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        if(fab != null) {
-            // Call the trusted contact if it exists, otherwise show the create contact dialog
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                    if (!phoneNumber.equals(""))
-                        openDialer(phoneNumber);
-                    else
-                        showCreateTrustedContactDialog();
-                }
-            });
-
-            // If you press and hold on the button, change the trusted contact
-            fab.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    showChangeTrustedContactDialog();
-                    return true;
-                }
-            });
-        }
-    }
-
-    /**
      * Create the client to connect with the Google sign in API
      */
     private void setupGoogleSignIn() {
@@ -637,6 +606,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Call the trusted contact. Show the create trusted contact dialog if not created
+     */
+    @OnClick(R.id.fab) public void callTrustedContact() {
+        String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        if (!phoneNumber.equals(""))
+            openDialer(phoneNumber);
+        else
+            showCreateTrustedContactDialog();
+    }
+
+    /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
     public void showCreateTrustedContactDialog() {
@@ -659,7 +639,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    protected void showChangeTrustedContactDialog() {
+    @OnLongClick(R.id.fab) protected boolean showChangeTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton(R.string.change_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
@@ -685,6 +665,8 @@ public class MainActivity extends AppCompatActivity
         }
         else
             showCreateTrustedContactDialog();
+
+        return true;
     }
 
     /**
