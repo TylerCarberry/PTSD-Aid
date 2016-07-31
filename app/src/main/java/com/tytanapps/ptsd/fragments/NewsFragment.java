@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.News;
@@ -47,7 +46,7 @@ public class NewsFragment extends AnalyticsFragment {
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.news_progressbar) ProgressBar loadingProgressBar;
+    @BindView(R.id.news_progressbar) View loadingProgressBar;
     @BindView(R.id.news_loading_textview) TextView loadingTextView;
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 

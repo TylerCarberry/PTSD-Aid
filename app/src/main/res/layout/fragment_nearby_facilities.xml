@@ -7,12 +7,16 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".fragments.FacilitiesFragment">
 
-    <ProgressBar
+    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
         android:id="@+id/facility_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        app:crs_pl_style="ball_pulse_sync"
+        app:crs_pl_size="small"
+        app:crs_pl_fg_color="@color/colorPrimaryDark"
+        app:crs_pl_bg_color="#fff"/>
 
     <TextView
         android:id="@+id/facility_loading_textview"

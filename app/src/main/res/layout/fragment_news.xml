@@ -2,14 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.tytanapps.ptsd.fragments.NewsFragment">
 
-    <ProgressBar
+    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
         android:id="@+id/news_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        app:crs_pl_style="ball_pulse_sync"
+        app:crs_pl_size="small"
+        app:crs_pl_fg_color="@color/colorPrimaryDark"
+        app:crs_pl_bg_color="#fff"/>
 
     <TextView
         android:id="@+id/news_loading_textview"
