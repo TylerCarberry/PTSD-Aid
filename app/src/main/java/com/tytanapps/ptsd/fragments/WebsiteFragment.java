@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
@@ -19,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
@@ -144,10 +144,9 @@ public class WebsiteFragment extends AnalyticsFragment {
         String name = (String) snapshot.child("name").getValue();
         String desc = (String) snapshot.child("description").getValue();
         String url = (String) snapshot.child("url").getValue();
-        String bitmap_base64 = (String) snapshot.child("icon").getValue();
-        Bitmap bmp = Utilities.decodeBitmap(bitmap_base64);
+        String icon_url = (String) snapshot.child("icon_url").getValue();
 
-        insertWebCard(name, desc, url, bmp, inflater, websitesLinearLayout);
+        insertWebCard(name, desc, url, icon_url, inflater, websitesLinearLayout);
     }
 
     /**
@@ -155,11 +154,11 @@ public class WebsiteFragment extends AnalyticsFragment {
      * @param name The name of the website
      * @param desc The description of the website
      * @param url The url of the website
-     * @param bmp A bitmap of the logo to show
+     * @param icon_url The url of the icon resource
      * @param inflater The inflater to inflate the card
      * @param websitesLinearLayout The linear layout to add the website to
      */
-    private void insertWebCard(String name, String desc, String url, Bitmap bmp, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
+    private void insertWebCard(String name, String desc, String url, String icon_url, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
         CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
         TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
@@ -169,7 +168,9 @@ public class WebsiteFragment extends AnalyticsFragment {
         detailsTextView.setText(desc);
 
         ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-        iconImageView.setImageBitmap(bmp);
+        //iconImageView.setImageBitmap(bmp);
+
+        Picasso.with(getActivity()).load(icon_url).into(iconImageView);
     }
 
     /**

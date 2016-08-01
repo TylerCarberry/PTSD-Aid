@@ -1,11 +1,8 @@
 package com.tytanapps.ptsd.fragments;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
@@ -158,12 +156,9 @@ public class PhoneFragment extends AnalyticsFragment {
         String name = (String) phoneDataSnapshot.child("name").getValue();
         String desc = (String) phoneDataSnapshot.child("description").getValue();
         String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
-        String bitmap_base64 = (String) phoneDataSnapshot.child("icon").getValue();
+        String iconUrl = (String) phoneDataSnapshot.child("icon_url").getValue();
 
-        byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
-        Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-
-        insertPhoneCard(name, desc, phone, inflater, phoneNumbersLinearLayout, bmp);
+        insertPhoneCard(name, desc, phone, inflater, phoneNumbersLinearLayout, iconUrl);
     }
 
     /**
@@ -173,9 +168,9 @@ public class PhoneFragment extends AnalyticsFragment {
      * @param phone The phone number
      * @param inflater The inflater to inflate the cardview with
      * @param phoneNumbersLinearLayout The linear layout containing the phone numbers
-     * @param imageBitmap The logo as a bitmap
+     * @param iconUrl The url of the icon
      */
-    private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, Bitmap imageBitmap) {
+    private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, String iconUrl) {
         CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
         TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
@@ -185,7 +180,7 @@ public class PhoneFragment extends AnalyticsFragment {
         phoneTextView.setText(phone);
 
         ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
-        iconImageView.setImageBitmap(imageBitmap);
+        Picasso.with(getActivity()).load(iconUrl).into(iconImageView);
     }
 
     /**
