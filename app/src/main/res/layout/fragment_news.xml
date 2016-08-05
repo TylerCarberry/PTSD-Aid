@@ -5,16 +5,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.tytanapps.ptsd.fragments.NewsFragment">
 
-    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
+    <com.bhargavms.dotloader.DotLoader
         android:id="@+id/news_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        app:crs_pl_style="ball_pulse_sync"
-        app:crs_pl_size="small"
-        app:crs_pl_fg_color="@color/colorPrimaryDark"
-        app:crs_pl_bg_color="#fff"/>
+        android:layout_centerHorizontal="true"
+        app:color_array="@array/dot_colors"
+        app:dot_radius="12dp"
+        app:number_of_dots="3"/>
 
     <TextView
         android:id="@+id/news_loading_textview"
