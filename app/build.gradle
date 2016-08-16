@@ -2,6 +2,7 @@ import com.android.ddmlib.DdmPreferences
 
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
+apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 24
@@ -15,16 +16,32 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 27
-        versionName "1.8.5"
+        versionCode 30
+        versionName "1.8.7"
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            File propsFile = rootProject.file('app/keystore.properties')
+            Properties props = new Properties()
+            props.load(new FileInputStream(propsFile))
+
+            storeFile = file(props['storeFile'])
+            storePassword = props['storePassword']
+            keyAlias = props['keyAlias']
+            keyPassword = props['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
         }
     }
     adbOptions {
@@ -70,6 +87,10 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+}
+
+play {
+    jsonFile = file('keys.json')
 }
 
 apply plugin: 'com.google.gms.google-services'
