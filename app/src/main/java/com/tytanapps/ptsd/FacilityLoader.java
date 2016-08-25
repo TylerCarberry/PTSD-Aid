@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -65,7 +66,7 @@ public abstract class FacilityLoader {
      * There are multiple PTSD programs per VA facility.
      */
     public void loadPTSDPrograms() {
-        String url = calculateVaAPIUrl();
+        String url = buildPTSDUrl();
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -173,7 +174,7 @@ public abstract class FacilityLoader {
      * @param numberOfFacilities The number of facilities that are being loaded
      */
     private void loadFacility(final Facility facility, final int numberOfFacilities) {
-        String url = calculateFacilityAPIURL(facility.getFacilityId(), fragment.getString(R.string.api_key_va_facilities));
+        String url = buildFacilityUrl(facility.getFacilityId(), fragment.getString(R.string.api_key_va_facilities));
 
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -323,11 +324,11 @@ public abstract class FacilityLoader {
      * @param facility The facility
      */
     private void loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
-        String url = "";
+        String url;
 
         // If the street view url cannot be created, load the map view instead
         try {
-            url = calculateStreetViewAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
+            url = buildStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
         } catch (UnsupportedEncodingException e) {
             FirebaseCrash.report(e);
             loadMapImage(facility, imageWidth, imageHeight);
@@ -375,7 +376,7 @@ public abstract class FacilityLoader {
 
         String url;
         try {
-            url = calculateMapAPIUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
+            url = buildMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
         } catch (UnsupportedEncodingException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
@@ -545,13 +546,16 @@ public abstract class FacilityLoader {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateStreetViewAPIUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
-        String url = "https://maps.googleapis.com/maps/api/streetview?size=" +
-                imageWidth + "x" + imageHeight + "&location=";
+    private String buildStreetViewUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
+        String location = encodeAddress(address, town, state);
 
-        // Encode the address
-        String params = address + ", " + town + ", " + state;
-        return url + URLEncoder.encode(params, "UTF-8");
+        Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview")
+                .buildUpon()
+                .appendQueryParameter("size", imageWidth+"x"+imageHeight)
+                .appendQueryParameter("location", location)
+                .build();
+
+        return builtUri.toString();
     }
 
     /**
@@ -562,27 +566,34 @@ public abstract class FacilityLoader {
      * @return The url for the street view api
      * @throws UnsupportedEncodingException If the address cannot be encoded into a url
      */
-    private String calculateMapAPIUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
-        String url = "http://maps.google.com/maps/api/staticmap?center=";
+    private String buildMapUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
+        String location = encodeAddress(address, town, state);
 
-        // Encode the address
-        String paramLocation = address + ", " + town + ", " + state;
-        paramLocation = URLEncoder.encode(paramLocation, "UTF-8");
+        Uri mapUri = Uri.parse("http://maps.google.com/maps/api/staticmap")
+                .buildUpon()
+                .appendQueryParameter("center", location)
+                .appendQueryParameter("zoom", "16")
+                .appendQueryParameter("size", imageWidth+"x"+imageHeight)
+                .appendQueryParameter("sensor", "false")
+                .appendQueryParameter("markers", "color:redzlabel:A%7C\" + paramLocation")
+                .build();
 
-        // Place a red marker over the location
-        url += paramLocation + "&zoom=16&size=" + imageWidth + "x" + imageHeight
-                + "&sensor=false&markers=color:redzlabel:A%7C" + paramLocation;
-
-        return url;
+        return mapUri.toString();
     }
 
     /**
      * Get the url for the PTSD Programs API
      * @return The url for the PTSD Programs API
      */
-    private String calculateVaAPIUrl() {
-        return "http://www.va.gov/webservices/PTSD/ptsd.cfc?method=PTSD_Program_Locator_array&license="
-                + fragment.getString(R.string.api_key_ptsd_programs) + "&ReturnFormat=JSON";
+    private String buildPTSDUrl() {
+        Uri builtUri = Uri.parse("http://www.va.gov/webservices/PTSD/ptsd.cfc")
+                .buildUpon()
+                .appendQueryParameter("method", "PTSD_Program_Locator_array")
+                .appendQueryParameter("license", fragment.getString(R.string.api_key_ptsd_programs))
+                .appendQueryParameter("ReturnFormat", "JSON")
+                .build();
+
+        return builtUri.toString();
     }
 
     /**
@@ -591,9 +602,23 @@ public abstract class FacilityLoader {
      * @param licenceKey The API licence key
      * @return The url for the VA facility API
      */
-    private String calculateFacilityAPIURL(int facilityId, String licenceKey) {
-        return "http://www.va.gov/webservices/fandl/facilities.cfc?method=GetFacsDetailByFacID_array&fac_id="
-                + facilityId + "&license=" + licenceKey + "&ReturnFormat=JSON";
+    private String buildFacilityUrl(int facilityId, String licenceKey) {
+        Uri builtUri = Uri.parse("http://www.va.gov/webservices/fandl/facilities.cfc")
+                .buildUpon()
+                .appendQueryParameter("method", "GetFacsDetailByFacID_array")
+                .appendQueryParameter("fac_id", ""+facilityId)
+                .appendQueryParameter("license", licenceKey)
+                .appendQueryParameter("ReturnFormat", "JSON")
+                .build();
+
+        return builtUri.toString();
+    }
+
+    private String encodeAddress(String address, String town, String state) throws UnsupportedEncodingException {
+        // Encode the address
+        String location = address + ", " + town + ", " + state;
+        location = URLEncoder.encode(location, "UTF-8");
+        return location;
     }
 
     /**
