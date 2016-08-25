@@ -928,16 +928,18 @@ public class MainActivity extends AppCompatActivity
      * @param newFragment The fragment to switch to
      */
     public void switchFragment(Fragment newFragment) {
-        if(!(newFragment.getClass().equals(currentFragment.getClass()))) {
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if(newFragment != null) {
+            if (!(newFragment.getClass().equals(currentFragment.getClass()))) {
+                android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
+                // Replace whatever is in the fragment_container view with this fragment
+                transaction.replace(R.id.fragment_container, newFragment);
+                transaction.addToBackStack(null);
 
-            // Commit the transaction
-            transaction.commit();
-            currentFragment = newFragment;
+                // Commit the transaction
+                transaction.commit();
+                currentFragment = newFragment;
+            }
         }
     }
 

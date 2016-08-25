@@ -609,8 +609,11 @@ public abstract class FacilityLoader {
      * @return Whether the response was a valid street view image
      */
     private boolean validStreetViewBitmap(Bitmap streetViewResponse) {
-        int pixel = streetViewResponse.getPixel(100, 100);
-        return pixel != -1776674;
+        if(streetViewResponse.getWidth() > 100 && streetViewResponse.getHeight() > 100) {
+            int pixel = streetViewResponse.getPixel(100, 100);
+            return pixel != -1776674;
+        }
+        return false;
     }
 
     /**

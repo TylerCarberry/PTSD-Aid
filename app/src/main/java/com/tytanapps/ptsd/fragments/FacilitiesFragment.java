@@ -226,8 +226,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Enable the refresh layout and stop the refreshing animation
      */
     private void enableRefreshLayout() {
-        swipeRefreshLayout.setRefreshing(false);
-        swipeRefreshLayout.setEnabled(true);
+        if(swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setEnabled(true);
+        }
     }
 
     /**
@@ -318,8 +320,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * Remove the loading progress bar and TextView
      */
     private void hideLoadingBar() {
-        loadingTextView.setVisibility(View.GONE);
-        loadingProgressBar.setVisibility(View.GONE);
+        if(loadingTextView != null) {
+            loadingTextView.setVisibility(View.GONE);
+            loadingProgressBar.setVisibility(View.GONE);
+        }
     }
 
     /**
