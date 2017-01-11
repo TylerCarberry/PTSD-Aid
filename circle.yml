@@ -12,18 +12,19 @@ machine:
     
   java:
     version: oraclejdk8
+    
+dependencies:
+    pre:
+        # The files containing API keys are not tracked in git
+        # Write them from environment variables
+        - echo $google_services_json4 > app/google-services.json
+        - echo $ids_xml_4 > app/src/main/res/values/ids.xml
+    
+        # Since it is only building the debug apk, the key values don't matter
+        - echo "storePassword=a \n keyPassword=b \n keyAlias=PTSD storeFile=/PTSD/PTSDkey.jks" > app/keystore.properties
 
     
 test:
   override:
-    # The files containing API keys are not tracked in git
-    # Write them from environment variables
-    - echo $google_services_json4 > app/google-services.json
-    - echo $ids_xml_4 > app/src/main/res/values/ids.xml
-    
-    # Since it is only building the debug apk, the key values don't matter
-    - echo "storePassword=a \n keyPassword=b \n keyAlias=PTSD storeFile=/PTSD/PTSDkey.jks" > app/keystore.properties
-    
-    
     - ./gradlew build:
         timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
