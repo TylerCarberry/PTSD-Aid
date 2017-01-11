@@ -3,6 +3,7 @@ import com.android.ddmlib.DdmPreferences
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 apply plugin: 'com.github.triplet.play'
+apply plugin: 'com.google.firebase.firebase-crash'
 
 android {
     compileSdkVersion 25
