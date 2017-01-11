@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Tyler on 6/26/16.
+ * Load the list of recent PTSD News Articles
+ * @author Tyler Carberry
  */
 public abstract class NewsLoader {
     private static final String LOG_TAG = NewsLoader.class.getSimpleName();
@@ -45,7 +46,6 @@ public abstract class NewsLoader {
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
     private static final int NEWS_TO_LOAD = 50;
-
 
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
@@ -211,7 +211,7 @@ public abstract class NewsLoader {
         Collections.sort(newsArrayList);
 
         onSuccess(newsArrayList);
-    };
+    }
 
     public void refresh() {
         numberOfLoadedArticles = 0;

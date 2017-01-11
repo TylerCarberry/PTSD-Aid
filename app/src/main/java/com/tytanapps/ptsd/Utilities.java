@@ -184,7 +184,7 @@ public class Utilities {
     }
 
     public static Bitmap drawableToBitmap (Drawable drawable) {
-        Bitmap bitmap = null;
+        Bitmap bitmap;
 
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
@@ -245,17 +245,17 @@ public class Utilities {
         return ((RemoteConfigurable)fragment.getActivity()).getRemoteConfig();
     }
 
-    public static boolean getRemoteConfigBoolean(@NonNull Fragment fragment, @NonNull int resId) {
+    public static boolean getRemoteConfigBoolean(@NonNull Fragment fragment, int resId) {
         FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
         return firebaseRemoteConfig.getBoolean(fragment.getString(resId));
     }
 
-    public static int getRemoteConfigInt(@NonNull Fragment fragment, @NonNull int resId) {
+    public static int getRemoteConfigInt(@NonNull Fragment fragment, int resId) {
         FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
         return (int) firebaseRemoteConfig.getDouble(fragment.getString(resId));
     }
 
-    public static double getRemoteConfigDouble(@NonNull Fragment fragment, @NonNull int resId) {
+    public static double getRemoteConfigDouble(@NonNull Fragment fragment, int resId) {
         FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
         return firebaseRemoteConfig.getDouble(fragment.getString(resId));
     }

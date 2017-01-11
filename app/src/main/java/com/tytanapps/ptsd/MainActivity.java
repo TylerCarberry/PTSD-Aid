@@ -80,6 +80,8 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.doorbell.android.Doorbell;
 
+import static com.tytanapps.ptsd.R.id.drawer_layout;
+
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
  * between them using the navigation view.
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         // Close the drawer layout if it is open
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -458,7 +460,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         if(drawer != null && toggle != null)
@@ -467,7 +469,7 @@ public class MainActivity extends AppCompatActivity
 
         // Add the header view containing the user's information
         LayoutInflater inflater = LayoutInflater.from(this);
-        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
+        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, rootViewGroup(), false);
         navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -629,7 +631,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, rootViewGroup(), false);
 
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setView(layout);
@@ -649,7 +651,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.change_trusted_contact_layout, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.change_trusted_contact_layout, rootViewGroup(), false);
 
         TextView currentContactTextView = (TextView) layout.findViewById(R.id.current_contact_textview);
 
@@ -871,7 +873,7 @@ public class MainActivity extends AppCompatActivity
      * Switch the fragment when a navigation item in the navigation pane is selected
      */
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment newFragment = null;
 
         // Switch to the appropriate fragment
@@ -917,7 +919,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void closeDrawerLayout() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         if(drawer != null)
             drawer.closeDrawer(GravityCompat.START);
     }
@@ -941,6 +943,13 @@ public class MainActivity extends AppCompatActivity
                 currentFragment = newFragment;
             }
         }
+    }
+
+    private ViewGroup rootViewGroup() {
+        View root = findViewById(R.id.drawer_layout);
+        if(root != null && root instanceof ViewGroup)
+            return (ViewGroup) root;
+        return null;
     }
 
     /**

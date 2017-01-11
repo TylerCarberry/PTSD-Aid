@@ -421,7 +421,7 @@ public abstract class FacilityLoader {
         Collections.sort(facilitiesList);
 
         onSuccess(facilitiesList);
-    };
+    }
 
     public void refresh() {
         numberOfLoadedFacilities = 0;
@@ -494,7 +494,7 @@ public abstract class FacilityLoader {
             facility = (Facility) input.readObject();
 
             double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
-            double distance = 0;
+            double distance;
 
             String description = "";
 

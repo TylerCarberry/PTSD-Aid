@@ -15,4 +15,4 @@ You can also find PTSD programs offered free of charge at local VA facilities. Q
 
 PTSD Aid also features a trusted contact button. Quickly call your trusted contact from every screen in the app. If you want to speak with a professional, PTSD Aid also provides phone numbers for veteran hotlines.
 
-![VA Facilities Scrrenshot](https://cloud.githubusercontent.com/assets/6628497/16568449/44fc921e-41f8-11e6-994c-5253a3d3e4f5.png)  ![Trusted Contact Screenshot](https://cloud.githubusercontent.com/assets/6628497/16568424/04a29aba-41f8-11e6-98ad-c016a7fe79e6.png)  ![Phone Numbers Screenshot](https://cloud.githubusercontent.com/assets/6628497/16568452/4f15cebe-41f8-11e6-9acd-c685bfd6b9b7.png)
+![VA Facilities Screenshot](https://cloud.githubusercontent.com/assets/6628497/16568449/44fc921e-41f8-11e6-994c-5253a3d3e4f5.png)  ![Trusted Contact Screenshot](https://cloud.githubusercontent.com/assets/6628497/16568424/04a29aba-41f8-11e6-98ad-c016a7fe79e6.png)  ![Phone Numbers Screenshot](https://cloud.githubusercontent.com/assets/6628497/16568452/4f15cebe-41f8-11e6-9acd-c685bfd6b9b7.png)
