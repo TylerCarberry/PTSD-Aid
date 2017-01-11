@@ -21,7 +21,7 @@ dependencies:
         - echo $ids_xml_4 > app/src/main/res/values/ids.xml
     
         # Since it is only building the debug apk, the key values don't matter
-        - echo "storePassword=a & keyPassword=b & keyAlias=PTSD & storeFile=/PTSD/PTSDkey.jks" > app/keystore.properties
+        (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
 
     
 test:
