@@ -14,19 +14,6 @@ machine:
     version: oraclejdk8
 
     
-dependencies:
-  pre:
-    # Update the avd
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all:
-        timeout: 3000  # Timeout after 50 minutes (Default 10 minutes)
-    
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22,sys-img-armeabi-v7a-google_apis-23,sys-img-armeabi-v7a-google_apis-22
-    
-    - echo y | android update sdk --all --no-ui --filter android-22
-    - echo y | android update sdk --all --no-ui --filter addon-google_apis-google-22 # Google APIs, use with sys-img-armeabi-v7a-addon-google_apis-google-22
-    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-addon-google_apis-google-22 # System image, requires android-22 and addon-google_apis-google-22, provides Google APIs
-    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-android-22 # System image, requires android-22
-
 test:
   override:
     # The files containing API keys are not tracked in git
@@ -34,32 +21,5 @@ test:
     - echo $google_services_json4 > app/google-services.json
     - echo $ids_xml_4 > app/src/main/res/values/ids.xml
     
-    # Create an avd with play services
-    # - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
-    
-    # Start the emulator
-    # - emulator -avd test -no-audio -no-window:
-    #     background: true
-    #    parallel: true
-    
-    # Wait for the emulator to have booted
-    # - circle-android wait-for-boot
-    # - sleep 60
-    
-    # Unlock the emulator screen
-    # - adb shell input keyevent 82
-    
-    # Run espresso tests on the emulator.
-    #- ./gradlew connectedAndroidTest -PdisablePreDex:
-    #    timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
-    
     - ./gradlew build:
         timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
-  
-  post:
-    # Collect the test reports
-    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find . -type f -regex ".*/app/build/outputs/androidTest-results/connected/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-    
-    # Collect artifacts
-    - cp -r . $CIRCLE_ARTIFACTS
