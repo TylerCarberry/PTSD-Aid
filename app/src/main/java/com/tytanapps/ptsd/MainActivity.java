@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String value = extras.getString("notification_action");
+            int value = extras.getString("notification_action");
             if(value != null && value.equals("unsubscribe")) {
                 unsubscribeNewsNotifications();
                 Snackbar.make(findViewById(R.id.fragment_container), R.string.unsubscribed_news_message, Snackbar.LENGTH_LONG).show();
