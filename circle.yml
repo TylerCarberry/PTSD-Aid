@@ -12,54 +12,28 @@ machine:
     
   java:
     version: oraclejdk8
-
     
 dependencies:
-  pre:
-    # Update the avd
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all:
-        timeout: 3000  # Timeout after 50 minutes (Default 10 minutes)
+    cache_directories:
+        - ~/.android
+        - ~/android
+    pre:
+        # The files containing API keys are not tracked in git
+        # Write them from environment variables
+        - echo $google_services_json4 > app/google-services.json
+        - echo $ids_xml_4 > app/src/main/res/values/ids.xml
     
-    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23,android-22,sys-img-armeabi-v7a-google_apis-23,sys-img-armeabi-v7a-google_apis-22
-    
-    - echo y | android update sdk --all --no-ui --filter android-22
-    - echo y | android update sdk --all --no-ui --filter addon-google_apis-google-22 # Google APIs, use with sys-img-armeabi-v7a-addon-google_apis-google-22
-    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-addon-google_apis-google-22 # System image, requires android-22 and addon-google_apis-google-22, provides Google APIs
-    - echo y | android update sdk --all --no-ui --filter sys-img-armeabi-v7a-android-22 # System image, requires android-22
+        # Since it is only building the debug apk, the key values don't matter
+        - (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
+        
+        # Accept the licenses. See http://stackoverflow.com/questions/38096225/automatically-accept-all-sdk-licences
+        # This will break when Google updates the license text
+        - mkdir "$ANDROID_HOME/licenses" || true
+        - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+        - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 
+    
 test:
   override:
-    # The files containing API keys are not tracked in git
-    # Write them from environment variables
-    - echo $google_services_json4 > app/google-services.json
-    - echo $ids_xml_4 > app/src/main/res/values/ids.xml
-    
-    # Create an avd with play services
-    # - echo no | android create avd --force --name test --target "android-22" --abi "google_apis/armeabi-v7a"
-    
-    # Start the emulator
-    # - emulator -avd test -no-audio -no-window:
-    #     background: true
-    #    parallel: true
-    
-    # Wait for the emulator to have booted
-    # - circle-android wait-for-boot
-    # - sleep 60
-    
-    # Unlock the emulator screen
-    # - adb shell input keyevent 82
-    
-    # Run espresso tests on the emulator.
-    #- ./gradlew connectedAndroidTest -PdisablePreDex:
-    #    timeout: 1800 # Timeout after 30 minutes (Default 10 minutes)
-    
-    - ./gradlew build:
+    - ./gradlew assembleDebug:
         timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
-  
-  post:
-    # Collect the test reports
-    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find . -type f -regex ".*/app/build/outputs/androidTest-results/connected/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-    
-    # Collect artifacts
-    - cp -r . $CIRCLE_ARTIFACTS
