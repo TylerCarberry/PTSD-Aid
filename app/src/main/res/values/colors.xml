@@ -8,4 +8,10 @@
     <color name="transparent_white">#c3ffffff</color>
     <color name="white">#ffffff</color>
 
+    <array name="dot_colors">
+        <item>#03A9F4</item>
+        <item>#E65100</item>
+        <item>#FFBB00</item>
+    </array>
+
 </resources>

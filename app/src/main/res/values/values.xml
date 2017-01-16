@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="remote_config_cache_seconds">43200</integer>
+
+
+</resources>

@@ -1,5 +1,8 @@
 package com.tytanapps.ptsd;
 
+import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +12,7 @@ import java.util.Set;
  */
 public class Facility implements Comparable<Facility>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     // Every VA facility has a unique id
     private final int FACILITY_ID;
@@ -37,6 +40,8 @@ public class Facility implements Comparable<Facility>, Serializable {
     // The distance from the user in miles
     private double distance;
 
+    private Bitmap facilityImage;
+
     // The PTSD programs offered at that location
     private Set<String> programs;
 
@@ -54,7 +59,7 @@ public class Facility implements Comparable<Facility>, Serializable {
      * @param facilityId The unique id of the facility
      * @param name The name of the facility
      * @param description The description of the facility
-     * @param phoneNumber The phone number of the facililty
+     * @param phoneNumber The phone number of the facility
      * @param url The url for more information about the facility
      * @param streetAddress The street address of the facility
      * @param city The city the facility is located in
@@ -286,10 +291,17 @@ public class Facility implements Comparable<Facility>, Serializable {
 
     /**
      * Get all of the PTSD programs offered at the facility
-     * @return All of the PTSD prgrams offered at the facility
+     * @return All of the PTSD programs offered at the facility
      */
     public Set<String> getPrograms() {
         return programs;
+    }
+
+    public void setAddress(String streetAddress, String city, String state, String zipCode) {
+        this.streetAddress = streetAddress;
+        this.city = city;
+        this.state = state;
+        this.zip = zipCode;
     }
 
     /**
@@ -299,11 +311,19 @@ public class Facility implements Comparable<Facility>, Serializable {
      *         Negative if it is farther away. 0 if they have the same distance
      */
     @Override
-    public int compareTo(Facility another) {
+    public int compareTo(@NonNull Facility another) {
         if(getDistance() < another.getDistance())
             return -1;
         if(getDistance() > another.getDistance())
             return 1;
         return 0;
+    }
+
+    public Bitmap getFacilityImage() {
+        return facilityImage;
+    }
+
+    public void setFacilityImage(Bitmap facilityImage) {
+        this.facilityImage = facilityImage;
     }
 }

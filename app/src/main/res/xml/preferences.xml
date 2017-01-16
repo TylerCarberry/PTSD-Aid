@@ -1,0 +1,82 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Notifications">
+
+        <CheckBoxPreference
+            android:key="@string/pref_news_notification"
+            android:title="News Articles"
+            android:summary="Receive notifications for VA news" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Trusted Contact">
+
+        <CheckBoxPreference
+            android:key="enable_trusted_contact"
+            android:defaultValue="true"
+            android:title="Enable trusted contact"
+            android:summary="Show the trusted contact button" />
+
+        <PreferenceScreen
+            android:key="change_trusted_contact"
+            android:title="Modify trusted contact"
+            android:summary="Change your trusted contact"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:dependency="enable_trusted_contact">
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Feedback">
+
+        <PreferenceScreen
+            android:key="provide_feedback"
+            android:title="Provide Feedback"
+            android:summary="Contact developer">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="Enjoying the app?"
+            android:summary="Please rate on Google Play">
+
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://play.google.com/store/apps/details?id=com.tytanapps.ptsd" />
+
+        </PreferenceScreen>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="About">
+
+        <PreferenceScreen
+            android:title="This app is open source"
+            android:summary="View the code on github">
+
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://www.github.com/TylerCarberry/PTSD-Aid" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="licenses"
+            android:title="View licenses"
+            android:summary="View the licenses used">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="app_info"
+            android:title="PTSD Aid"
+            android:summary="Version: #">
+        </PreferenceScreen>
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

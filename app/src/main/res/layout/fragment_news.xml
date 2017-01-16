@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.tytanapps.ptsd.fragments.NewsFragment">
+
+    <com.bhargavms.dotloader.DotLoader
+        android:id="@+id/news_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        app:color_array="@array/dot_colors"
+        app:dot_radius="12dp"
+        app:number_of_dots="3"/>
+
+    <TextView
+        android:id="@+id/news_loading_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:layout_above="@id/news_progressbar"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/retry_load_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/button"
+        android:layout_below="@id/news_loading_textview"
+        android:layout_centerHorizontal="true"
+        android:text="@string/retry"
+        android:visibility="invisible"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</RelativeLayout>

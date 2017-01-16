@@ -4,12 +4,15 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,8 +21,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,7 +37,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -55,23 +57,41 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.tytanapps.ptsd.fragments.FacilitiesFragment;
+import com.tytanapps.ptsd.fragments.MainFragment;
+import com.tytanapps.ptsd.fragments.NewsFragment;
+import com.tytanapps.ptsd.fragments.PTSDTestFragment;
+import com.tytanapps.ptsd.fragments.PhoneFragment;
+import com.tytanapps.ptsd.fragments.ResourcesFragment;
+import com.tytanapps.ptsd.fragments.SettingsFragment;
+import com.tytanapps.ptsd.fragments.WebsiteFragment;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
+import io.doorbell.android.Doorbell;
+
+import static com.tytanapps.ptsd.R.id.drawer_layout;
 
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
  * between them using the navigation view.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
+        implements  NavigationView.OnNavigationItemSelectedListener,
+                    GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
 
+    // The tag used in log statements
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
-    private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     // The connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
@@ -87,16 +107,38 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RC_SIGN_IN = 1;
     private static final int PICK_CONTACT_REQUEST = 2;
+    private static final int PERMISSION_CONTACT_REQUEST = 4;
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private boolean alreadySetPersistence = false;
+
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String value = extras.getString("notification_action");
+            if(value != null && value.equals("unsubscribe")) {
+                unsubscribeNewsNotifications();
+                Snackbar.make(findViewById(R.id.fragment_container), R.string.unsubscribed_news_message, Snackbar.LENGTH_LONG).show();
+
+                // Dismiss the notification
+                NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+                manager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID);
+            }
+        }
+
+        // Set up the side drawer layout containing the user's information and navigation items
+        setupDrawerLayout();
+
+        // Set up the connection to the Google API Client. This does not sign in the user.
+        setupGoogleSignIn();
+
+        setupRemoteConfig();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -106,8 +148,17 @@ public class MainActivity extends AppCompatActivity
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
             if (savedInstanceState == null) {
-                // Create a new Fragment to be placed in the activity layout
-                MainFragment firstFragment = new MainFragment();
+                Fragment firstFragment;
+
+                if (extras != null && extras.getString("fragment") != null) {
+                    firstFragment = getFirstFragment(extras.getString("fragment"));
+                }
+                else {
+                    firstFragment = new MainFragment();
+
+                    if(!BuildConfig.DEBUG)
+                        showRatingPrompt();
+                }
 
                 // In case this activity was started with special instructions from an
                 // Intent, pass the Intent's extras to the fragment as arguments
@@ -116,26 +167,97 @@ public class MainActivity extends AppCompatActivity
                 // Add the fragment to the 'fragment_container' FrameLayout
                 getFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, firstFragment).commit();
+
+                currentFragment = firstFragment;
             }
         }
 
-        if(!alreadySetPersistence) {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            alreadySetPersistence = true;
+        makeFirebaseDatabasePersistent();
+
+        if(BuildConfig.DEBUG) {
+            ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
+            //Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
+            FirebaseMessaging.getInstance().subscribeToTopic("debug");
+        }
+        else {
+            FirebaseMessaging.getInstance().subscribeToTopic("release");
         }
 
-        // Set up the side drawer layout containing the user's information and navigation items
-        setupDrawerLayout();
+        setupNewsNotifications();
+    }
 
-        // Set up the trusted contact button
-        setupFAB();
+    @Override
+    public void onStart() {
+        super.onStart();
 
-        // Set up the connection to the Google API Client. This does not sign in the user.
-        setupGoogleSignIn();
+        findViewById(R.id.fab).setVisibility(getSharedPreferenceBoolean("enable_trusted_contact", true) ? View.VISIBLE : View.INVISIBLE);
+    }
 
-        setupRemoteConfig();
+    /**
+     * Unsubscribe the user from notifications regarding new va news
+     */
+    private void unsubscribeNewsNotifications() {
+        saveSharedPreference(getString(R.string.pref_news_notification), false);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+    }
 
-        showRatingPrompt();
+    /**
+     * Make the firebase database persistent and cache it for offline use
+     */
+    private void makeFirebaseDatabasePersistent() {
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        } catch (DatabaseException e) {
+            // If the persistence has already been set, it will throw an error.
+            // There is no way to determine if it has been set beforehand.
+        }
+    }
+
+    /**
+     * Get the first fragment that should be shown to the user when the app is opened
+     * @param extrasFragment The string extra that was passed in the intent
+     * @return The fragment to display on screen
+     */
+    @NonNull
+    private Fragment getFirstFragment(String extrasFragment) {
+        Fragment firstFragment;
+        switch (extrasFragment) {
+            case "main":
+                firstFragment = new MainFragment();
+                break;
+            case "test":
+                firstFragment = new PTSDTestFragment();
+                break;
+            case "resources":
+                firstFragment = new ResourcesFragment();
+                break;
+            case "facilities":
+                firstFragment = new FacilitiesFragment();
+                break;
+            case "news":
+                firstFragment = new NewsFragment();
+                break;
+            case "phone":
+                firstFragment = new PhoneFragment();
+                break;
+            case "website":
+                firstFragment = new WebsiteFragment();
+                break;
+            default:
+                firstFragment = new MainFragment();
+                break;
+        }
+        return firstFragment;
+    }
+
+    /**
+     * Subscribe or unsubscribe the user from news notifications depending on the shared preference
+     */
+    private void setupNewsNotifications() {
+        if(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true))
+            FirebaseMessaging.getInstance().subscribeToTopic("news");
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
     }
 
     /**
@@ -144,67 +266,87 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"tyler.carberry@gmail.com");
-        fiveStarsDialog.setRateText("How well do you like the app?")
-                .setTitle("Enjoying the app?")
-                .setForceMode(false)
-                .setUpperBound(4) // Market opened if a rating >= 4 is selected
-                .setNegativeReviewListener(new NegativeReviewListener() {
-                    @Override
-                    public void onNegativeReview(int i) {
-                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                                "mailto","tyler.carberry@gmail.com", null));
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "PTSD Aid");
-                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello! I would like to give feedback on PTSD Aid!\nWhat I liked:\n\nWhat I didn't like:\n\n");
-                        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                    }
-                }) // OVERRIDE mail intent for negative review
-                .setReviewListener(new ReviewListener() {
-                    @Override
-                    public void onReview(int i) {
+        int ratingPromptShowAfter = (int) mFirebaseRemoteConfig.getDouble("rating_prompt_show_after");
+        int ratingUpperBound = (int) mFirebaseRemoteConfig.getDouble("rating_upper_bound");
+        final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
 
-                    }
-                }) // Used to listen for reviews (if you want to track them )
-                .showAfter(3);
+        if(ratingPromptShowAfter > 0) {
+            FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
+            fiveStarsDialog.setRateText(getString(R.string.rating_prompt_message))
+                    .setTitle(getString(R.string.rating_prompt_title))
+                    .setForceMode(false)
+                    .setUpperBound(ratingUpperBound) // Market opened if a rating >= 4 is selected
+                    .setNegativeReviewListener(new NegativeReviewListener() {
+                        @Override
+                        public void onNegativeReview(int i) {
+                            provideFeedback();
+                        }
+                    }) // OVERRIDE mail intent for negative review
+                    .setReviewListener(new ReviewListener() {
+                        @Override
+                        public void onReview(int i) {
+
+                        }
+                    }) // Used to listen for reviews (if you want to track them )
+                    .showAfter(ratingPromptShowAfter);
+        }
     }
 
-    private void setupRemoteConfig() {
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
-
-        mFirebaseRemoteConfig.fetch(24 * 60 * 60) // cache for 24 hours
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(LOG_TAG, "Fetch Succeeded");
-                        // Once the config is successfully fetched it must be activated before newly fetched
-                        // values are returned.
-                        mFirebaseRemoteConfig.activateFetched();
-                        //displayPrice();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(LOG_TAG, "Fetch failed");
-                        //mPriceTextView.setText(mFirebaseRemoteConfig.getString(PRICE_PREFIX_CONFIG_KEY) +
-                        //        mFirebaseRemoteConfig.getLong(PRICE_CONFIG_KEY));
-                    }
-                });
+    /**
+     * Open a new Doorbell dialog asking the user for feedback
+     */
+    public void provideFeedback() {
+        Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
+        doorbell.addProperty("device", getDeviceInformation());
+        doorbell.setMessageHint(getString(R.string.feedback_message_hint));
+        doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
+        doorbell.show();
     }
 
-    public FirebaseRemoteConfig getRemoteConfig() {
-        return mFirebaseRemoteConfig;
-    }
+    /**
+     * Get the device debug information
+     * @return Debug information about the phone and app
+     */
+    private String getDeviceInformation() {
+        String deviceInformation = "";
 
-    @Override
-    public void onStart() {
-        //Log.d(LOG_TAG, "onStart() called with: " + "");
-        super.onStart();
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            int verCode = pInfo.versionCode;
+            
+            deviceInformation += "APP VERSION: " + version + " (" + verCode + ")\n";
+
+        } catch (PackageManager.NameNotFoundException e) {
+            FirebaseCrash.report(e);
+            e.printStackTrace();
+        }
+        
+        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
+        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
+        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
+        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
+        deviceInformation += "BOARD: " + Build.BOARD + "\n";
+        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
+        deviceInformation += "BRAND: " + Build.BRAND + "\n";
+        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
+        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
+        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
+        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
+        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
+        deviceInformation += "HOST: " + Build.HOST + "\n";
+        deviceInformation += "ID: " + Build.ID + "\n";
+        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
+        deviceInformation += "MODEL: " + Build.MODEL + "\n";
+        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
+        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
+        deviceInformation += "TAGS: " + Build.TAGS + "\n";
+        deviceInformation += "TYPE: " + Build.TYPE + "\n";
+        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
+        deviceInformation += "USER: " + Build.USER + "\n";
+        deviceInformation += "TIME: " + Build.TIME + "\n";
+
+        return deviceInformation;
     }
 
     @Override
@@ -215,20 +357,14 @@ public class MainActivity extends AppCompatActivity
         silentSignIn();
     }
 
-    @Override
-    public void onStop() {
-        //Log.d(LOG_TAG, "onStop() called with: " + "");
-        super.onStop();
-    }
-
     /**
      * When the back button is pressed, close the layout drawer or exit the app
      */
     @Override
     public void onBackPressed() {
         // Close the drawer layout if it is open
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -254,34 +390,49 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Set up the floating action button in the bottom of the app
-     * When pressed, call the trusted contact if it exists. If not, show the create contact dialog
+     * Setup Firebase remote configuration
      */
-    private void setupFAB() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    private void setupRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
-        if(fab != null) {
-            // Call the trusted contact if it exists, otherwise show the create contact dialog
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                    if (!phoneNumber.equals(""))
-                        openDialer(phoneNumber);
-                    else
-                        showCreateTrustedContactDialog();
-                }
-            });
+        int cacheSeconds = getResources().getInteger(R.integer.remote_config_cache_seconds);
+        if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
+            cacheSeconds = 0;
 
-            // If you press and hold on the button, change the trusted contact
-            fab.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    showChangeTrustedContactDialog();
-                    return true;
-                }
-            });
-        }
+        fetchRemoteConfig(cacheSeconds);
+    }
+
+    public void fetchRemoteConfig(int cacheSeconds) {
+        mFirebaseRemoteConfig.fetch(cacheSeconds)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(LOG_TAG, "Fetch Succeeded");
+                        mFirebaseRemoteConfig.activateFetched();
+                        // Once the config is successfully fetched it must be activated before
+                        // newly fetched values are returned. This is done in onStop() so values
+                        // do not change as the user is interacting with the app.
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d(LOG_TAG, "Fetch failed");
+                    }
+                });
+    }
+
+    /**
+     *
+     * @return The Firebase remote configuration for the activity
+     */
+    public FirebaseRemoteConfig getRemoteConfig() {
+        return mFirebaseRemoteConfig;
     }
 
     /**
@@ -309,19 +460,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        if(drawer != null && toggle != null)
+            drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        // The navigation view is contained within the drawer layout
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         // Add the header view containing the user's information
         LayoutInflater inflater = LayoutInflater.from(this);
-        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, null, false);
+        ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, rootViewGroup(), false);
         navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -329,7 +477,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        navigationView.addHeaderView(navigationHeader);
+        // The navigation view is contained within the drawer layout
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if(navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+            navigationView.addHeaderView(navigationHeader);
+        }
         navHeader = navigationHeader;
     }
 
@@ -351,15 +504,17 @@ public class MainActivity extends AppCompatActivity
 
             GoogleSignInAccount googleAccount = result.getSignInAccount();
 
-            String name = googleAccount.getDisplayName();
-            String email = googleAccount.getEmail();
-            Uri profilePicture = googleAccount.getPhotoUrl();
+            if(googleAccount != null) {
+                String name = googleAccount.getDisplayName();
+                String email = googleAccount.getEmail();
+                Uri profilePicture = googleAccount.getPhotoUrl();
 
-            View signInButton = findViewById(R.id.button_sign_in);
-            if(signInButton != null)
-                signInButton.setVisibility(View.INVISIBLE);
+                View signInButton = findViewById(R.id.button_sign_in);
+                if (signInButton != null)
+                    signInButton.setVisibility(View.INVISIBLE);
 
-            updateNavigationHeader(name, email, profilePicture);
+                updateNavigationHeader(name, email, profilePicture);
+            }
         }
     }
 
@@ -391,7 +546,7 @@ public class MainActivity extends AppCompatActivity
      * Is the user signed in to the app with their Google Account
      * @return Whether the user is signed in to the app
      */
-    protected boolean isUserSignedIn() {
+    public boolean isUserSignedIn() {
         return isUserSignedIn;
     }
 
@@ -453,9 +608,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Call the trusted contact. Show the create trusted contact dialog if not created
+     */
+    @OnClick(R.id.fab) public void callTrustedContact() {
+        String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        if (!phoneNumber.equals(""))
+            openDialer(phoneNumber);
+        else
+            showCreateTrustedContactDialog();
+    }
+
+    /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    protected void showCreateTrustedContactDialog() {
+    public void showCreateTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton(R.string.add_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
@@ -463,14 +629,9 @@ public class MainActivity extends AppCompatActivity
                 pickTrustedContact();
             }
         });
-        alertDialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.create_trusted_contact_layout, rootViewGroup(), false);
 
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setView(layout);
@@ -480,7 +641,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    protected void showChangeTrustedContactDialog() {
+    @OnLongClick(R.id.fab) protected boolean showChangeTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton(R.string.change_trusted_contact, new DialogInterface.OnClickListener() {
             @Override
@@ -490,7 +651,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.change_trusted_contact_layout, null, false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.change_trusted_contact_layout, rootViewGroup(), false);
 
         TextView currentContactTextView = (TextView) layout.findViewById(R.id.current_contact_textview);
 
@@ -506,14 +667,21 @@ public class MainActivity extends AppCompatActivity
         }
         else
             showCreateTrustedContactDialog();
+
+        return true;
     }
 
+    /**
+     * @return Whether the user has granted the READ_CONTACTS permission
+     */
     private boolean contactsPermissionGranted() {
-        // Assume thisActivity is the current activity
         return ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Request the contacts permission if it has not been granted
+     */
     @TargetApi(Build.VERSION_CODES.M)
     private void requestContactsPermission() {
         if (!contactsPermissionGranted()) {
@@ -525,50 +693,31 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_CONTACT_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission was granted
                     pickTrustedContact();
-
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                }
+                else {
+                    // Permission denied
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                    alertDialog.setTitle("Please grant the contacts permission");
-                    alertDialog.setMessage("Grant the contacts permission to continue");
+                    alertDialog.setTitle(R.string.contacts_permission_title);
+                    alertDialog.setMessage(R.string.contacts_permission_message);
                     alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        // When the ok button is pressed, dismiss the dialog and do not do anything
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            
-                        }
+                        public void onClick(DialogInterface dialog, int which) {}
                     });
                     alertDialog.create().show();
-
-                    //errorLoadingResults(getString(R.string.error_location_permission));
                 }
-                return;
             }
 
             // other 'case' lines to check for other
             // permissions this app might request
         }
-    }
-
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
     }
 
     /**
@@ -582,25 +731,24 @@ public class MainActivity extends AppCompatActivity
             intent.setData(Uri.parse("tel:" + phoneNumber));
             startActivity(intent);
         } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(getBaseContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.fragment_container), R.string.error_open_dialer, Snackbar.LENGTH_SHORT).show();
         }
     }
 
     /**
      * Open an intent to allow the user to pick one of their contacts
      */
-    protected void pickTrustedContact() {
+    public void pickTrustedContact() {
         if(!contactsPermissionGranted()) {
             requestContactsPermission();
         }
         else {
-
             try {
                 Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
                 startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
             } catch (ActivityNotFoundException activityNotFoundException) {
-                Toast.makeText(getBaseContext(), R.string.error_choose_contact, Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.fragment_container), R.string.error_choose_contact, Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -624,8 +772,6 @@ public class MainActivity extends AppCompatActivity
 
             saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
             saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
-
-            Log.d(LOG_TAG, "Trusted contact changed: NAME: " + name + " PHONENUMBER: " + phoneNumber);
         }
     }
 
@@ -635,26 +781,40 @@ public class MainActivity extends AppCompatActivity
      * @return The contact's name
      */
     public String getContactName(String phoneNumber) {
-        Log.d(LOG_TAG, "getContactName() called with: " + "phoneNumber = [" + phoneNumber + "]");
-
         ContentResolver cr = getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
 
-        if (cursor == null) {
-            return null;
-        }
         String contactName = null;
-        if(cursor.moveToFirst()) {
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        if (cursor != null) {
+            if (cursor.moveToFirst())
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+
+            if (cursor != null && !cursor.isClosed())
+                cursor.close();
         }
 
-        if(cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-
-        Log.d(LOG_TAG, "getContactName() returned: " + contactName);
         return contactName;
+    }
+
+    /**
+     * Read a shared preference string from memory
+     * @param prefKey The key of the shared preference
+     * @param defaultValue The value to return if the key does not exist
+     * @return The shared preference with the given key
+     */
+    private String getSharedPreferenceString(String prefKey, String defaultValue) {
+        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
+    }
+
+    /**
+     * Read a shared preference string from memory
+     * @param prefKey The key of the shared preference
+     * @param defaultValue The value to return if the key does not exist
+     * @return The shared preference with the given key
+     */
+    private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
+        return getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
     }
 
     /**
@@ -670,10 +830,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Save a String to a SharedPreference
+     * @param prefKey The key of the shared preference
+     * @param value The value to save in the shared preference
+     */
+    private void saveSharedPreference(String prefKey, boolean value) {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(prefKey, value);
+        editor.apply();
+    }
+
+    /**
      * Get the request queue. Creates it if it has not yet been instantiated
      * @return The request queue for connecting with an API
      */
-    protected RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue() {
         if(requestQueue == null)
             instantiateRequestQueue();
 
@@ -683,7 +855,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Create the request queue. This is used to connect to the API in the background
      */
-    protected void instantiateRequestQueue() {
+    private void instantiateRequestQueue() {
         // Instantiate the cache
         Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
 
@@ -701,7 +873,7 @@ public class MainActivity extends AppCompatActivity
      * Switch the fragment when a navigation item in the navigation pane is selected
      */
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment newFragment = null;
 
         // Switch to the appropriate fragment
@@ -722,8 +894,18 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_websites:
                 newFragment = new WebsiteFragment();
                 break;
+            case R.id.nav_settings:
+                newFragment = new SettingsFragment();
+                break;
             case R.id.nav_nearby:
-                newFragment = new NearbyFacilitiesFragment();
+                newFragment = new FacilitiesFragment();
+                break;
+            case R.id.nav_news:
+                newFragment = new NewsFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("param1", "From Activity");
+                newFragment.setArguments(bundle);
                 break;
         }
 
@@ -731,10 +913,15 @@ public class MainActivity extends AppCompatActivity
             switchFragment(newFragment);
         }
 
-        // Close the drawer layout
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        closeDrawerLayout();
+
         return true;
+    }
+
+    private void closeDrawerLayout() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
+        if(drawer != null)
+            drawer.closeDrawer(GravityCompat.START);
     }
 
     /**
@@ -743,14 +930,26 @@ public class MainActivity extends AppCompatActivity
      * @param newFragment The fragment to switch to
      */
     public void switchFragment(Fragment newFragment) {
-        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if(newFragment != null) {
+            if (!(newFragment.getClass().equals(currentFragment.getClass()))) {
+                android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-            // Replace whatever is in the fragment_container view with this fragment
-            transaction.replace(R.id.fragment_container, newFragment);
-            transaction.addToBackStack(null);
+                // Replace whatever is in the fragment_container view with this fragment
+                transaction.replace(R.id.fragment_container, newFragment);
+                transaction.addToBackStack(null);
 
-            // Commit the transaction
-            transaction.commit();
+                // Commit the transaction
+                transaction.commit();
+                currentFragment = newFragment;
+            }
+        }
+    }
+
+    private ViewGroup rootViewGroup() {
+        View root = findViewById(R.id.drawer_layout);
+        if(root != null && root instanceof ViewGroup)
+            return (ViewGroup) root;
+        return null;
     }
 
     /**
@@ -762,5 +961,5 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {}
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 }

@@ -18,3 +18,7 @@ app/app.iml
 .idea/encodings.xml
 
 .idea/gradle.xml
+
+keys.json
+
+keystore.properties

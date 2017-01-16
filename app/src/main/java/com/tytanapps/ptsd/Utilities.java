@@ -1,7 +1,10 @@
 package com.tytanapps.ptsd;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -9,12 +12,24 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
+import android.util.Base64;
+import android.widget.Toast;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -167,4 +182,206 @@ public class Utilities {
             return phoneNumbers.substring(0, orLocation);
         return phoneNumbers;
     }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * Decode a bitmap from a base64 string
+     * @param bitmap_base64 The encoded bitmap
+     * @return The decoded bitmap
+     */
+    public static Bitmap decodeBitmap(String bitmap_base64) {
+        byte[] imageAsBytes = Base64.decode(bitmap_base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+    }
+
+    public static Bitmap base64ToBitmap(String base64) {
+        byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    public static String drawableToBase64 (Drawable drawable) {
+        Bitmap bitmap = Utilities.drawableToBitmap(drawable);
+        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    /**
+     * Get the FirebaseRemoteConfig of a fragment's parent activity
+     * PRECONDITION: The activity containing fragment implements RemoteConfigurable
+     * @param fragment The fragment to get the remote config from
+     * @return The FirebaseRemoteConfig of fragment's activity
+     */
+    private static FirebaseRemoteConfig getRemoteConfig(@NonNull Fragment fragment) {
+        return ((RemoteConfigurable)fragment.getActivity()).getRemoteConfig();
+    }
+
+    public static boolean getRemoteConfigBoolean(@NonNull Fragment fragment, int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getBoolean(fragment.getString(resId));
+    }
+
+    public static int getRemoteConfigInt(@NonNull Fragment fragment, int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return (int) firebaseRemoteConfig.getDouble(fragment.getString(resId));
+    }
+
+    public static double getRemoteConfigDouble(@NonNull Fragment fragment, int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getDouble(fragment.getString(resId));
+    }
+
+    public static String getRemoteConfigString(@NonNull Fragment fragment, int resId) {
+        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
+        return firebaseRemoteConfig.getString(fragment.getString(resId));
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    public static void openDialer(Context context, String phoneNumber) {
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(context.getApplicationContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Open the dialer with a phone number entered
+     * This does not call the number directly, the user needs to press the call button
+     * @param phoneNumber The phone number to call
+     */
+    public static void openDialer(Fragment fragment, String phoneNumber) {
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            fragment.startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFoundException) {
+            Toast.makeText(fragment.getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
+     */
+    public static void openBrowserIntent(Context context, String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        context.startActivity(i);
+    }
+
+    /**
+     * Open a website in the browser
+     * Precondition: url is a valid url
+     * @param url The url to open
+     */
+    public static void openBrowserIntent(Fragment fragment, String url) {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(fragment.getResources().getColor(R.color.colorPrimary));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
+
+        /*
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        fragment.startActivity(i);
+        */
+    }
+
+    /**
+     * Open the maps app to a specified location
+     * @param geoLocation The uri of the location to open
+     */
+    public static void openMapIntent(Context context, Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        }
+    }
+
+    /**
+     * Open the maps app to a specified location
+     * @param geoLocation The uri of the location to open
+     */
+    public static void openMapIntent(Fragment fragment, Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(fragment.getActivity().getPackageManager()) != null) {
+            fragment.startActivity(intent);
+        }
+    }
+
+    /**
+     * Get the url for the Google Maps Api
+     * @param name The street address
+     * @param town The town
+     * @param state The state. Can be initials or full name
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
+    public static Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
+        // Encode the address
+        String location = name + ", " + town + ", " + state;
+        location = URLEncoder.encode(location, "UTF-8");
+
+        return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    /**
+     * Get the url for the Google Maps Api
+     * @param location The location to encode
+     * @return The url for the street view api
+     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
+     */
+    public static Uri getMapUri(String location) throws UnsupportedEncodingException {
+        // Encode the address
+        location = URLEncoder.encode(location, "UTF-8");
+
+        return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    public static String htmlToText(String html) {
+        return android.text.Html.fromHtml(html).toString();
+    }
+
+
 }

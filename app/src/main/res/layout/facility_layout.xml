@@ -21,6 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/default_facility_image"
+                android:contentDescription="@string/facility_image_content_description"
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"/>
 
@@ -39,11 +40,9 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="Placeholder Name"
                     android:gravity="center"
                     android:background="@color/transparent_white"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="25sp"/>
+                    android:textSize="@dimen/medium_text_size"/>
 
                 <ImageButton
                     android:id="@+id/facility_phone_icon"
@@ -51,8 +50,13 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/facility_name_textview"
                     android:paddingTop="@dimen/activity_vertical_margin"
+                    android:contentDescription="@string/phone_icon_content_description"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:background="@android:color/transparent"
                     android:src="@drawable/call_icon"/>
 
@@ -62,12 +66,12 @@
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@id/facility_phone_icon"
                     android:layout_toRightOf="@id/facility_phone_icon"
+                    android:layout_toEndOf="@id/facility_phone_icon"
                     android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:text="Phone Placeholder"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="25sp" />
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:textSize="@dimen/medium_text_size" />
 
                 <ImageButton
                     android:id="@+id/facility_address_icon"
@@ -76,7 +80,10 @@
                     android:layout_below="@+id/facility_phone_textview"
                     android:paddingTop="@dimen/activity_vertical_margin"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:contentDescription="@string/address_icon_content_description"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:background="@android:color/transparent"
                     android:src="@drawable/map_icon"/>
 
@@ -85,26 +92,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@id/facility_address_icon"
-                    android:layout_toRightOf="@id/facility_phone_icon"
+                    android:layout_toRightOf="@id/facility_address_icon"
+                    android:layout_toEndOf="@id/facility_phone_icon"
                     android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:text="Address Placeholder"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="25sp" />
+                    android:textSize="@dimen/medium_text_size" />
 
                 <TextView
                     android:id="@+id/facility_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="visible"
                     android:paddingTop="@dimen/activity_vertical_margin"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin"
                     android:layout_below="@+id/facility_address_textview"
-                    android:text="Detail Placeholder"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="15sp"/>
+                    android:textSize="@dimen/small_text_size"/>
 
                 <Button
                     android:id="@+id/more_info_button"
@@ -113,8 +115,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/facility_details"
                     android:layout_alignParentLeft="true"
-                    android:text="More Info"
-                    android:fontFamily="sans-serif-medium"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/open_website"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"/>
@@ -124,6 +127,5 @@
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
-
 
 </RelativeLayout>

@@ -1,11 +1,11 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +15,29 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import io.techery.progresshint.ProgressHintDelegate;
+
+import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
+
 
 /**
  * A short multiple choice quiz to determine if you suffer from PTSD. Based on the results, gives
  * you recommendations on what to do next. Find a professional is always a recommendation even if
  * the user shows no signs of PTSD.
  */
-public class PTSDTestFragment extends Fragment {
+public class PTSDTestFragment extends AnalyticsFragment {
 
     private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
+
+    private Unbinder unbinder;
+    @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
+
 
     public PTSDTestFragment() {
         // Required empty public constructor
@@ -33,11 +47,23 @@ public class PTSDTestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_ptsd_test, container, false);
-
-        LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-        insertQuestions(questionsLinearLayout);
-
+        unbinder = ButterKnife.bind(this, rootView);
+        setupQuestionsLayout();
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
     }
 
     /**
@@ -49,6 +75,18 @@ public class PTSDTestFragment extends Fragment {
         if(rootView instanceof ViewGroup)
             return (ViewGroup) getView();
         return null;
+    }
+
+    /**
+     * Add the prompt and the questions to the layout
+     */
+    private void setupQuestionsLayout() {
+        if(getRemoteConfigBoolean(this, R.string.rc_questions_sticky)) {
+            TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+            headerTextView.setTag("sticky");
+        }
+
+        insertQuestions(questionsLinearLayout);
     }
 
     /**
@@ -66,6 +104,28 @@ public class PTSDTestFragment extends Fragment {
             questionTextView.setText(question);
 
             questionsLinearLayout.addView(layout);
+
+            io.techery.progresshint.addition.widget.SeekBar seekBar =
+                    (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
+
+            seekBar.getHintDelegate()
+                    .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {
+                        @Override public String getHint(android.widget.SeekBar seekBar, int progress) {
+                            String progressHint;
+                            if(progress < seekBar.getMax() / 5.0)
+                                progressHint = getString(R.string.not_at_all);
+                            else if(progress < seekBar.getMax() * 2.0/5)
+                                progressHint = getString(R.string.little_bit);
+                            else if(progress < seekBar.getMax() * 3.0/5)
+                                progressHint = getString(R.string.moderately);
+                            else if(progress < seekBar.getMax() * 4.0/5)
+                                progressHint = getString(R.string.quite_a_bit);
+                            else
+                                progressHint = getString(R.string.extremely);
+                            
+                            return progressHint;
+                        }
+                    });
         }
 
         addSubmitButton(questionsLinearLayout);
@@ -92,7 +152,7 @@ public class PTSDTestFragment extends Fragment {
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         submitButton.setTextColor(getResources().getColor(R.color.white));
-        submitButton.setTextSize(20);
+        submitButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         submitButton.setText(getString(R.string.submit_test));
 
         submitButton.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +170,7 @@ public class PTSDTestFragment extends Fragment {
      * Calculate the total score and notify the user appropriately
      */
     private void submit() {
+        sendAnalyticsEvent("Action", "Submit Test");
         int score = getScore();
         showResults(score);
     }
@@ -168,18 +229,10 @@ public class PTSDTestFragment extends Fragment {
     }
 
     /**
-     * Switch to the NearbyFacilitiesFragment and show a list of nearby facilities
+     * Switch to the FacilitiesFragment and show a list of nearby facilities
      */
     private void findProfessional() {
-        NearbyFacilitiesFragment nearbyFacilitiesFragment = new NearbyFacilitiesFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment
-        transaction.replace(R.id.fragment_container, nearbyFacilitiesFragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        ((MainActivity)getActivity()).switchFragment(new FacilitiesFragment());
     }
 
     /**
@@ -193,7 +246,7 @@ public class PTSDTestFragment extends Fragment {
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, shareText);
-        startActivity(Intent.createChooser(intent, "Share via"));
+        startActivity(Intent.createChooser(intent, getString(R.string.share_results_chooser)));
     }
 
     /**
@@ -205,11 +258,9 @@ public class PTSDTestFragment extends Fragment {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
         int[] answers = getEachAnswer();
 
-        String shareText = getString(R.string.stress_prompt);
-        shareText += "\n\n";
+        String shareText = getString(R.string.stress_prompt) + "\n\n";
 
         for(int i = 0; i < questions.length; i++) {
-
             // Include each question prompt
             shareText += (i+1) + ") ";
             shareText += questions[i] + "\n";
@@ -257,14 +308,12 @@ public class PTSDTestFragment extends Fragment {
 
         View rootView = getView();
         if(rootView != null) {
-            LinearLayout questionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.questions_linearlayout);
-
             for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
                 View childView = questionsLinearLayout.getChildAt(i);
 
                 if (childView instanceof ViewGroup) {
                     SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
-                    score[questionCount] = seekBar.getProgress() + 1;
+                    score[questionCount] = seekBar.getProgress()/((seekBar.getMax()+1)/5) + 1;
 
                     questionCount++;
                 }

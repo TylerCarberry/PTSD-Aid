@@ -1,17 +1,21 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/nearby_facilities_container"
-    tools:context="com.tytanapps.ptsd.NearbyFacilitiesFragment">
 
-    <ProgressBar
+    android:id="@+id/nearby_facilities_container"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".fragments.FacilitiesFragment">
+
+    <com.bhargavms.dotloader.DotLoader
         android:id="@+id/facility_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        app:color_array="@array/dot_colors"
+        app:dot_radius="12dp"
+        app:number_of_dots="3"/>
 
     <TextView
         android:id="@+id/facility_loading_textview"
@@ -24,8 +28,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:textSize="25sp"
-        android:text="@string/loading"/>
+        android:textSize="25sp" />
 
     <Button
         android:id="@+id/retry_load_button"
@@ -37,21 +40,17 @@
         android:text="@string/retry"
         android:visibility="invisible"/>
 
-    <ScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/facilities_linear_layout"
-            android:orientation="vertical"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:animateLayoutChanges="true">
+            android:scrollbars="vertical" />
 
-            </LinearLayout>
-
-        </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

@@ -10,6 +10,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.widget.SeekBar;
 
+import com.tytanapps.ptsd.fragments.PTSDTestFragment;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +70,7 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
         String[] questions = mainActivity.getResources().getStringArray(R.array.stress_questions);
 
         for(String question : questions)
-            onView(allOf(hasSibling(withText(question)), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(4)).check(matches(isDisplayed()));
+            onView(allOf(hasSibling(withText(question)), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(99)).check(matches(isDisplayed()));
 
         onView(withText(is(mainActivity.getString(R.string.submit_test)))).perform(scrollTo(), click());
         onView(withText(is(mainActivity.getString(R.string.result_high)))).check(matches(isDisplayed()));
@@ -83,8 +85,8 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testSomeSymptoms() {
         String[] questions = mainActivity.getResources().getStringArray(R.array.stress_questions);
 
-        onView(allOf(hasSibling(withText(questions[0])), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(4)).check(matches(isDisplayed()));
-        onView(allOf(hasSibling(withText(questions[1])), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(4)).check(matches(isDisplayed()));
+        onView(allOf(hasSibling(withText(questions[0])), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(99)).check(matches(isDisplayed()));
+        onView(allOf(hasSibling(withText(questions[1])), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(99)).check(matches(isDisplayed()));
 
         onView(withText(is(mainActivity.getString(R.string.submit_test)))).perform(scrollTo(), click());
         onView(withText(is(mainActivity.getString(R.string.result_medium)))).check(matches(isDisplayed()));

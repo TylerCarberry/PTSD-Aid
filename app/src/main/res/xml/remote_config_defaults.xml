@@ -1,25 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- START xml_defaults -->
 <defaultsMap>
+
     <entry>
-        <key>symptoms_text</key>
-        <value>Usually start soon after the event but may not appear for months or years later.%%Symptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.%%Negative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.%%Hyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.%%Co-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</value>
+        <key>show_extra_emoji</key>
+        <value>true</value>
     </entry>
+
     <entry>
-        <key>causes_text</key>
-        <value>Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</value>
+        <key>rating_prompt_show_after</key>
+        <value>-1</value>
     </entry>
+
     <entry>
-        <key>diagnosis_text</key>
-        <value>This app is for reference only. For a complete diagnosis, please visit a mental health professional.</value>
+        <key>rating_upper_bound</key>
+        <value>5</value>
     </entry>
+
     <entry>
-        <key>treatment_text</key>
-        <value>There are two main types of treatment, psychotherapy and medication.%%1.  Psychotherapy (or counseling) includes Cognitive Behavioral Therapy (CBT). Some of the types of CBT are Cognitive Processing Therapy (CPT) where you learn skills to understand how the trauma changed your thoughts and thinking, then change the negative thought patters. There is also Prolonged Exposure Therapy (PE) which is the repeated imaginal and real-world exposure to the trauma until it is no longer upsetting.%%2. Medications, Selective Serotonin Reuptake Inhibitor (SSRI) is also effective for PTSD. Some people seek treatments that do not involve medications because of the side effects.</value>
+        <key>support_email_address</key>
+        <value>tyler.carberry@gmail.com</value>
     </entry>
+
     <entry>
-        <key>counseling_text</key>
-        <value>The Vet Centers provides bereavement, military sexual trauma, substance abuse, screening and referral for medical issues including TBI, depression, etc. For more information or to find the nearest Vet Center use the VA Facilities tab</value>
+        <key>questions_sticky</key>
+        <value>false</value>
     </entry>
+
+    <entry>
+        <key>never_fetched</key>
+        <value>true</value>
+    </entry>
+
+    <entry>
+        <key>map_image_width</key>
+        <value>640</value>
+    </entry>
+
+    <entry>
+        <key>map_image_height</key>
+        <value>350</value>
+    </entry>
+
+    <entry>
+        <key>facilities_to_display</key>
+        <value>10</value>
+    </entry>
+
+    <entry>
+        <key>news_to_display</key>
+        <value>10</value>
+    </entry>
+
+    <entry>
+        <key>check_recommendations_database</key>
+        <value>false</value>
+    </entry>
+
+    <entry>
+        <key>resource_sticky</key>
+        <value>true</value>
+    </entry>
+
+    <entry>
+        <key>support_subject</key>
+        <value>PTSD Aid</value>
+    </entry>
+
+    <entry>
+        <key>support_message</key>
+        <value>Hello! I would like to give feedback on PTSD Aid.^^What I liked:^^What I didn't like:^^^Device Information:^</value>
+    </entry>
+
+    <entry>
+        <key>show_va_programs</key>
+        <value>false</value>
+    </entry>
+
+    <entry>
+        <key>newest_app_version</key>
+        <value>-1</value>
+    </entry>
+
+
 </defaultsMap>
-    <!-- END xml_defaults -->
+<!-- END xml_defaults -->

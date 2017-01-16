@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:src="@drawable/nvf"
+            android:contentDescription="@string/phone_icon_content_description"
             android:adjustViewBounds="true"/>
 
         <TextView
@@ -26,8 +27,7 @@
             android:layout_below="@+id/phone_icon_imageview"
             android:gravity="center_horizontal"
             android:text="@string/phone_veterans_foundation_hotline"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="30sp" />
+            android:textSize="@dimen/large_text_size" />
 
         <TextView
             android:id="@+id/phone_details_textview"
@@ -35,8 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/phone_number_textview"
             android:text="@string/veterans_foundation_phone_details"
-            android:fontFamily="sans-serif-light"
-            android:textSize="20sp"/>
+            android:textSize="@dimen/small_text_size"/>
 
     </RelativeLayout>
 

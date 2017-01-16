@@ -16,7 +16,28 @@
 #   public *;
 #}
 
+
+# Proguard removes files from the support library that I am using. Keep them
 -keep class android.support.v7.widget.LinearLayoutManager { *; }
+-keep class android.support.v7.widget.SearchView { *; }
+
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
 -printmapping out.map
+
+# Keep Picasso
+-keep class com.squareup.picasso.** { *; }
+-keepclasseswithmembers class * {
+    @com.squareup.picasso.** *;
+}
+-keepclassmembers class * {
+    @com.squareup.picasso.** *;
+}
+
+-keepattributes SourceFile,LineNumberTable
+-keep class com.parse.*{ *; }
+-dontwarn com.parse.**
+-dontwarn com.squareup.picasso.**
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
