@@ -586,7 +586,7 @@ public abstract class FacilityLoader {
      * @return The url for the PTSD Programs API
      */
     private String buildPTSDUrl() {
-        Uri builtUri = Uri.parse("http://www.va.gov/webservices/PTSD/ptsd.cfc")
+        Uri builtUri = Uri.parse("https://www.va.gov/webservices/PTSD/ptsd.cfc")
                 .buildUpon()
                 .appendQueryParameter("method", "PTSD_Program_Locator_array")
                 .appendQueryParameter("license", fragment.getString(R.string.api_key_ptsd_programs))
@@ -603,7 +603,7 @@ public abstract class FacilityLoader {
      * @return The url for the VA facility API
      */
     private String buildFacilityUrl(int facilityId, String licenceKey) {
-        Uri builtUri = Uri.parse("http://www.va.gov/webservices/fandl/facilities.cfc")
+        Uri builtUri = Uri.parse("https://www.va.gov/webservices/fandl/facilities.cfc")
                 .buildUpon()
                 .appendQueryParameter("method", "GetFacsDetailByFacID_array")
                 .appendQueryParameter("fac_id", ""+facilityId)
