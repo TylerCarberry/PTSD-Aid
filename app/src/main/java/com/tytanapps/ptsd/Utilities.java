@@ -64,34 +64,21 @@ public class Utilities {
     }
 
     /**
-     * Calculate the distance between coordinates
+     * Calculate the distance between coordinates in miles
      * @param lat1 Latitude of coordinate 1
      * @param lon1 Longitude of coordinate 1
      * @param lat2 Latitude of coordinate 2
      * @param lon2 Longitude of coordinate 2
-     * @param unit The unit that the result should be in. (M)iles (K)ilometers (N)autical Miles
      * @return The distance between the two coordinates in the specified unit
      */
-    public static double distanceBetweenCoordinates(double lat1, double lon1, double lat2, double lon2, String unit) {
-        double theta = lon1 - lon2;
-        double distance =
-                Math.sin(degreesToRadians(lat1)) * Math.sin(degreesToRadians(lat2))
-                        + Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * Math.cos(degreesToRadians(theta));
+    public static double distanceBetweenCoordinates(double lat1, double lon1, double lat2, double lon2) {
+        float[] result = {0, 0};
+        Location.distanceBetween(lat1, lon1, lat2, lon2, result);
+        return metersToMiles(result[0]);
+    }
 
-        distance = Math.acos(distance);
-        distance = radiansToDegrees(distance);
-
-        // Miles
-        distance = distance * 60 * 1.1515;
-
-        // Kilometers
-        if (unit.equalsIgnoreCase("K"))
-            distance = distance * 1.609344;
-            // Nautical Miles
-        else if (unit.equalsIgnoreCase("N"))
-            distance = distance * 0.8684;
-
-        return distance;
+    public static double metersToMiles(float meters) {
+        return meters * 0.000621371192;
     }
 
     public static double degreesToRadians(double deg) {

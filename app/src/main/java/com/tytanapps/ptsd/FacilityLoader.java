@@ -258,7 +258,7 @@ public abstract class FacilityLoader {
         double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
         // The description contains the distance and all PTSD programs located there
         if(userLocation[0] != 0 && userLocation[1] != 0) {
-            double distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1], "M");
+            double distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1]);
             facilityToUpdate.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
@@ -500,7 +500,7 @@ public abstract class FacilityLoader {
 
             // The description contains the distance and all PTSD programs located there
             if(userLocation[0] != 0 && userLocation[1] != 0) {
-                distance = Utilities.distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1], "M");
+                distance = Utilities.distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1]);
                 facility.setDistance(distance);
 
                 DecimalFormat df = new DecimalFormat("#.##");
