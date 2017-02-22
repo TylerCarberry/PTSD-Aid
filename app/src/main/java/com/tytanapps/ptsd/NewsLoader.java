@@ -60,17 +60,14 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
-        final String url = calculateNewsUrl();
-
-        Observable<String> fetchNews = Observable.create(new Observable.OnSubscribe<String>() {
+        Observable<String> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, String>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
+            public String call(String url) {
                 try {
-                    String data = Utilities.readFromUrl(url);
-                    subscriber.onNext(data); // Emit the contents of the URL
-                    subscriber.onCompleted(); // Nothing more to emit
-                } catch(Exception e){
-                    subscriber.onError(e); // In case there are network errors
+                    return Utilities.readFromUrl(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "";
                 }
             }
         });
@@ -134,7 +131,6 @@ public abstract class NewsLoader {
                                 @Override
                                 public void onError(Throwable e) {
                                     Log.e(LOG_TAG, e.toString());
-                                    //incrementLoadedArticleCount(numberOfNews);
                                 }
 
                                 @Override
@@ -155,15 +151,9 @@ public abstract class NewsLoader {
                                         // Save the news to a file so it doesn't need to be loaded next time
                                         cacheNews(news);
 
-                                        //numberOfLoadedArticles++;
-
-                                        //if(numberOfLoadedArticles == numberOfNews)
-                                        //    allNewsHaveLoaded();
-
                                     } catch (JSONException e) {
                                         FirebaseCrash.report(e);
                                         e.printStackTrace();
-                                        //incrementLoadedArticleCount(numberOfNews);
                                     }
                                 }
                             });
@@ -181,79 +171,6 @@ public abstract class NewsLoader {
                 .subscribeOn(Schedulers.newThread()) // Create a new Thread
                 .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
                 .subscribe(newsObserver);
-    }
-
-    private void loadArticle(final int news_id, final int numberOfNews) {
-        /*
-        News cachedNews = readCachedNews(news_id);
-        if(cachedNews != null) {
-            knownNews.put(news_id, cachedNews);
-            incrementLoadedArticleCount(numberOfNews);
-            return;
-        }
-        */
-
-        final String url = calculateArticleURL(news_id);
-        Observable<String> fetchNews = Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                try {
-                    String data = Utilities.readFromUrl(url);
-                    subscriber.onNext(data); // Emit the contents of the URL
-                    subscriber.onCompleted(); // Nothing more to emit
-                } catch(Exception e){
-                    subscriber.onError(e); // In case there are network errors
-                }
-            }
-        });
-
-        fetchNews
-                .subscribeOn(Schedulers.newThread()) // Create a new Thread
-                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {}
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(LOG_TAG, e.toString());
-                        incrementLoadedArticleCount(numberOfNews);
-                    }
-
-                    @Override
-                    public void onNext(String response) {
-                        // The JSON that the sever responds starts with //
-                        // I am cropping the first two characters to create valid JSON.
-                        response = response.substring(2);
-
-                        try {
-                            JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
-                            News news = parseJSONNews(rootJson);
-
-                            knownNews.put(news_id, news);
-
-                            // Save the news to a file so it doesn't need to be loaded next time
-                            cacheNews(news);
-
-                            //numberOfLoadedArticles++;
-
-                            //if(numberOfLoadedArticles == numberOfNews)
-                            //    allNewsHaveLoaded();
-
-                        } catch (JSONException e) {
-                            FirebaseCrash.report(e);
-                            e.printStackTrace();
-                            incrementLoadedArticleCount(numberOfNews);
-                        }
-                    }
-                });
-    }
-
-    private void incrementLoadedArticleCount(int numberOfNews) {
-        //numberOfLoadedArticles++;
-
-        //if(numberOfLoadedArticles == numberOfNews)
-            allNewsHaveLoaded();
     }
 
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
@@ -295,7 +212,6 @@ public abstract class NewsLoader {
     }
 
     public void refresh() {
-        //numberOfLoadedArticles = 0;
         knownNews.clear();
         loadNews();
     }
