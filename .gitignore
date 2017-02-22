@@ -22,3 +22,5 @@ app/app.iml
 keys.json
 
 keystore.properties
+
+\.idea/vcs\.xml

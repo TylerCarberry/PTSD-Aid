@@ -301,7 +301,8 @@ public class FacilitiesFragment extends AnalyticsFragment {
         }
     }
 
-    @OnClick(R.id.retry_load_button) public void retryLoadFacilities() {
+    @OnClick(R.id.retry_load_button)
+    public void retryLoadFacilities() {
         retryLoadButton.setVisibility(View.INVISIBLE);
         loadingTextView.setText("");
         loadingTextView.setVisibility(View.INVISIBLE);
