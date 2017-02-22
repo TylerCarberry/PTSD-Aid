@@ -4,11 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.util.Log;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
@@ -25,11 +21,14 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -61,11 +60,35 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
-        String url = calculateNewsUrl();
+        final String url = calculateNewsUrl();
 
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+        Observable<String> fetchNews = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onResponse(String response) {
+            public void call(Subscriber<? super String> subscriber) {
+                try {
+                    String data = Utilities.readFromUrl(url);
+                    subscriber.onNext(data); // Emit the contents of the URL
+                    subscriber.onCompleted(); // Nothing more to emit
+                } catch(Exception e){
+                    subscriber.onError(e); // In case there are network errors
+                }
+            }
+        });
+
+        Observer<String> newsObserver = new Observer<String>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(LOG_TAG, e.toString());
+                errorLoadingResults("Unable to load the news. Check you internet connection.");
+            }
+
+            @Override
+            public void onNext(String response) {
                 // The JSON that the sever responds starts with //
                 // Trim the first two characters to create valid JSON.
                 response = response.substring(2);
@@ -73,44 +96,39 @@ public abstract class NewsLoader {
                 // Load the initial JSON request
                 try {
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
+                    final int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
                     if (numberOfResults == 0) {
                         errorLoadingResults(fragment.getString(R.string.error_load_news));
                         return;
                     }
 
+                    List<Integer> pressIds = new LinkedList<>();
                     for (int i = 1; i <= numberOfResults; i++) {
                         JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-                        int pressId = ptsdProgramJson.getInt("PRESS_ID");
-
-                        loadArticle(pressId, numberOfResults);
-
+                        pressIds.add(ptsdProgramJson.getInt("PRESS_ID"));
                     }
+
+                    Observable<Integer> observable = Observable.from(pressIds);
+                    observable.subscribe(new Action1<Integer>() {
+                        @Override
+                        public void call(Integer integer) {
+                            loadArticle(integer, numberOfResults);
+                        }
+                    });
+
+
+
                 } catch (JSONException e) {
                     FirebaseCrash.report(e);
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                errorLoadingResults("Unable to load the news. Check you internet connection.");
-            }
-        });
+        };
 
-        // Set a longer Volley timeout policy
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        // Start loading the PTSD programs in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if (requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            errorLoadingResults("Unable to load the news. Check you internet connection.");
+        fetchNews.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(newsObserver);
     }
 
     private void loadArticle(final int news_id, final int numberOfNews) {
