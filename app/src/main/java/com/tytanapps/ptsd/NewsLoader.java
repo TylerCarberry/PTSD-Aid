@@ -27,6 +27,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Load the list of recent PTSD News Articles
  * @author Tyler Carberry
@@ -116,56 +121,60 @@ public abstract class NewsLoader {
             return;
         }
 
-        String url = calculateArticleURL(news_id);
-
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+        final String url = calculateArticleURL(news_id);
+        Observable<String> fetchNews = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // I am cropping the first two characters to create valid JSON.
-                response = response.substring(2);
-
+            public void call(Subscriber<? super String> subscriber) {
                 try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
-                    News news = parseJSONNews(rootJson);
-
-                    knownNews.put(news_id, news);
-
-                    // Save the news to a file so it doesn't need to be loaded next time
-                    cacheNews(news);
-
-                    numberOfLoadedArticles++;
-
-                    if(numberOfLoadedArticles == numberOfNews)
-                        allNewsHaveLoaded();
-
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
-                    e.printStackTrace();
-                    incrementLoadedArticleCount(numberOfNews);
+                    String data = Utilities.readFromUrl(url);
+                    subscriber.onNext(data); // Emit the contents of the URL
+                    subscriber.onCompleted(); // Nothing more to emit
+                } catch(Exception e){
+                    subscriber.onError(e); // In case there are network errors
                 }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                incrementLoadedArticleCount(numberOfNews);
             }
         });
 
-        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        // Volley does retry for you if you have specified the policy.
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        fetchNews
+                .subscribeOn(Schedulers.newThread()) // Create a new Thread
+                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {}
 
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            numberOfLoadedArticles++;
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, e.toString());
+                        incrementLoadedArticleCount(numberOfNews);
+                    }
+
+                    @Override
+                    public void onNext(String response) {
+                        // The JSON that the sever responds starts with //
+                        // I am cropping the first two characters to create valid JSON.
+                        response = response.substring(2);
+
+                        try {
+                            JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
+                            News news = parseJSONNews(rootJson);
+
+                            knownNews.put(news_id, news);
+
+                            // Save the news to a file so it doesn't need to be loaded next time
+                            cacheNews(news);
+
+                            numberOfLoadedArticles++;
+
+                            if(numberOfLoadedArticles == numberOfNews)
+                                allNewsHaveLoaded();
+
+                        } catch (JSONException e) {
+                            FirebaseCrash.report(e);
+                            e.printStackTrace();
+                            incrementLoadedArticleCount(numberOfNews);
+                        }
+                    }
+                });
     }
 
     private void incrementLoadedArticleCount(int numberOfNews) {
