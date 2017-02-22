@@ -26,10 +26,11 @@ import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Load the list of recent PTSD News Articles
@@ -60,7 +61,50 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
-        Observable<String> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, String>() {
+        Observable<News> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, JSONObject>() {
+            @Override
+            public JSONObject call(String url) {
+                try {
+                    String response = Utilities.readFromUrl(url).substring(2);
+                    Log.d(TAG, "call() called with: url = [" + url + "]");
+                    Log.d(TAG, "call: " + response);
+                    return new JSONObject(response);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    errorLoadingResults("Unable to load the news. Check you internet connection.");
+                    return null;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        /*}).filter(new Func1<JSONObject, Boolean>() {
+            @Override
+            public Boolean call(JSONObject j) {
+                return j != null;
+            }*/
+        }).map(new Func1<JSONObject, List<String>>() {
+            @Override
+            public List<String> call(JSONObject jsonObject) {
+                try {
+                    List<String> newsUrls = new LinkedList<>();
+                    int numberOfResults = jsonObject.getInt("MATCHES");
+                    for (int i = 1; i <= numberOfResults; i++) {
+                        JSONObject ptsdProgramJson = jsonObject.getJSONObject("RESULTS").getJSONObject("" + i);
+                        newsUrls.add(calculateArticleURL(ptsdProgramJson.getInt("PRESS_ID")));
+                    }
+                    return newsUrls;
+                }catch (JSONException e) {
+                    Log.e(LOG_TAG, "call: ", e);
+                    return null;
+                }
+            }
+        }).flatMap(new Func1<List<String>, Observable<String>>() {
+            @Override
+            public Observable<String> call(List<String> strings) {
+                return Observable.from(strings);
+            }
+        }).map(new Func1<String, String>() {
             @Override
             public String call(String url) {
                 try {
@@ -70,12 +114,35 @@ public abstract class NewsLoader {
                     return "";
                 }
             }
+        }).map(new Func1<String, News>() {
+            @Override
+            public News call(String response) {
+                response = response.substring(2);
+
+                try {
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
+                    return parseJSONNews(rootJson);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        /*}).filter(new Func1<News, Boolean>() {
+            @Override
+            public Boolean call(News news) {
+                return news != null;
+            }*/
         });
 
-        Observer<String> newsObserver = new Observer<String>() {
+
+
+
+
+        Observer<News> newsObserver = new Observer<News>() {
             @Override
             public void onCompleted() {
-
+                Log.d(LOG_TAG, "onCompleted() called");
+                allNewsHaveLoaded();
             }
 
             @Override
@@ -85,85 +152,10 @@ public abstract class NewsLoader {
             }
 
             @Override
-            public void onNext(String response) {
-                // The JSON that the sever responds starts with //
-                // Trim the first two characters to create valid JSON.
-                response = response.substring(2);
-
-                // Load the initial JSON request
-                try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    final int numberOfResults = new JSONObject(response).getInt("MATCHES");
-
-                    if (numberOfResults == 0) {
-                        errorLoadingResults(fragment.getString(R.string.error_load_news));
-                        return;
-                    }
-
-                    List<Integer> pressIds = new LinkedList<>();
-                    for (int i = 1; i <= numberOfResults; i++) {
-                        JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-                        pressIds.add(ptsdProgramJson.getInt("PRESS_ID"));
-                    }
-
-                    Observable<String> observable = Observable.from(pressIds).map(new Func1<Integer, String>() {
-                        @Override
-                        public String call(Integer news_id) {
-                            try {
-                                return Utilities.readFromUrl(calculateArticleURL(news_id));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                return "";
-                            }
-                        }
-                    });
-
-                    observable
-                            .subscribeOn(Schedulers.newThread()) // Create a new Thread
-                            .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
-                            .subscribe(new Subscriber<String>() {
-                                @Override
-                                public void onCompleted() {
-                                    Log.d(LOG_TAG, "onCompleted() called");
-                                    allNewsHaveLoaded();
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    Log.e(LOG_TAG, e.toString());
-                                }
-
-                                @Override
-                                public void onNext(String response) {
-                                    Log.d(LOG_TAG, "onNext() called with: response = [" + response + "]");
-
-
-                                    // The JSON that the sever responds starts with //
-                                    // I am cropping the first two characters to create valid JSON.
-                                    response = response.substring(2);
-
-                                    try {
-                                        JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
-                                        News news = parseJSONNews(rootJson);
-
-                                        knownNews.put(news.getPressId(), news);
-
-                                        // Save the news to a file so it doesn't need to be loaded next time
-                                        cacheNews(news);
-
-                                    } catch (JSONException e) {
-                                        FirebaseCrash.report(e);
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-
-
-
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
-                    e.printStackTrace();
-                }
+            public void onNext(News news) {
+                knownNews.put(news.getPressId(), news);
+                // Save the news to a file so it doesn't need to be loaded next time
+                cacheNews(news);
             }
         };
 
