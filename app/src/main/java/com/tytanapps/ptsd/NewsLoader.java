@@ -28,7 +28,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -42,7 +42,7 @@ public abstract class NewsLoader {
 
     // The number of news articles that have already loaded, either by API or from cache
     // This number is still incremented when the API load fails
-    private int numberOfLoadedArticles = 0;
+    //private int numberOfLoadedArticles = 0;
 
     // Stores the news that have already loaded
     // Key: Press id
@@ -109,13 +109,64 @@ public abstract class NewsLoader {
                         pressIds.add(ptsdProgramJson.getInt("PRESS_ID"));
                     }
 
-                    Observable<Integer> observable = Observable.from(pressIds);
-                    observable.subscribe(new Action1<Integer>() {
+                    Observable<String> observable = Observable.from(pressIds).map(new Func1<Integer, String>() {
                         @Override
-                        public void call(Integer integer) {
-                            loadArticle(integer, numberOfResults);
+                        public String call(Integer news_id) {
+                            try {
+                                return Utilities.readFromUrl(calculateArticleURL(news_id));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                return "";
+                            }
                         }
                     });
+
+                    observable
+                            .subscribeOn(Schedulers.newThread()) // Create a new Thread
+                            .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
+                            .subscribe(new Subscriber<String>() {
+                                @Override
+                                public void onCompleted() {
+                                    Log.d(LOG_TAG, "onCompleted() called");
+                                    allNewsHaveLoaded();
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Log.e(LOG_TAG, e.toString());
+                                    //incrementLoadedArticleCount(numberOfNews);
+                                }
+
+                                @Override
+                                public void onNext(String response) {
+                                    Log.d(LOG_TAG, "onNext() called with: response = [" + response + "]");
+
+
+                                    // The JSON that the sever responds starts with //
+                                    // I am cropping the first two characters to create valid JSON.
+                                    response = response.substring(2);
+
+                                    try {
+                                        JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
+                                        News news = parseJSONNews(rootJson);
+
+                                        knownNews.put(news.getPressId(), news);
+
+                                        // Save the news to a file so it doesn't need to be loaded next time
+                                        cacheNews(news);
+
+                                        //numberOfLoadedArticles++;
+
+                                        //if(numberOfLoadedArticles == numberOfNews)
+                                        //    allNewsHaveLoaded();
+
+                                    } catch (JSONException e) {
+                                        FirebaseCrash.report(e);
+                                        e.printStackTrace();
+                                        //incrementLoadedArticleCount(numberOfNews);
+                                    }
+                                }
+                            });
 
 
 
@@ -126,18 +177,21 @@ public abstract class NewsLoader {
             }
         };
 
-        fetchNews.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
+        fetchNews
+                .subscribeOn(Schedulers.newThread()) // Create a new Thread
+                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
                 .subscribe(newsObserver);
     }
 
     private void loadArticle(final int news_id, final int numberOfNews) {
+        /*
         News cachedNews = readCachedNews(news_id);
         if(cachedNews != null) {
             knownNews.put(news_id, cachedNews);
             incrementLoadedArticleCount(numberOfNews);
             return;
         }
+        */
 
         final String url = calculateArticleURL(news_id);
         Observable<String> fetchNews = Observable.create(new Observable.OnSubscribe<String>() {
@@ -181,10 +235,10 @@ public abstract class NewsLoader {
                             // Save the news to a file so it doesn't need to be loaded next time
                             cacheNews(news);
 
-                            numberOfLoadedArticles++;
+                            //numberOfLoadedArticles++;
 
-                            if(numberOfLoadedArticles == numberOfNews)
-                                allNewsHaveLoaded();
+                            //if(numberOfLoadedArticles == numberOfNews)
+                            //    allNewsHaveLoaded();
 
                         } catch (JSONException e) {
                             FirebaseCrash.report(e);
@@ -196,9 +250,9 @@ public abstract class NewsLoader {
     }
 
     private void incrementLoadedArticleCount(int numberOfNews) {
-        numberOfLoadedArticles++;
+        //numberOfLoadedArticles++;
 
-        if(numberOfLoadedArticles == numberOfNews)
+        //if(numberOfLoadedArticles == numberOfNews)
             allNewsHaveLoaded();
     }
 
@@ -241,7 +295,7 @@ public abstract class NewsLoader {
     }
 
     public void refresh() {
-        numberOfLoadedArticles = 0;
+        //numberOfLoadedArticles = 0;
         knownNews.clear();
         loadNews();
     }
