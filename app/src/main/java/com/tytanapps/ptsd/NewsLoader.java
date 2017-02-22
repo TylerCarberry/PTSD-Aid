@@ -1,10 +1,8 @@
 package com.tytanapps.ptsd;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.util.Log;
 
-import com.android.volley.RequestQueue;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
@@ -41,15 +39,12 @@ public abstract class NewsLoader {
 
     private Fragment fragment;
 
-    // The number of news articles that have already loaded, either by API or from cache
-    // This number is still incremented when the API load fails
-    //private int numberOfLoadedArticles = 0;
-
     // Stores the news that have already loaded
     // Key: Press id
     // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
+    // The number of news to load from the api
     private static final int NEWS_TO_LOAD = 50;
 
     public NewsLoader(Fragment fragment) {
@@ -61,6 +56,7 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
+        // Start with the base api url
         Observable<News> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, JSONObject>() {
             @Override
             public JSONObject call(String url) {
@@ -83,6 +79,7 @@ public abstract class NewsLoader {
             public Boolean call(JSONObject j) {
                 return j != null;
             }*/
+        // Given the JSONObject response, return a list of urls that contain more info about each individual news article
         }).map(new Func1<JSONObject, List<String>>() {
             @Override
             public List<String> call(JSONObject jsonObject) {
@@ -99,11 +96,13 @@ public abstract class NewsLoader {
                     return null;
                 }
             }
+            // Flatten the list into just it's individual elements
         }).flatMap(new Func1<List<String>, Observable<String>>() {
             @Override
             public Observable<String> call(List<String> strings) {
                 return Observable.from(strings);
             }
+            // Get the api request for each individual news story
         }).map(new Func1<String, String>() {
             @Override
             public String call(String url) {
@@ -114,6 +113,7 @@ public abstract class NewsLoader {
                     return "";
                 }
             }
+            // Convert each Json response into a News object
         }).map(new Func1<String, News>() {
             @Override
             public News call(String response) {
@@ -134,23 +134,30 @@ public abstract class NewsLoader {
             }*/
         });
 
-
-
-
-
         Observer<News> newsObserver = new Observer<News>() {
+            /**
+             * Gets called after all News items have loaded
+             */
             @Override
             public void onCompleted() {
                 Log.d(LOG_TAG, "onCompleted() called");
                 allNewsHaveLoaded();
             }
 
+            /**
+             * If an error occurred
+             * @param e the error that occurred
+             */
             @Override
             public void onError(Throwable e) {
                 Log.e(LOG_TAG, e.toString());
                 errorLoadingResults("Unable to load the news. Check you internet connection.");
             }
 
+            /**
+             * Get called for every News object
+             * @param news The news object that loaded
+             */
             @Override
             public void onNext(News news) {
                 knownNews.put(news.getPressId(), news);
@@ -160,11 +167,17 @@ public abstract class NewsLoader {
         };
 
         fetchNews
-                .subscribeOn(Schedulers.newThread()) // Create a new Thread
-                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread
+                .subscribeOn(Schedulers.newThread()) // Load the News on a new thread
+                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread to display the news
                 .subscribe(newsObserver);
     }
 
+    /**
+     * Given a json response from the api, return a News object
+     * @param rootJson The json response from the api
+     * @return The article converted into a News
+     * @throws JSONException If the json is malformed
+     */
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
         String title = rootJson.getString("PRESS_TITLE");
 
@@ -254,8 +267,6 @@ public abstract class NewsLoader {
         return new File(fragment.getActivity().getFilesDir(), fileName);
     }
 
-
-
     /**
      * Get the url for the PTSD Programs API
      * @return The url for the PTSD Programs API
@@ -266,19 +277,6 @@ public abstract class NewsLoader {
 
     private String calculateArticleURL(int pressId) {
         return "https://www.va.gov/webservices/press/releases.cfc?method=getPressDetail_array&press_id=" + pressId + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
-    }
-
-    /**
-     * Get the request queue and create it if necessary
-     * Precondition: fragment is a member of MainActivity
-     * @return The request queue
-     */
-    private RequestQueue getRequestQueue() {
-        Activity parentActivity = fragment.getActivity();
-        if(parentActivity != null && parentActivity instanceof MainActivity) {
-            return ((MainActivity) fragment.getActivity()).getRequestQueue();
-        }
-        return null;
     }
 
 }
