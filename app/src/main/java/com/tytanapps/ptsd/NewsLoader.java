@@ -80,58 +80,34 @@ public abstract class NewsLoader {
                 return j != null;
             }*/
         // Given the JSONObject response, return a list of urls that contain more info about each individual news article
-        }).map(new Func1<JSONObject, List<String>>() {
+        }).map(new Func1<JSONObject, List<Integer>>() {
             @Override
-            public List<String> call(JSONObject jsonObject) {
+            public List<Integer> call(JSONObject jsonObject) {
                 try {
-                    List<String> newsUrls = new LinkedList<>();
+                    List<Integer> pressids = new LinkedList<>();
                     int numberOfResults = jsonObject.getInt("MATCHES");
                     for (int i = 1; i <= numberOfResults; i++) {
                         JSONObject ptsdProgramJson = jsonObject.getJSONObject("RESULTS").getJSONObject("" + i);
-                        newsUrls.add(calculateArticleURL(ptsdProgramJson.getInt("PRESS_ID")));
+                        pressids.add(ptsdProgramJson.getInt("PRESS_ID"));
                     }
-                    return newsUrls;
+                    return pressids;
                 }catch (JSONException e) {
                     Log.e(LOG_TAG, "call: ", e);
                     return null;
                 }
             }
             // Flatten the list into just it's individual elements
-        }).flatMap(new Func1<List<String>, Observable<String>>() {
+        }).flatMap(new Func1<List<Integer>, Observable<Integer>>() {
             @Override
-            public Observable<String> call(List<String> strings) {
+            public Observable<Integer> call(List<Integer> strings) {
                 return Observable.from(strings);
             }
             // Get the api request for each individual news story
-        }).map(new Func1<String, String>() {
+        }).flatMap(new Func1<Integer, Observable<? extends News>>() {
             @Override
-            public String call(String url) {
-                try {
-                    return Utilities.readFromUrl(url);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return "";
-                }
+            public Observable<? extends News> call(Integer integer) {
+                return fetchArticle(integer);
             }
-            // Convert each Json response into a News object
-        }).map(new Func1<String, News>() {
-            @Override
-            public News call(String response) {
-                response = response.substring(2);
-
-                try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
-                    return parseJSONNews(rootJson);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        /*}).filter(new Func1<News, Boolean>() {
-            @Override
-            public Boolean call(News news) {
-                return news != null;
-            }*/
         });
 
         Observer<News> newsObserver = new Observer<News>() {
@@ -170,6 +146,49 @@ public abstract class NewsLoader {
                 .subscribeOn(Schedulers.newThread()) // Load the News on a new thread
                 .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread to display the news
                 .subscribe(newsObserver);
+    }
+
+    private Observable<News> fetchArticle(final int pressid) {
+        return Observable.concat(
+                fetchArticleFromCache(pressid),
+                fetchArticleFromNetwork(pressid)
+        ).filter(new Func1<News, Boolean>() {
+            @Override
+            public Boolean call(News news) {
+                return news != null;
+            }
+        }).first();
+    }
+
+
+    private Observable<News> fetchArticleFromCache(final int pressid) {
+        return Observable.just(pressid).map(new Func1<Integer, News>() {
+            @Override
+            public News call(Integer pressid) {
+                return readCachedNews(pressid);
+            }
+        });
+    }
+
+
+    private Observable<News> fetchArticleFromNetwork(final int pressId) {
+        return Observable.just(pressId).map(new Func1<Integer, News>() {
+            @Override
+            public News call(Integer integer) {
+                try {
+                    String response = Utilities.readFromUrl(calculateArticleURL(pressId));
+                    response = response.substring(2);
+                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
+                    return parseJSONNews(rootJson);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        });
     }
 
     /**
