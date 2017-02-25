@@ -35,6 +35,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
 import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
 
 /**
@@ -44,10 +50,6 @@ public abstract class FacilityLoader {
     private static final String LOG_TAG = FacilityLoader.class.getSimpleName();
 
     private Fragment fragment;
-
-    // The number of VA facilities that have already loaded, either by API or from cache
-    // This number is still incremented when the API load fails
-    private int numberOfLoadedFacilities = 0;
 
     // Stores the facilities that have already loaded
     // Key: VA Id, Value: The facility with the given id
@@ -67,7 +69,6 @@ public abstract class FacilityLoader {
      */
     public void loadPTSDPrograms() {
         String url = buildPTSDUrl();
-
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -106,11 +107,43 @@ public abstract class FacilityLoader {
                 // We only have the id of each facility. Load the rest of the information
                 // about that location such as phone number and address.
                 if (knownFacilities != null && knownFacilities.size() > 0) {
-                    for (int facilityId : knownFacilities.keySet()) {
-                        Facility facility = knownFacilities.get(facilityId);
+                    Observable.from(knownFacilities.keySet()).observeOn(Schedulers.newThread())
+                            .subscribeOn(AndroidSchedulers.mainThread())
+                            .flatMap(new Func1<Integer, Observable<Facility>>() {
+                        @Override
+                        public Observable<Facility> call(Integer facilityId) {
+                            return loadFacility(facilityId);
+                        }
+                    })
+                    .subscribe(new Subscriber<Facility>() {
+                        @Override
+                        public void onCompleted() {
+                            fragment.getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    allFacilitiesHaveLoaded();
+                                }
+                            });
 
-                        // Try to load the facility from cache
-                        Facility cachedFacility = readCachedFacility(facilityId);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e(LOG_TAG, "onError: ", e);
+                        }
+
+                        @Override
+                        public void onNext(Facility facility) {
+                            knownFacilities.put(facility.getFacilityId(), facility);
+                        }
+                    });
+
+
+                    //for (int facilityId : knownFacilities.keySet()) {
+                    //Facility facility = knownFacilities.get(facilityId);
+
+                    // Try to load the facility from cache
+                        /*Facility cachedFacility = readCachedFacility(facilityId);
                         if (cachedFacility != null) {
                             facility = cachedFacility;
                             knownFacilities.put(facilityId, facility);
@@ -122,8 +155,9 @@ public abstract class FacilityLoader {
                         }
                         // Load the facility using the api. Display them after they all load
                         else
-                            loadFacility(facility, knownFacilities.size());
+
                     }
+                    */
                 }
             }
         }, new Response.ErrorListener() {
@@ -168,79 +202,49 @@ public abstract class FacilityLoader {
         knownFacilities.put(facilityID, facility);
     }
 
-    /**
-     * Fully load a single facility
-     * @param facility The facility to load, must contain an id. The results of the load are placed into it
-     * @param numberOfFacilities The number of facilities that are being loaded
-     */
-    private void loadFacility(final Facility facility, final int numberOfFacilities) {
-        String url = buildFacilityUrl(facility.getFacilityId(), fragment.getString(R.string.api_key_va_facilities));
-
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+    private Observable<Facility> loadFacility(int facilityId) {
+        Log.d(LOG_TAG, "loadFacility() called with: facilityId = [" + facilityId + "]");
+        Observable<Facility> facilityObservable = Observable.just(facilityId).map(new Func1<Integer, Facility>() {
             @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // I am cropping the first two characters to create valid JSON.
-                response = response.substring(2);
-
+            public Facility call(Integer facilityId) {
                 try {
+                    String response = Utilities.readFromUrl(buildFacilityUrl(facilityId, fragment.getString(R.string.api_key_va_facilities)));
+                    // The JSON that the sever responds starts with //
+                    // I am cropping the first two characters to create valid JSON.
+                    response = response.substring(2);
+
                     // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    parseJSONFacility(facility, rootJson);
+                    return parseJSONFacility(facilityId, rootJson);
 
                     // Save the facility to a file so it doesn't need to be loaded next time
-                    cacheFacility(facility);
+                    //cacheFacility(facility);
 
-                    numberOfLoadedFacilities++;
+                    //numberOfLoadedFacilities++;
 
                     // When all facilities have loaded, sort them by distance and show them to the user
-                    if(numberOfLoadedFacilities == numberOfFacilities)
-                        allFacilitiesHaveLoaded();
+                    //if(numberOfLoadedFacilities == numberOfFacilities)
+                    //   allFacilitiesHaveLoaded();
 
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
+                } catch (IOException e) {
                     e.printStackTrace();
-                    numberOfLoadedFacilities++;
-
-                    // When all facilities have loaded, sort them by distance and show them to the user
-                    if(numberOfLoadedFacilities == numberOfFacilities)
-                        allFacilitiesHaveLoaded();
+                    return null;
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                numberOfLoadedFacilities++;
-
-                // When all facilities have loaded, sort them by distance and show them to the user
-                if(numberOfLoadedFacilities == numberOfFacilities)
-                    allFacilitiesHaveLoaded();
+                return null;
             }
         });
 
-        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        // Volley does retry for you if you have specified the policy.
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        return facilityObservable;
 
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            numberOfLoadedFacilities++;
     }
 
-    /**
-     * Parse the JSON facility and save it to a Facility object
-     * @param facilityToUpdate The facility to save the information to
-     * @param rootJson To JSON containing information about the VA facility
-     * @throws JSONException Invalid facility JSON
-     */
-    private Facility parseJSONFacility(Facility facilityToUpdate, JSONObject rootJson) throws JSONException {
+
+
+    private Facility parseJSONFacility(int facilityId, JSONObject rootJson) throws JSONException {
+        Facility facility = new Facility(facilityId);
+
         JSONObject locationJson = rootJson.getJSONObject("1");
 
         String name = (String) locationJson.get("FAC_NAME");
@@ -259,7 +263,7 @@ public abstract class FacilityLoader {
         // The description contains the distance and all PTSD programs located there
         if(userLocation[0] != 0 && userLocation[1] != 0) {
             double distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1]);
-            facilityToUpdate.setDistance(distance);
+            facility.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
             description = "Distance: " + df.format(distance) + " miles";
@@ -267,20 +271,20 @@ public abstract class FacilityLoader {
 
         if(Utilities.getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
             description += "\n";
-            Set<String> programs = facilityToUpdate.getPrograms();
+            Set<String> programs = facility.getPrograms();
             for(String program : programs)
                 description += "\n" + program;
         }
 
-        facilityToUpdate.setName(name);
-        facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
-        facilityToUpdate.setUrl(url);
-        facilityToUpdate.setAddress(address, city, state, zip);
-        facilityToUpdate.setDescription(description);
-        facilityToUpdate.setLatitude(locationLat);
-        facilityToUpdate.setLongitude(locationLong);
+        facility.setName(name);
+        facility.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
+        facility.setUrl(url);
+        facility.setAddress(address, city, state, zip);
+        facility.setDescription(description);
+        facility.setLatitude(locationLat);
+        facility.setLongitude(locationLong);
 
-        return facilityToUpdate;
+        return facility;
     }
 
     /**
@@ -412,6 +416,8 @@ public abstract class FacilityLoader {
      * Called when all facilities have loaded and knownValues is fully populated
      */
     public void allFacilitiesHaveLoaded() {
+        Log.d(LOG_TAG, "allFacilitiesHaveLoaded() called");
+
         ArrayList<Facility> facilitiesList = new ArrayList<>();
         for(Facility facility : knownFacilities.values()) {
             facilitiesList.add(facility);
@@ -424,7 +430,7 @@ public abstract class FacilityLoader {
     }
 
     public void refresh() {
-        numberOfLoadedFacilities = 0;
+        //numberOfLoadedFacilities = 0;
         knownFacilities.clear();
         loadPTSDPrograms();
     }
