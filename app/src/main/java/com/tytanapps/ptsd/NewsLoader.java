@@ -80,9 +80,9 @@ public abstract class NewsLoader {
                 return j != null;
             }*/
         // Given the JSONObject response, return a list of urls that contain more info about each individual news article
-        }).map(new Func1<JSONObject, List<Integer>>() {
+        }).flatMap(new Func1<JSONObject, Observable<Integer>>() {
             @Override
-            public List<Integer> call(JSONObject jsonObject) {
+            public Observable<Integer> call(JSONObject jsonObject) {
                 try {
                     List<Integer> pressids = new LinkedList<>();
                     int numberOfResults = jsonObject.getInt("MATCHES");
@@ -90,19 +90,13 @@ public abstract class NewsLoader {
                         JSONObject ptsdProgramJson = jsonObject.getJSONObject("RESULTS").getJSONObject("" + i);
                         pressids.add(ptsdProgramJson.getInt("PRESS_ID"));
                     }
-                    return pressids;
-                }catch (JSONException e) {
+                    return Observable.from(pressids);
+                } catch (JSONException e) {
                     Log.e(LOG_TAG, "call: ", e);
                     return null;
                 }
             }
             // Flatten the list into just it's individual elements
-        }).flatMap(new Func1<List<Integer>, Observable<Integer>>() {
-            @Override
-            public Observable<Integer> call(List<Integer> strings) {
-                return Observable.from(strings);
-            }
-            // Get the api request for each individual news story
         }).flatMap(new Func1<Integer, Observable<? extends News>>() {
             @Override
             public Observable<? extends News> call(Integer integer) {
@@ -161,6 +155,11 @@ public abstract class NewsLoader {
     }
 
 
+    /**
+     * Fetch a News article from cache. Returns null if it doesn't exist
+     * @param pressid The press id of the Article
+     * @return The News item with the given press id, null if it doesn't exist in cache
+     */
     private Observable<News> fetchArticleFromCache(final int pressid) {
         return Observable.just(pressid).map(new Func1<Integer, News>() {
             @Override
@@ -235,11 +234,31 @@ public abstract class NewsLoader {
         onSuccess(newsArrayList);
     }
 
+    /**
+     * Reload the News articles from the network
+     */
     public void refresh() {
+        clearNewsCache();
         knownNews.clear();
         loadNews();
     }
 
+    /**
+     * Clear the cached news articles
+     */
+    private void clearNewsCache() {
+        for(int pressid : knownNews.keySet()) {
+            File file = getNewsFile(pressid);
+            if(file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    /**
+     * Save a News article to a cache file
+     * @param news The News to save
+     */
     private void cacheNews(News news) {
         File file = getNewsFile(news.getPressId());
         ObjectOutput out;
@@ -254,6 +273,11 @@ public abstract class NewsLoader {
         }
     }
 
+    /**
+     * Read a News article from cache, returns null if it doesn't exist in cache
+     * @param pressId The press id of the article to find
+     * @return the news article if it exists in cache, null otherwise
+     */
     private News readCachedNews(int pressId) {
         ObjectInputStream input;
         File file = getNewsFile(pressId);
