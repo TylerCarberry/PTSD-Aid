@@ -1,14 +1,8 @@
 package com.tytanapps.ptsd;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.util.Log;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
@@ -25,7 +19,16 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Load the list of recent PTSD News Articles
@@ -36,15 +39,12 @@ public abstract class NewsLoader {
 
     private Fragment fragment;
 
-    // The number of news articles that have already loaded, either by API or from cache
-    // This number is still incremented when the API load fails
-    private int numberOfLoadedArticles = 0;
-
     // Stores the news that have already loaded
     // Key: Press id
     // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
+    // The number of news to load from the api
     private static final int NEWS_TO_LOAD = 50;
 
     public NewsLoader(Fragment fragment) {
@@ -56,125 +56,146 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
-        String url = calculateNewsUrl();
-
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+        // Start with the base api url
+        Observable<News> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, JSONObject>() {
             @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // Trim the first two characters to create valid JSON.
-                response = response.substring(2);
-
-                // Load the initial JSON request
+            public JSONObject call(String url) {
                 try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
-
-                    if (numberOfResults == 0) {
-                        errorLoadingResults(fragment.getString(R.string.error_load_news));
-                        return;
-                    }
-
-                    for (int i = 1; i <= numberOfResults; i++) {
-                        JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-                        int pressId = ptsdProgramJson.getInt("PRESS_ID");
-
-                        loadArticle(pressId, numberOfResults);
-
-                    }
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
+                    String response = Utilities.readFromUrl(url).substring(2);
+                    Log.d(TAG, "call() called with: url = [" + url + "]");
+                    Log.d(TAG, "call: " + response);
+                    return new JSONObject(response);
+                } catch (IOException e) {
                     e.printStackTrace();
+                    errorLoadingResults("Unable to load the news. Check you internet connection.");
+                    return null;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
                 }
             }
-        }, new Response.ErrorListener() {
+        /*}).filter(new Func1<JSONObject, Boolean>() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
+            public Boolean call(JSONObject j) {
+                return j != null;
+            }*/
+        // Given the JSONObject response, return a list of urls that contain more info about each individual news article
+        }).flatMap(new Func1<JSONObject, Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call(JSONObject jsonObject) {
+                try {
+                    List<Integer> pressids = new LinkedList<>();
+                    int numberOfResults = jsonObject.getInt("MATCHES");
+                    for (int i = 1; i <= numberOfResults; i++) {
+                        JSONObject ptsdProgramJson = jsonObject.getJSONObject("RESULTS").getJSONObject("" + i);
+                        pressids.add(ptsdProgramJson.getInt("PRESS_ID"));
+                    }
+                    return Observable.from(pressids);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "call: ", e);
+                    return null;
+                }
+            }
+            // Flatten the list into just it's individual elements
+        }).flatMap(new Func1<Integer, Observable<? extends News>>() {
+            @Override
+            public Observable<? extends News> call(Integer integer) {
+                return fetchArticle(integer);
+            }
+        });
+
+        Observer<News> newsObserver = new Observer<News>() {
+            /**
+             * Gets called after all News items have loaded
+             */
+            @Override
+            public void onCompleted() {
+                Log.d(LOG_TAG, "onCompleted() called");
+                allNewsHaveLoaded();
+            }
+
+            /**
+             * If an error occurred
+             * @param e the error that occurred
+             */
+            @Override
+            public void onError(Throwable e) {
+                Log.e(LOG_TAG, e.toString());
                 errorLoadingResults("Unable to load the news. Check you internet connection.");
             }
-        });
 
-        // Set a longer Volley timeout policy
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            /**
+             * Get called for every News object
+             * @param news The news object that loaded
+             */
+            @Override
+            public void onNext(News news) {
+                knownNews.put(news.getPressId(), news);
+                // Save the news to a file so it doesn't need to be loaded next time
+                cacheNews(news);
+            }
+        };
 
-        // Start loading the PTSD programs in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if (requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            errorLoadingResults("Unable to load the news. Check you internet connection.");
+        fetchNews
+                .subscribeOn(Schedulers.newThread()) // Load the News on a new thread
+                .observeOn(AndroidSchedulers.mainThread()) // Use the UI thread to display the news
+                .subscribe(newsObserver);
     }
 
-    private void loadArticle(final int news_id, final int numberOfNews) {
-        News cachedNews = readCachedNews(news_id);
-        if(cachedNews != null) {
-            knownNews.put(news_id, cachedNews);
-            incrementLoadedArticleCount(numberOfNews);
-            return;
-        }
-
-        String url = calculateArticleURL(news_id);
-
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+    private Observable<News> fetchArticle(final int pressid) {
+        return Observable.concat(
+                fetchArticleFromCache(pressid),
+                fetchArticleFromNetwork(pressid)
+        ).filter(new Func1<News, Boolean>() {
             @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // I am cropping the first two characters to create valid JSON.
-                response = response.substring(2);
+            public Boolean call(News news) {
+                return news != null;
+            }
+        }).first();
+    }
 
+
+    /**
+     * Fetch a News article from cache. Returns null if it doesn't exist
+     * @param pressid The press id of the Article
+     * @return The News item with the given press id, null if it doesn't exist in cache
+     */
+    private Observable<News> fetchArticleFromCache(final int pressid) {
+        return Observable.just(pressid).map(new Func1<Integer, News>() {
+            @Override
+            public News call(Integer pressid) {
+                return readCachedNews(pressid);
+            }
+        });
+    }
+
+
+    private Observable<News> fetchArticleFromNetwork(final int pressId) {
+        return Observable.just(pressId).map(new Func1<Integer, News>() {
+            @Override
+            public News call(Integer integer) {
                 try {
+                    String response = Utilities.readFromUrl(calculateArticleURL(pressId));
+                    response = response.substring(2);
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
-                    News news = parseJSONNews(rootJson);
-
-                    knownNews.put(news_id, news);
-
-                    // Save the news to a file so it doesn't need to be loaded next time
-                    cacheNews(news);
-
-                    numberOfLoadedArticles++;
-
-                    if(numberOfLoadedArticles == numberOfNews)
-                        allNewsHaveLoaded();
-
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
+                    return parseJSONNews(rootJson);
+                } catch (IOException e) {
                     e.printStackTrace();
-                    incrementLoadedArticleCount(numberOfNews);
+                    return null;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
                 }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                incrementLoadedArticleCount(numberOfNews);
             }
         });
-
-        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        // Volley does retry for you if you have specified the policy.
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            numberOfLoadedArticles++;
     }
 
-    private void incrementLoadedArticleCount(int numberOfNews) {
-        numberOfLoadedArticles++;
-
-        if(numberOfLoadedArticles == numberOfNews)
-            allNewsHaveLoaded();
-    }
-
+    /**
+     * Given a json response from the api, return a News object
+     * @param rootJson The json response from the api
+     * @return The article converted into a News
+     * @throws JSONException If the json is malformed
+     */
     private News parseJSONNews(JSONObject rootJson) throws JSONException {
         String title = rootJson.getString("PRESS_TITLE");
 
@@ -213,12 +234,31 @@ public abstract class NewsLoader {
         onSuccess(newsArrayList);
     }
 
+    /**
+     * Reload the News articles from the network
+     */
     public void refresh() {
-        numberOfLoadedArticles = 0;
+        clearNewsCache();
         knownNews.clear();
         loadNews();
     }
 
+    /**
+     * Clear the cached news articles
+     */
+    private void clearNewsCache() {
+        for(int pressid : knownNews.keySet()) {
+            File file = getNewsFile(pressid);
+            if(file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    /**
+     * Save a News article to a cache file
+     * @param news The News to save
+     */
     private void cacheNews(News news) {
         File file = getNewsFile(news.getPressId());
         ObjectOutput out;
@@ -233,6 +273,11 @@ public abstract class NewsLoader {
         }
     }
 
+    /**
+     * Read a News article from cache, returns null if it doesn't exist in cache
+     * @param pressId The press id of the article to find
+     * @return the news article if it exists in cache, null otherwise
+     */
     private News readCachedNews(int pressId) {
         ObjectInputStream input;
         File file = getNewsFile(pressId);
@@ -265,8 +310,6 @@ public abstract class NewsLoader {
         return new File(fragment.getActivity().getFilesDir(), fileName);
     }
 
-
-
     /**
      * Get the url for the PTSD Programs API
      * @return The url for the PTSD Programs API
@@ -277,19 +320,6 @@ public abstract class NewsLoader {
 
     private String calculateArticleURL(int pressId) {
         return "https://www.va.gov/webservices/press/releases.cfc?method=getPressDetail_array&press_id=" + pressId + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
-    }
-
-    /**
-     * Get the request queue and create it if necessary
-     * Precondition: fragment is a member of MainActivity
-     * @return The request queue
-     */
-    private RequestQueue getRequestQueue() {
-        Activity parentActivity = fragment.getActivity();
-        if(parentActivity != null && parentActivity instanceof MainActivity) {
-            return ((MainActivity) fragment.getActivity()).getRequestQueue();
-        }
-        return null;
     }
 
 }

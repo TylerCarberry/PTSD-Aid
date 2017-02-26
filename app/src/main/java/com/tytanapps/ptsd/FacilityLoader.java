@@ -1,18 +1,10 @@
 package com.tytanapps.ptsd;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
@@ -35,7 +27,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
+import static com.tytanapps.ptsd.Utilities.distanceBetweenCoordinates;
+import static com.tytanapps.ptsd.Utilities.getFirstPhoneNumber;
+import static com.tytanapps.ptsd.Utilities.getGPSLocation;
+import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
 import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
+import static com.tytanapps.ptsd.Utilities.loadBitmapFromFile;
+import static com.tytanapps.ptsd.Utilities.readBitmapFromUrl;
+import static com.tytanapps.ptsd.Utilities.readFromUrl;
+import static com.tytanapps.ptsd.Utilities.saveBitmapToFile;
+import static rx.Observable.just;
 
 /**
  * Created by Tyler on 6/26/16.
@@ -44,10 +52,6 @@ public abstract class FacilityLoader {
     private static final String LOG_TAG = FacilityLoader.class.getSimpleName();
 
     private Fragment fragment;
-
-    // The number of VA facilities that have already loaded, either by API or from cache
-    // This number is still incremented when the API load fails
-    private int numberOfLoadedFacilities = 0;
 
     // Stores the facilities that have already loaded
     // Key: VA Id, Value: The facility with the given id
@@ -66,85 +70,81 @@ public abstract class FacilityLoader {
      * There are multiple PTSD programs per VA facility.
      */
     public void loadPTSDPrograms() {
-        String url = buildPTSDUrl();
-
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // Trim the first two characters to create valid JSON.
-                response = response.substring(2);
-
-                // Load the initial JSON request. This this is a program name and the
-                // facility ID where it is located.
-                try {
-                    JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    int numberOfResults = new JSONObject(response).getInt("MATCHES");
-
-                    if (numberOfResults == 0) {
-                        errorLoadingResults("Error");
-                        return;
-                    }
-
-                    double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
-                    // If the user's GPS location cannot be found
-                    if (userLocation[0] == 0 && userLocation[1] == 0) {
-                        errorLoadingResults(fragment.getString(R.string.gps_error));
-                        return;
-                    }
-
-                    // Add each PTSD program to the correct VA facility
-                    for (int i = 1; i < numberOfResults; i++) {
-                        JSONObject ptsdProgramJson = rootJson.getJSONObject(""+i);
-                        addPTSDProgram(ptsdProgramJson);
-                    }
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
-                    e.printStackTrace();
-                }
-
-                // We only have the id of each facility. Load the rest of the information
-                // about that location such as phone number and address.
-                if (knownFacilities != null && knownFacilities.size() > 0) {
-                    for (int facilityId : knownFacilities.keySet()) {
-                        Facility facility = knownFacilities.get(facilityId);
-
-                        // Try to load the facility from cache
-                        Facility cachedFacility = readCachedFacility(facilityId);
-                        if (cachedFacility != null) {
-                            facility = cachedFacility;
-                            knownFacilities.put(facilityId, facility);
-                            numberOfLoadedFacilities++;
-
-                            // When all facilities have loaded, sort them by distance and show them to the user
-                            if (numberOfLoadedFacilities == knownFacilities.size())
-                                allFacilitiesHaveLoaded();
+        Observable<Facility> facilityObservable = Observable.just(buildPTSDUrl())
+                .map(new Func1<String, String>() {
+                    @Override
+                    public String call(String s) {
+                        try {
+                            return readFromUrl(s);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
                         }
-                        // Load the facility using the api. Display them after they all load
-                        else
-                            loadFacility(facility, knownFacilities.size());
                     }
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                errorLoadingResults("Error");
-            }
-        });
+                }).flatMap(new Func1<String, Observable<Integer>>() {
+                    @Override
+                    public Observable<Integer> call(String response) {
+                        // The JSON that the sever responds starts with //
+                        // Trim the first two characters to create valid JSON.
+                        response = response.substring(2);
 
-        // Set a longer Volley timeout policy
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000, // Timeout in milliseconds
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        // Load the initial JSON request. This this is a program name and the
+                        // facility ID where it is located.
+                        try {
+                            JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
+                            int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
-        // Start loading the PTSD programs in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if (requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            errorLoadingResults("Error");
+                            if (numberOfResults == 0) {
+                                errorLoadingResults("Error");
+                                return null;
+                            }
+
+                            double[] userLocation = getGPSLocation(fragment.getActivity());
+                            // If the user's GPS location cannot be found
+                            if (userLocation[0] == 0 && userLocation[1] == 0) {
+                                errorLoadingResults(fragment.getString(R.string.gps_error));
+                                return null;
+                            }
+
+                            // Add each PTSD program to the correct VA facility
+                            for (int i = 1; i < numberOfResults; i++) {
+                                JSONObject ptsdProgramJson = rootJson.getJSONObject("" + i);
+                                addPTSDProgram(ptsdProgramJson);
+                            }
+                            return Observable.from(knownFacilities.keySet());
+                        } catch (JSONException e) {
+                            FirebaseCrash.report(e);
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                }).flatMap(new Func1<Integer, Observable<Facility>>() {
+                    @Override
+                    public Observable<Facility> call(Integer facilityId) {
+                        return loadFacility(facilityId);
+                    }
+                });
+
+        facilityObservable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Facility>() {
+                    @Override
+                    public void onCompleted() {
+                        allFacilitiesHaveLoaded();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, "onError: ", e);
+                        errorLoadingResults(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Facility facility) {
+                        knownFacilities.put(facility.getFacilityId(), facility);
+                    }
+                });
     }
 
     /**
@@ -168,79 +168,45 @@ public abstract class FacilityLoader {
         knownFacilities.put(facilityID, facility);
     }
 
-    /**
-     * Fully load a single facility
-     * @param facility The facility to load, must contain an id. The results of the load are placed into it
-     * @param numberOfFacilities The number of facilities that are being loaded
-     */
-    private void loadFacility(final Facility facility, final int numberOfFacilities) {
-        String url = buildFacilityUrl(facility.getFacilityId(), fragment.getString(R.string.api_key_va_facilities));
+    private Observable<Facility> loadFacility(int facility) {
+        return Observable.concat(Observable.just(readCachedFacility(facility)), loadFacilityFromNetwork(facility))
+                .filter(new Func1<Facility, Boolean>() {
+                    @Override
+                    public Boolean call(Facility facility) {
+                        return facility != null;
+                    }
+                }).first();
+    }
 
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+    private Observable<Facility> loadFacilityFromNetwork(int facilityId) {
+        Observable<Facility> facilityObservable = just(facilityId).map(new Func1<Integer, Facility>() {
             @Override
-            public void onResponse(String response) {
-                // The JSON that the sever responds starts with //
-                // I am cropping the first two characters to create valid JSON.
-                response = response.substring(2);
-
+            public Facility call(Integer facilityId) {
                 try {
+                    String response = readFromUrl(buildFacilityUrl(facilityId, fragment.getString(R.string.api_key_va_facilities)));
+                    // The JSON that the sever responds starts with //
+                    // I am cropping the first two characters to create valid JSON.
+                    response = response.substring(2);
+
                     // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    parseJSONFacility(facility, rootJson);
-
-                    // Save the facility to a file so it doesn't need to be loaded next time
+                    Facility facility =  parseJSONFacility(facilityId, rootJson);
                     cacheFacility(facility);
-
-                    numberOfLoadedFacilities++;
-
-                    // When all facilities have loaded, sort them by distance and show them to the user
-                    if(numberOfLoadedFacilities == numberOfFacilities)
-                        allFacilitiesHaveLoaded();
-
-                } catch (JSONException e) {
-                    FirebaseCrash.report(e);
+                    return facility;
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
-                    numberOfLoadedFacilities++;
-
-                    // When all facilities have loaded, sort them by distance and show them to the user
-                    if(numberOfLoadedFacilities == numberOfFacilities)
-                        allFacilitiesHaveLoaded();
+                    return null;
                 }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error.toString());
-                numberOfLoadedFacilities++;
-
-                // When all facilities have loaded, sort them by distance and show them to the user
-                if(numberOfLoadedFacilities == numberOfFacilities)
-                    allFacilitiesHaveLoaded();
             }
         });
 
-        // Set a retry policy in case of SocketTimeout & ConnectionTimeout Exceptions.
-        // Volley does retry for you if you have specified the policy.
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(stringRequest);
-        else
-            numberOfLoadedFacilities++;
+        return facilityObservable;
     }
 
-    /**
-     * Parse the JSON facility and save it to a Facility object
-     * @param facilityToUpdate The facility to save the information to
-     * @param rootJson To JSON containing information about the VA facility
-     * @throws JSONException Invalid facility JSON
-     */
-    private Facility parseJSONFacility(Facility facilityToUpdate, JSONObject rootJson) throws JSONException {
+
+    private Facility parseJSONFacility(int facilityId, JSONObject rootJson) throws JSONException {
+        Facility facility = new Facility(facilityId);
+
         JSONObject locationJson = rootJson.getJSONObject("1");
 
         String name = (String) locationJson.get("FAC_NAME");
@@ -255,32 +221,32 @@ public abstract class FacilityLoader {
         String url = getFacilityUrl(locationJson);
 
 
-        double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
+        double userLocation[] = getGPSLocation(fragment.getActivity());
         // The description contains the distance and all PTSD programs located there
         if(userLocation[0] != 0 && userLocation[1] != 0) {
-            double distance = Utilities.distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1]);
-            facilityToUpdate.setDistance(distance);
+            double distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1]);
+            facility.setDistance(distance);
 
             DecimalFormat df = new DecimalFormat("#.##");
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(Utilities.getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+        if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
             description += "\n";
-            Set<String> programs = facilityToUpdate.getPrograms();
+            Set<String> programs = facility.getPrograms();
             for(String program : programs)
                 description += "\n" + program;
         }
 
-        facilityToUpdate.setName(name);
-        facilityToUpdate.setPhoneNumber(Utilities.getFirstPhoneNumber(phoneNumber));
-        facilityToUpdate.setUrl(url);
-        facilityToUpdate.setAddress(address, city, state, zip);
-        facilityToUpdate.setDescription(description);
-        facilityToUpdate.setLatitude(locationLat);
-        facilityToUpdate.setLongitude(locationLong);
+        facility.setName(name);
+        facility.setPhoneNumber(getFirstPhoneNumber(phoneNumber));
+        facility.setUrl(url);
+        facility.setAddress(address, city, state, zip);
+        facility.setDescription(description);
+        facility.setLatitude(locationLat);
+        facility.setLongitude(locationLong);
 
-        return facilityToUpdate;
+        return facility;
     }
 
     /**
@@ -297,24 +263,43 @@ public abstract class FacilityLoader {
         return url;
     }
 
-    /**
-     * Load the facility image and place it into facilityImageView.
-     * Try the street view image first, then the map image, then the default image.
-     * @param facility The facility
-     */
-    public void loadFacilityImage(Facility facility) {
-        Bitmap cachedBitmap = loadCacheFacilityImage(facility.getFacilityId());
 
-        if(cachedBitmap != null) {
-            facility.setFacilityImage(cachedBitmap);
-            onLoadedImage(facility.getFacilityId());
-        }
-        else {
-            int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
-            int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
+    public void loadFacilityImage(final Facility facility) {
+        int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
+        int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
 
-            loadStreetViewImage(facility, imageWidth, imageHeight);
-        }
+        Observable<Bitmap> bitmapObservable = Observable.concat(
+                loadCacheFacilityImage(facility.getFacilityId()),
+                loadStreetViewImage(facility, imageWidth, imageHeight),
+                loadMapImage(facility, imageWidth, imageHeight))
+                .filter(new Func1<Bitmap, Boolean>() {
+                    @Override
+                    public Boolean call(Bitmap bitmap) {
+                        return bitmap != null;
+                    }
+                }).first();
+
+        Observer<Bitmap> bitmapObserver = new Observer<Bitmap>() {
+            @Override
+            public void onCompleted() {
+                onLoadedImage(facility.getFacilityId());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Bitmap bitmap) {
+                facility.setFacilityImage(bitmap);
+            }
+        };
+
+        bitmapObservable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bitmapObserver);
     }
 
     /**
@@ -323,46 +308,33 @@ public abstract class FacilityLoader {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
-        String url;
-
-        // If the street view url cannot be created, load the map view instead
+    private Observable<Bitmap> loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
         try {
-            url = buildStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
-        } catch (UnsupportedEncodingException e) {
-            FirebaseCrash.report(e);
-            loadMapImage(facility, imageWidth, imageHeight);
-            return;
-        }
-
-        // Retrieves an image specified by the URL, displays it in the UI.
-        ImageRequest request = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        // If there is no street view image for the address use the map view instead
-                        if(validStreetViewBitmap(bitmap)) {
-                            facility.setFacilityImage(bitmap);
-                            saveFacilityImage(bitmap, facility.getFacilityId());
-                            onLoadedImage(facility.getFacilityId());
+            return Observable
+                    .just(buildStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight))
+                    .filter(new Func1<String, Boolean>() {
+                        @Override
+                        public Boolean call(String s) {
+                            return streetViewAvailable(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
                         }
-                        else
-                            loadMapImage(facility, imageWidth, imageHeight);
+                    })
+                    .map(new Func1<String, Bitmap>() {
+                @Override
+                public Bitmap call(String url) {
+                    try {
+                        Bitmap bitmap = readBitmapFromUrl(url);
+                        saveFacilityImage(bitmap, facility.getFacilityId());
+                        return bitmap;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
                     }
-                }, 0, 0, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
-
-                        // Load the map view instead
-                        loadMapImage(facility, imageWidth, imageHeight);
-                    }
-                });
-
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(request);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Observable.just(null);
     }
 
     /**
@@ -371,41 +343,25 @@ public abstract class FacilityLoader {
      * You should not call this directly. Call loadFacilityImage instead
      * @param facility The facility
      */
-    private void loadMapImage(final Facility facility, int imageWidth, int imageHeight) {
-        final int defaultImageId = R.drawable.default_facility_image;
-
-        String url;
+    private Observable<Bitmap> loadMapImage(final Facility facility, int imageWidth, int imageHeight) {
         try {
-            url = buildMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
-        } catch (UnsupportedEncodingException e) {
-            FirebaseCrash.report(e);
-            e.printStackTrace();
-            facility.setFacilityImage(BitmapFactory.decodeResource(fragment.getResources(), defaultImageId));
-            return;
-        }
-
-        // Retrieves an image specified by the URL, displays it in the UI.
-        ImageRequest request = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        facility.setFacilityImage(bitmap);
+            return Observable.just(buildMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight)).map(new Func1<String, Bitmap>() {
+                @Override
+                public Bitmap call(String url) {
+                    try {
+                        Bitmap bitmap = readBitmapFromUrl(url);
                         saveFacilityImage(bitmap, facility.getFacilityId());
-                        onLoadedImage(facility.getFacilityId());
+                        return bitmap;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
                     }
-                }, 0, 0, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(LOG_TAG, "IMAGE errorListener " + error.toString());
-                        facility.setFacilityImage(BitmapFactory.decodeResource(fragment.getResources(), defaultImageId));
-                        onLoadedImage(facility.getFacilityId());
-                    }
-                });
-
-        // Start loading the image in the background
-        RequestQueue requestQueue = getRequestQueue();
-        if(requestQueue != null)
-            requestQueue.add(request);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Observable.just(null);
     }
 
     /**
@@ -424,7 +380,7 @@ public abstract class FacilityLoader {
     }
 
     public void refresh() {
-        numberOfLoadedFacilities = 0;
+        clearFacilityCache();
         knownFacilities.clear();
         loadPTSDPrograms();
     }
@@ -437,7 +393,7 @@ public abstract class FacilityLoader {
      */
     public void saveFacilityImage(Bitmap bitmap, int facilityId) {
         File file = getFacilityImageFile(facilityId);
-        Utilities.saveBitmapToFile(file, bitmap);
+        saveBitmapToFile(file, bitmap);
     }
 
     /**
@@ -445,9 +401,9 @@ public abstract class FacilityLoader {
      * @param facilityId The id of the facility
      * @return The facility image. Null if the file does not exist
      */
-    public Bitmap loadCacheFacilityImage(int facilityId) {
+    public Observable<Bitmap> loadCacheFacilityImage(int facilityId) {
         File file = getFacilityImageFile(facilityId);
-        return Utilities.loadBitmapFromFile(file);
+        return Observable.just(loadBitmapFromFile(file));
     }
 
     /**
@@ -479,6 +435,23 @@ public abstract class FacilityLoader {
     }
 
     /**
+     * Clear the cached news articles
+     */
+    private void clearFacilityCache() {
+        for(int facilityid : knownFacilities.keySet()) {
+            File file = getFacilityFile(facilityid);
+            if(file.exists()) {
+                file.delete();
+            }
+
+            file = getFacilityImageFile(facilityid);
+            if(file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    /**
      * Load the facility from the saved file
      * @param facilityId The id of the facility
      * @return The facility with the given id. Null if the facility is not saved
@@ -493,21 +466,21 @@ public abstract class FacilityLoader {
             input = new ObjectInputStream(new FileInputStream(file));
             facility = (Facility) input.readObject();
 
-            double userLocation[] = Utilities.getGPSLocation(fragment.getActivity());
+            double userLocation[] = getGPSLocation(fragment.getActivity());
             double distance;
 
             String description = "";
 
             // The description contains the distance and all PTSD programs located there
             if(userLocation[0] != 0 && userLocation[1] != 0) {
-                distance = Utilities.distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1]);
+                distance = distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1]);
                 facility.setDistance(distance);
 
                 DecimalFormat df = new DecimalFormat("#.##");
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(Utilities.getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+            if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
                 for (String program : programs)
@@ -521,7 +494,6 @@ public abstract class FacilityLoader {
             // If the file was not found, nothing is wrong.
             // It just means that the facility has not yet been cached.
         } catch (IOException | ClassNotFoundException e) {
-            FirebaseCrash.report(e);
             e.printStackTrace();
         }
 
@@ -557,6 +529,29 @@ public abstract class FacilityLoader {
 
         return builtUri.toString();
     }
+
+
+    private boolean streetViewAvailable(String address, String town, final String state, int imageWidth, int imageHeight) {
+        try {
+            String location = encodeAddress(address, town, state);
+            Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
+                    .buildUpon()
+                    .appendQueryParameter("size", imageWidth + "x" + imageHeight)
+                    .appendQueryParameter("location", location)
+                    .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
+                    .build();
+
+            String response = readFromUrl(builtUri.toString());
+            String status = new JSONObject(response).getString("status");
+
+            return status.equalsIgnoreCase("OK");
+
+        } catch (JSONException | IOException e) {
+            Log.e(LOG_TAG, "streetViewAvailable: ", e);
+            return false;
+        }
+    }
+
 
     /**
      * Get the url for the Google Maps Api
@@ -619,39 +614,6 @@ public abstract class FacilityLoader {
         String location = address + ", " + town + ", " + state;
         location = URLEncoder.encode(location, "UTF-8");
         return location;
-    }
-
-    /**
-     * Determine if the response from the Street View API was a valid street view image
-     * If there is no street view imagery for the address, Google returns a static image
-     * stating that there is no imagery. I then load a map of the address instead.
-     * I cannot find a way to check if the street view exists properly. However, since the image
-     * is always the same, I check the color of one of the pixels.
-     *
-     *** This code will break if Google changes the error message image. ***
-     *
-     * @param streetViewResponse The bitmap response that the Street View API gave
-     * @return Whether the response was a valid street view image
-     */
-    private boolean validStreetViewBitmap(Bitmap streetViewResponse) {
-        if(streetViewResponse.getWidth() > 100 && streetViewResponse.getHeight() > 100) {
-            int pixel = streetViewResponse.getPixel(100, 100);
-            return pixel != -1776674;
-        }
-        return false;
-    }
-
-    /**
-     * Get the request queue and create it if necessary
-     * Precondition: FacilitiesFragment is a member of MainActivity
-     * @return The request queue
-     */
-    private RequestQueue getRequestQueue() {
-        Activity parentActivity = fragment.getActivity();
-        if(parentActivity != null && parentActivity instanceof MainActivity) {
-            return ((MainActivity) fragment.getActivity()).getRequestQueue();
-        }
-        return null;
     }
 
 }

@@ -24,11 +24,14 @@ import android.widget.Toast;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -368,6 +371,25 @@ public class Utilities {
 
     public static String htmlToText(String html) {
         return android.text.Html.fromHtml(html).toString();
+    }
+
+    public static String readFromUrl(String urlString) throws IOException {
+        String response = "";
+
+        URL url = new URL(urlString);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            response += line;
+        }
+        reader.close();
+
+        return response;
+    }
+
+    public static Bitmap readBitmapFromUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        return BitmapFactory.decodeStream(url.openConnection().getInputStream());
     }
 
 

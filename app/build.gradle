@@ -81,6 +81,7 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
     compile 'com.github.bhargavms:DotLoader:1.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'io.reactivex:rxandroid:0.25.0'
 
     testCompile 'junit:junit:4.12'
 
