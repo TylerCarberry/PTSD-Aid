@@ -25,6 +25,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -65,13 +66,9 @@ public abstract class NewsLoader {
                     Log.d(TAG, "call() called with: url = [" + url + "]");
                     Log.d(TAG, "call: " + response);
                     return new JSONObject(response);
-                } catch (IOException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
-                    errorLoadingResults("Unable to load the news. Check you internet connection.");
-                    return null;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return null;
+                    throw Exceptions.propagate(e);
                 }
             }
         /*}).filter(new Func1<JSONObject, Boolean>() {
@@ -93,7 +90,7 @@ public abstract class NewsLoader {
                     return Observable.from(pressids);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "call: ", e);
-                    return null;
+                    throw Exceptions.propagate(e);
                 }
             }
             // Flatten the list into just it's individual elements
@@ -121,7 +118,7 @@ public abstract class NewsLoader {
             @Override
             public void onError(Throwable e) {
                 Log.e(LOG_TAG, e.toString());
-                errorLoadingResults("Unable to load the news. Check you internet connection.");
+                errorLoadingResults(fragment.getString(R.string.error_news_network));
             }
 
             /**

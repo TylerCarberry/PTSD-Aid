@@ -46,7 +46,7 @@ import static com.tytanapps.ptsd.Utilities.saveBitmapToFile;
 import static rx.Observable.just;
 
 /**
- * Created by Tyler on 6/26/16.
+ * Load the VA facilities that offer PTSD programs
  */
 public abstract class FacilityLoader {
     private static final String LOG_TAG = FacilityLoader.class.getSimpleName();
@@ -117,6 +117,7 @@ public abstract class FacilityLoader {
                             e.printStackTrace();
                             return null;
                         }
+                        // Get the facility given its id
                     }
                 }).flatMap(new Func1<Integer, Observable<Facility>>() {
                     @Override
@@ -490,7 +491,7 @@ public abstract class FacilityLoader {
             facility.setDescription(description);
 
             input.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
             // If the file was not found, nothing is wrong.
             // It just means that the facility has not yet been cached.
         } catch (IOException | ClassNotFoundException e) {

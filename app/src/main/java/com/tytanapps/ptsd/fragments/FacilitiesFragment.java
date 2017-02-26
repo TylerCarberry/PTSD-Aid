@@ -191,17 +191,12 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
     }
 
+    /**
+     * Refresh the facilities
+     */
     public void refreshFacilities() {
-        // Refresh items
         mAdapter.notifyDataSetChanged();
-
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                facilityLoader.refresh();
-            }
-        });
-        t.run();
+        facilityLoader.refresh();
     }
 
     /**
@@ -254,8 +249,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
 
         switch (requestCode) {
             case PERMISSION_LOCATION_REQUEST: {
@@ -301,6 +295,9 @@ public class FacilitiesFragment extends AnalyticsFragment {
         }
     }
 
+    /**
+     * Retry loading the facilities after an error has occurred
+     */
     @OnClick(R.id.retry_load_button)
     public void retryLoadFacilities() {
         retryLoadButton.setVisibility(View.INVISIBLE);
@@ -311,9 +308,13 @@ public class FacilitiesFragment extends AnalyticsFragment {
         loadFacilities();
     }
 
+    /**
+     * Load the VA facilities
+     */
     private void loadFacilities() {
         if(locationPermissionGranted())
             facilityLoader.loadPTSDPrograms();
+        // Request the location permission before loading the facilities
         else
             requestLocationPermission();
     }
@@ -330,6 +331,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
     /**
      * Close the on screen keyboard
+     * See http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard/1109108#1109108
      */
     private void dismissKeyboard() {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
