@@ -387,5 +387,10 @@ public class Utilities {
         return response;
     }
 
+    public static Bitmap readBitmapFromUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        return BitmapFactory.decodeStream(url.openConnection().getInputStream());
+    }
+
 
 }
