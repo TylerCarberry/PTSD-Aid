@@ -95,15 +95,13 @@ public abstract class FacilityLoader {
                             int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
                             if (numberOfResults == 0) {
-                                errorLoadingResults("Error");
-                                return null;
+                                throw new RuntimeException(fragment.getString(R.string.va_loading_error));
                             }
 
                             double[] userLocation = getGPSLocation(fragment.getActivity());
                             // If the user's GPS location cannot be found
                             if (userLocation[0] == 0 && userLocation[1] == 0) {
-                                errorLoadingResults(fragment.getString(R.string.gps_error));
-                                return null;
+                                throw new RuntimeException(fragment.getString(R.string.gps_error));
                             }
 
                             // Add each PTSD program to the correct VA facility

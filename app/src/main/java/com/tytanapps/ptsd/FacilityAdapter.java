@@ -2,7 +2,6 @@ package com.tytanapps.ptsd;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -124,8 +123,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             Bitmap facilityImage = facility.getFacilityImage();
             if(facilityImage != null)
                 facilityImageView.setImageBitmap(facility.getFacilityImage());
-            else
-                facilityImageView.setImageBitmap(BitmapFactory.decodeResource(fragment.getResources(), R.drawable.default_facility_image));
+            //else
+             //   facilityImageView.setImageBitmap(BitmapFactory.decodeResource(fragment.getResources(), R.drawable.default_facility_image));
 
             facilityImageView.setOnClickListener(mapOnClick);
 
