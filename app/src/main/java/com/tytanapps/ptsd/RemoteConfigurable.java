@@ -7,5 +7,5 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
  */
 public interface RemoteConfigurable {
 
-    public FirebaseRemoteConfig getRemoteConfig();
+    FirebaseRemoteConfig getRemoteConfig();
 }

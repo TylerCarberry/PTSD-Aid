@@ -88,7 +88,7 @@ public class PhoneFragment extends AnalyticsFragment {
 
             insertPhoneCard(getString(R.string.veterans_crisis_line), getString(R.string.veterans_support_phone_details), getString(R.string.phone_veterans_crisis_line), inflater, phoneNumbersLinearLayout, R.drawable.veterans_crisis_line);
             insertPhoneCard(getString(R.string.lifeline_for_vets), getString(R.string.veterans_foundation_phone_details), getString(R.string.phone_veterans_foundation_hotline), inflater, phoneNumbersLinearLayout, R.drawable.nvf);
-            insertPhoneCard(getString(R.string.suicice_lifeline), getString(R.string.suicide_lifeline_phone_details), getString(R.string.phone_suicide_lifeline), inflater, phoneNumbersLinearLayout, R.drawable.nspl);
+            insertPhoneCard(getString(R.string.suicide_lifeline), getString(R.string.suicide_lifeline_phone_details), getString(R.string.phone_suicide_lifeline), inflater, phoneNumbersLinearLayout, R.drawable.nspl);
             insertPhoneCard(getString(R.string.ncaad), getString(R.string.alcohol_phone_details), getString(R.string.phone_alcoholism), inflater, phoneNumbersLinearLayout, R.drawable.ncadd);
         }
     }

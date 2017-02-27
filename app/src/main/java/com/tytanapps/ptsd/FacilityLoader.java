@@ -167,8 +167,16 @@ public abstract class FacilityLoader {
         knownFacilities.put(facilityID, facility);
     }
 
-    private Observable<Facility> loadFacility(int facility) {
-        return Observable.concat(Observable.just(readCachedFacility(facility)), loadFacilityFromNetwork(facility))
+
+    /**
+     * Load a VA facility from the VA api, using cache if available
+     * @param facilityId The id of the facility to load
+     * @return An observable for the facility
+     */
+    private Observable<Facility> loadFacility(int facilityId) {
+        return Observable.concat(
+                    Observable.just(readCachedFacility(facilityId)),
+                    loadFacilityFromNetwork(facilityId))
                 .filter(new Func1<Facility, Boolean>() {
                     @Override
                     public Boolean call(Facility facility) {
@@ -177,19 +185,26 @@ public abstract class FacilityLoader {
                 }).first();
     }
 
+
+    /**
+     * Load a VA facility from the VA api
+     * @param facilityId The id of the facility to fetch
+     * @return An observable for the facility
+     */
     private Observable<Facility> loadFacilityFromNetwork(int facilityId) {
-        Observable<Facility> facilityObservable = just(facilityId).map(new Func1<Integer, Facility>() {
+
+        return just(facilityId).map(new Func1<Integer, Facility>() {
             @Override
-            public Facility call(Integer facilityId) {
+            public Facility call(Integer facilityId1) {
                 try {
-                    String response = readFromUrl(buildFacilityUrl(facilityId, fragment.getString(R.string.api_key_va_facilities)));
+                    String response = readFromUrl(buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
                     // The JSON that the sever responds starts with //
                     // I am cropping the first two characters to create valid JSON.
                     response = response.substring(2);
 
                     // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    Facility facility =  parseJSONFacility(facilityId, rootJson);
+                    Facility facility =  parseJSONFacility(facilityId1, rootJson);
                     cacheFacility(facility);
                     return facility;
                 } catch (IOException | JSONException e) {
@@ -198,11 +213,16 @@ public abstract class FacilityLoader {
                 }
             }
         });
-
-        return facilityObservable;
     }
 
 
+    /**
+     * Convert a JSON VA facility into a Facility object
+     * @param facilityId The unique id of the facility
+     * @param rootJson The json representing the facility
+     * @return The converted Facility
+     * @throws JSONException If the JSON is improperly formed
+     */
     private Facility parseJSONFacility(int facilityId, JSONObject rootJson) throws JSONException {
         Facility facility = new Facility(facilityId);
 
@@ -255,14 +275,18 @@ public abstract class FacilityLoader {
      * @throws JSONException The facility json is not valid
      */
     private String getFacilityUrl(JSONObject locationJson) throws JSONException {
-        // For some reason the facility urls start with vaww. instead of www.
-        // These cannot be loaded on my phone so use www. instead.
+        // The facility urls start with vaww. instead of www.
+        // These cannot be loaded on the public internet so use www. instead.
         String url = (String) locationJson.get("FANDL_URL");
         url = url.replace("vaww", "www");
         return url;
     }
 
 
+    /**
+     * Load the Google Maps imagery for the given facility
+     * @param facility The facility to load the imagery for
+     */
     public void loadFacilityImage(final Facility facility) {
         int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
         int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
@@ -314,7 +338,7 @@ public abstract class FacilityLoader {
                     .filter(new Func1<String, Boolean>() {
                         @Override
                         public Boolean call(String s) {
-                            return streetViewAvailable(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
+                            return streetViewAvailable(facility.getStreetAddress(), facility.getCity(), facility.getState());
                         }
                     })
                     .map(new Func1<String, Bitmap>() {
@@ -366,7 +390,7 @@ public abstract class FacilityLoader {
     /**
      * Called when all facilities have loaded and knownValues is fully populated
      */
-    public void allFacilitiesHaveLoaded() {
+    private void allFacilitiesHaveLoaded() {
         ArrayList<Facility> facilitiesList = new ArrayList<>();
         for(Facility facility : knownFacilities.values()) {
             facilitiesList.add(facility);
@@ -378,6 +402,9 @@ public abstract class FacilityLoader {
         onSuccess(facilitiesList);
     }
 
+    /**
+     * Clear the cache and reload the facilities from the network
+     */
     public void refresh() {
         clearFacilityCache();
         knownFacilities.clear();
@@ -437,13 +464,13 @@ public abstract class FacilityLoader {
      * Clear the cached news articles
      */
     private void clearFacilityCache() {
-        for(int facilityid : knownFacilities.keySet()) {
-            File file = getFacilityFile(facilityid);
+        for(int facilityId : knownFacilities.keySet()) {
+            File file = getFacilityFile(facilityId);
             if(file.exists()) {
                 file.delete();
             }
 
-            file = getFacilityImageFile(facilityid);
+            file = getFacilityImageFile(facilityId);
             if(file.exists()) {
                 file.delete();
             }
@@ -530,12 +557,18 @@ public abstract class FacilityLoader {
     }
 
 
-    private boolean streetViewAvailable(String address, String town, final String state, int imageWidth, int imageHeight) {
+    /**
+     * Check if street view imagery is available for the given address in the United States
+     * @param address The street address
+     * @param town The city/town
+     * @param state The state
+     * @return Whether street view imagery exists for the given address
+     */
+    private boolean streetViewAvailable(String address, String town, final String state) {
         try {
             String location = encodeAddress(address, town, state);
             Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
                     .buildUpon()
-                    .appendQueryParameter("size", imageWidth + "x" + imageHeight)
                     .appendQueryParameter("location", location)
                     .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
                     .build();
@@ -608,6 +641,14 @@ public abstract class FacilityLoader {
         return builtUri.toString();
     }
 
+    /**
+     * Encode an address to be used in Google Maps
+     * @param address The street address
+     * @param town The city/town
+     * @param state Can be represented with either the full name or initials (New Jersey or NJ)
+     * @return The encoded address to be used with the Google Maps API
+     * @throws UnsupportedEncodingException The address was unable to be encoded
+     */
     private String encodeAddress(String address, String town, String state) throws UnsupportedEncodingException {
         // Encode the address
         String location = address + ", " + town + ", " + state;

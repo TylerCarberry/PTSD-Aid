@@ -422,7 +422,7 @@ public class MainFragment extends AnalyticsFragment {
                 return createSuggestionLayout(message, onClickListener);
             }
         // If an exception is thrown, there is no phone number associated with the recommendation
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 
 
         // If an exception is thrown, there is no website associated with the recommendation
@@ -439,7 +439,7 @@ public class MainFragment extends AnalyticsFragment {
                 return createSuggestionLayout(message, onClickListener);
             }
 
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 
         // If an exception is thrown, there is no website associated with the recommendation
         try {

@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bhargavms.dotloader.DotLoader;
 import com.tytanapps.ptsd.News;
 import com.tytanapps.ptsd.NewsAdapter;
 import com.tytanapps.ptsd.NewsLoader;
@@ -46,7 +47,7 @@ public class NewsFragment extends AnalyticsFragment {
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.news_progressbar) View loadingProgressBar;
+    @BindView(R.id.news_progressbar) DotLoader loadingProgressBar;
     @BindView(R.id.news_loading_textview) TextView loadingTextView;
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
@@ -125,8 +126,10 @@ public class NewsFragment extends AnalyticsFragment {
      * Close the on screen keyboard
      */
     private void dismissKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        if(getActivity().getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     private NewsLoader setupNewsLoader(final View rootView) {
@@ -158,15 +161,18 @@ public class NewsFragment extends AnalyticsFragment {
         enableRefreshLayout();
 
         // Hide the progress bar
-        loadingProgressBar.setVisibility(View.GONE);
+        if(loadingProgressBar != null)
+            loadingProgressBar.setVisibility(View.GONE);
 
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }
 
     private void enableRefreshLayout() {
-        swipeRefreshLayout.setRefreshing(false);
-        swipeRefreshLayout.setEnabled(true);
+        if(swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setEnabled(true);
+        }
     }
 
     /**
@@ -216,20 +222,22 @@ public class NewsFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        swipeRefreshLayout.setRefreshing(false);
-        if (newsList.size() > 0) {
-            Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
-        } else {
-            loadingTextView.setVisibility(View.VISIBLE);
-        loadingTextView.setText(errorMessage);
-        loadingProgressBar.setVisibility(View.INVISIBLE);
-        retryLoadButton.setVisibility(View.VISIBLE);
-    }
+        if(getView() != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            if (newsList.size() > 0) {
+                Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
+            } else {
+                loadingTextView.setVisibility(View.VISIBLE);
+                loadingTextView.setText(errorMessage);
+                loadingProgressBar.setVisibility(View.INVISIBLE);
+                retryLoadButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
-    @OnClick(R.id.retry_load_button) public void retryLoadNews() {
+    @OnClick(R.id.retry_load_button)
+    public void retryLoadNews() {
         retryLoadButton.setVisibility(View.INVISIBLE);
-
         loadingTextView.setText("");
         loadingTextView.setVisibility(View.INVISIBLE);
         loadingProgressBar.setVisibility(View.VISIBLE);

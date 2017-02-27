@@ -283,15 +283,16 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        if(swipeRefreshLayout != null)
+        if(getView() != null) {
             swipeRefreshLayout.setRefreshing(false);
-        if(facilityList.size() > 0) {
-            Snackbar.make(getView(), "Unable to refresh VA facilities", Snackbar.LENGTH_SHORT).show();
-        } else {
-            loadingTextView.setVisibility(View.VISIBLE);
-            loadingTextView.setText(errorMessage);
-            retryLoadButton.setVisibility(View.VISIBLE);
-            loadingProgressBar.setVisibility(View.INVISIBLE);
+            if (facilityList.size() > 0) {
+                Snackbar.make(getView(), R.string.error_va_facilities, Snackbar.LENGTH_SHORT).show();
+            } else {
+                loadingTextView.setVisibility(View.VISIBLE);
+                loadingTextView.setText(errorMessage);
+                retryLoadButton.setVisibility(View.VISIBLE);
+                loadingProgressBar.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -334,8 +335,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
      * See http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard/1109108#1109108
      */
     private void dismissKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        if(getActivity().getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
     
 }

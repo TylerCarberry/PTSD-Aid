@@ -91,7 +91,7 @@
     <string name="phone_veterans_crisis_line">1-800-273-8255</string>
     <string name="veterans_support_phone_details">Veterans Press 1</string>
 
-    <string name="suicice_lifeline">Suicide Lifeline</string>
+    <string name="suicide_lifeline">Suicide Lifeline</string>
     <string name="phone_suicide_lifeline">1-800-273-8255</string>
     <string name="suicide_lifeline_phone_details">It is common to feel anxious after incidents of mass violence. You are not alone.</string>
     
@@ -163,5 +163,6 @@
     <string name="expand_message">Expand message</string>
     <string name="your_current_trusted_contact_is">Your current trusted contact is</string>
     <string name="error_news_network">Unable to load the news. Check you internet connection.</string>
+    <string name="error_va_facilities">Unable to load VA facilities</string>
 
 </resources>

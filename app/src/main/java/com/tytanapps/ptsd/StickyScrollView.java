@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ScrollView;
 
 import java.util.ArrayList;
@@ -45,8 +43,8 @@ public class StickyScrollView extends ScrollView {
      * Interface for start sticking and stop sticking current view listener.
      */
     public interface OnStickyScrollViewListener {
-        public void startStickingView(View v);
-        public void stopStickingCurrentView(View v);
+        void startStickingView(View v);
+        void stopStickingCurrentView(View v);
     }
 
     private ArrayList<View> stickyViews;
@@ -398,25 +396,11 @@ public class StickyScrollView extends ScrollView {
     }
 
     private void hideView(View v) {
-        if(Build.VERSION.SDK_INT>=11){
-            v.setAlpha(0);
-        }else{
-            AlphaAnimation anim = new AlphaAnimation(1, 0);
-            anim.setDuration(0);
-            anim.setFillAfter(true);
-            v.startAnimation(anim);
-        }
+        v.setAlpha(0);
     }
 
     private void showView(View v) {
-        if(Build.VERSION.SDK_INT>=11){
-            v.setAlpha(1);
-        }else{
-            AlphaAnimation anim = new AlphaAnimation(0, 1);
-            anim.setDuration(0);
-            anim.setFillAfter(true);
-            v.startAnimation(anim);
-        }
+        v.setAlpha(1);
     }
 
     /**

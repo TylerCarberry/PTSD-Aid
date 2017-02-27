@@ -174,14 +174,10 @@ public class MainActivity extends AppCompatActivity
 
         makeFirebaseDatabasePersistent();
 
-        if(BuildConfig.DEBUG) {
-            ((TextView)navHeader.findViewById(R.id.drawer_name)).setText("PTSD AID: DEBUG");
-            //Toast.makeText(MainActivity.this, "You are running a debug build", Toast.LENGTH_SHORT).show();
+        if(BuildConfig.DEBUG)
             FirebaseMessaging.getInstance().subscribeToTopic("debug");
-        }
-        else {
+        else
             FirebaseMessaging.getInstance().subscribeToTopic("release");
-        }
 
         setupNewsNotifications();
     }
