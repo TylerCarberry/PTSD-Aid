@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -98,7 +99,7 @@ public class StickyScrollView extends ScrollView {
                 R.styleable.StickyScrollView_stuckShadowDrawable, -1);
 
         if (shadowDrawableRes != -1) {
-            mShadowDrawable = context.getResources().getDrawable(shadowDrawableRes);
+            mShadowDrawable = ContextCompat.getDrawable(context, shadowDrawableRes);
         }
 
         a.recycle();

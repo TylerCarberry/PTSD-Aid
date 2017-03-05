@@ -1,7 +1,7 @@
 package com.tytanapps.ptsd;
 
 /**
- * Created by tyler on 3/4/17.
+ * Thrown when the user's location can not be determined
  */
 
 public class LocationNotFoundException extends RuntimeException {

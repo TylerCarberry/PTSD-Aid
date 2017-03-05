@@ -17,8 +17,11 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -305,7 +308,7 @@ public class Utilities {
      */
     public static void openBrowserIntent(Fragment fragment, String url) {
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(fragment.getResources().getColor(R.color.colorPrimary));
+        builder.setToolbarColor(ContextCompat.getColor(fragment.getActivity(), R.color.colorPrimary));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
 
@@ -369,8 +372,13 @@ public class Utilities {
         return Uri.parse("geo:0,0?q=" + location);
     }
 
-    public static String htmlToText(String html) {
-        return android.text.Html.fromHtml(html).toString();
+    @SuppressWarnings("deprecation")
+    public static String htmlToText(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY).toString();
+        } else {
+            return Html.fromHtml(source).toString();
+        }
     }
 
     public static String readFromUrl(String urlString) throws IOException {

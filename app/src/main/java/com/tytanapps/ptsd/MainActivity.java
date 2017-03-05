@@ -459,8 +459,8 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        if(drawer != null && toggle != null)
-            drawer.setDrawerListener(toggle);
+        if(drawer != null)
+            drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         // Add the header view containing the user's information
@@ -637,7 +637,8 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display a dialog explaining a trusted contact and allow the user to make one
      */
-    @OnLongClick(R.id.fab) protected boolean showChangeTrustedContactDialog() {
+    @OnLongClick(R.id.fab)
+    protected boolean showChangeTrustedContactDialog() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setPositiveButton(R.string.change_trusted_contact, new DialogInterface.OnClickListener() {
             @Override

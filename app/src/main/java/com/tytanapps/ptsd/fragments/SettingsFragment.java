@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragment {
     public void onStart() {
         super.onStart();
 
-        if(BuildConfig.DEBUG) {
+        if(BuildConfig.DEBUG && getView() != null) {
             ((MainActivity)getActivity()).fetchRemoteConfig(0);
             Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
         }

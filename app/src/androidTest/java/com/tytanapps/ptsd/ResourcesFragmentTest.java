@@ -2,9 +2,9 @@ package com.tytanapps.ptsd;
 
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ResourcesFragmentTest {
         textView.check(matches(isDisplayed()));
 
         ViewInteraction textView2 = onView(
-                allOf(withId(R.id.resource_desc), withText("Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring symptoms may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems."), isDisplayed()));
+                allOf(withId(R.id.resource_desc), withText("Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyper-arousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring symptoms may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems."), isDisplayed()));
         textView2.perform(scrollTo()).check(matches(isDisplayed()));
 
     }

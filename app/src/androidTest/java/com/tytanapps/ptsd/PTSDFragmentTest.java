@@ -4,9 +4,9 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.widget.SeekBar;
 

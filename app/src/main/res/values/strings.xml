@@ -71,7 +71,7 @@
 
     <!-- Resources -->
     <string name="symptoms">Symptoms</string>
-    <string name="symptoms_detail">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyperarousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
+    <string name="symptoms_detail">Usually start soon after the event but may not appear for months or years later.\n\nSymptoms include nightmares or flashbacks, avoiding situations that remind you of an event, avoiding situations or people that trigger memories.\n\nNegative changes in beliefs and feelings, the way you feel about yourself or others may change. You may feel guilt or shame. You may not be interested in activities that you used to enjoy.\n\nHyper-arousal, always alert, jumpy, may have trouble concentrating or sleeping.\n\nCo-occurring problems may include: depression, anxiety, substance abuse (self-medicating), employment and relationship problems.</string>
     <string name="causes">Causes</string>
     <string name="causes_detail">Usually occurs after a traumatic event. It depends on the intensity of the trauma, how long it lasted, if injured or lost someone, how close you were to the event and how much you felt in control of the event.</string>
     <string name="diagnosis">Diagnosis</string>

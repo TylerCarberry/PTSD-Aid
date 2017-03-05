@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +33,6 @@ import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
  * the user shows no signs of PTSD.
  */
 public class PTSDTestFragment extends AnalyticsFragment {
-
-    private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
 
     private Unbinder unbinder;
     @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
@@ -150,8 +149,8 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
         // Set the appearance of the button
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
-        submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        submitButton.setTextColor(getResources().getColor(R.color.white));
+        submitButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+        submitButton.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         submitButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         submitButton.setText(getString(R.string.submit_test));
 

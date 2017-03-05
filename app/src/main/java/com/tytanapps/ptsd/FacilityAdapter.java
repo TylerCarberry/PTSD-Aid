@@ -17,8 +17,6 @@ import java.util.List;
 
 public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyViewHolder> {
 
-    private static final String LOG_TAG = FacilityAdapter.class.getSimpleName();
-
     private Fragment fragment;
     private List<Facility> facilityList;
     private List<Facility> facilityListAll;

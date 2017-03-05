@@ -68,7 +68,7 @@ public class NewsFragment extends AnalyticsFragment {
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        newsLoader = setupNewsLoader(rootView);
+        newsLoader = setupNewsLoader();
         setupRefreshLayout();
         return rootView;
     }
@@ -132,7 +132,7 @@ public class NewsFragment extends AnalyticsFragment {
         }
     }
 
-    private NewsLoader setupNewsLoader(final View rootView) {
+    private NewsLoader setupNewsLoader() {
         return new NewsLoader(this) {
             @Override
             public void errorLoadingResults(String errorMessage) {
@@ -141,7 +141,7 @@ public class NewsFragment extends AnalyticsFragment {
 
             @Override
             public void onSuccess(List<News> loadedNews) {
-                NewsFragment.this.onSuccess(loadedNews, rootView);
+                NewsFragment.this.onSuccess(loadedNews);
             }
         };
     }
@@ -149,9 +149,8 @@ public class NewsFragment extends AnalyticsFragment {
     /**
      * When all of the news have loaded, add them to the recycler view and display them
      * @param loadedNews The loaded news
-     * @param rootView The root view of the fragment
      */
-    private void onSuccess(List<News> loadedNews, View rootView) {
+    private void onSuccess(List<News> loadedNews) {
         newsList.clear();
         for(News news : loadedNews) {
             newsList.add(news);

@@ -43,7 +43,7 @@ public class Facility implements Comparable<Facility>, Serializable {
     private Bitmap facilityImage;
 
     // The PTSD programs offered at that location
-    private Set<String> programs;
+    private final Set<String> programs;
 
     /**
      * Create a new VA Facility given their id

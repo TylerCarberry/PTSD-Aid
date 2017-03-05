@@ -54,7 +54,7 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
     private FacilityLoader facilityLoader;
 
-    private List<Facility> facilityList = new ArrayList<>();
+    private final List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
     private Unbinder unbinder;
