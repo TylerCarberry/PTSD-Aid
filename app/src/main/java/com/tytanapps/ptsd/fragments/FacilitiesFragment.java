@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.tytanapps.ptsd.Facility;
 import com.tytanapps.ptsd.FacilityAdapter;
 import com.tytanapps.ptsd.FacilityLoader;
+import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.Utilities;
 
@@ -73,8 +74,8 @@ public class FacilitiesFragment extends AnalyticsFragment {
 
         facilityLoader = new FacilityLoader(this) {
             @Override
-            public void errorLoadingResults(String errorMessage) {
-                FacilitiesFragment.this.errorLoadingResults();
+            public void errorLoadingResults(Throwable throwable) {
+                FacilitiesFragment.this.errorLoadingResults(throwable);
             }
 
             @Override
@@ -272,10 +273,13 @@ public class FacilitiesFragment extends AnalyticsFragment {
     }
 
     /**
-     * There was an error loading the VA facilities. Display the default error message
+     * There was an error loading the VA facilities. Display an error message
      */
-    private void errorLoadingResults() {
-        errorLoadingResults(getString(R.string.va_loading_error));
+    private void errorLoadingResults(Throwable throwable) {
+        if(throwable instanceof LocationNotFoundException)
+            errorLoadingResults(getString(R.string.gps_error));
+        else
+            errorLoadingResults(getString(R.string.va_loading_error));
     }
 
     /**

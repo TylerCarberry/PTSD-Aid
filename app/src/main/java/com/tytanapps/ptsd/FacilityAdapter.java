@@ -186,7 +186,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     private void loadFacilityImages() {
         FacilityLoader facilityLoader = new FacilityLoader(fragment) {
             @Override
-            public void errorLoadingResults(String errorMessage) {}
+            public void errorLoadingResults(Throwable throwable) {}
             @Override
             public void onSuccess(List<Facility> loadedFacilities) {}
 

@@ -83,7 +83,7 @@
 
     <!-- VA Facilities -->
     <string name="loading">Loading</string>
-    <string name="va_loading_error">The VA facilities cannot be loaded</string>
+    <string name="va_loading_error">The VA facilities can not be loaded</string>
     <string name="retry">Retry</string>
 
     <!-- Call -->
@@ -134,7 +134,7 @@
     <string name="profile_picture_content_description">Profile Picture</string>
     <string name="error_open_dialer">Unable to open the dialer</string>
     <string name="error_choose_contact">Unable to choose a trusted contact</string>
-    <string name="error_location_permission">Cannot load the VA facilities. Please grant the location permission</string>
+    <string name="error_location_permission">Unable to load the VA facilities. Please grant the location permission</string>
     <string name="facility_more_info">More Info</string>
     <string name="phone_icon_content_description">Phone Icon</string>
     <string name="website_icon_content_description">Website icon</string>
@@ -147,7 +147,7 @@
     <string name="support_body">Hello! I would like to give feedback on PTSD Aid!\n\nWhat I liked:\n\nWhat I didn\'t like:\n\n\nDevice Information:\n</string>
     <string name="contacts_permission_title">Please grant the contacts permission</string>
     <string name="contacts_permission_message">Grant the contacts permission to continue</string>
-    <string name="gps_error">Your GPS location cannot be determined</string>
+    <string name="gps_error">Your GPS location can not be determined</string>
     <string name="share_results_chooser">Share with</string>
     <string name="action_search">Search</string>
     <string name="open_website">Open Website</string>

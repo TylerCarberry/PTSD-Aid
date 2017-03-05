@@ -61,7 +61,7 @@ public abstract class FacilityLoader {
         this.fragment = fragment;
     }
 
-    public abstract void errorLoadingResults(String errorMessage);
+    public abstract void errorLoadingResults(Throwable throwable);
     public abstract void onSuccess(List<Facility> loadedFacilities);
     public abstract void onLoadedImage(int facilityId);
 
@@ -101,7 +101,7 @@ public abstract class FacilityLoader {
                             double[] userLocation = getGPSLocation(fragment.getActivity());
                             // If the user's GPS location cannot be found
                             if (userLocation[0] == 0 && userLocation[1] == 0) {
-                                throw new RuntimeException(fragment.getString(R.string.gps_error));
+                                throw new LocationNotFoundException();
                             }
 
                             // Add each PTSD program to the correct VA facility
@@ -136,7 +136,7 @@ public abstract class FacilityLoader {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, "onError: ", e);
-                        errorLoadingResults(e.getMessage());
+                        errorLoadingResults(e);
                     }
 
                     @Override
