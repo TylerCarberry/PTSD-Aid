@@ -26,6 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static com.tytanapps.ptsd.Utilities.isVeteran;
+
 
 /**
  * Displays a list of websites to find more information about PTSD. Shows a brief description for
@@ -86,9 +88,11 @@ public class WebsiteFragment extends AnalyticsFragment {
         if(rootView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-            insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
-            insertWebCard(getString(R.string.veterans_affairs), getString(R.string.veteran_affairs_details), getString(R.string.website_va), R.drawable.va, inflater, websitesLinearLayout);
-            insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
+            if(isVeteran(getActivity())) {
+                insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
+                insertWebCard(getString(R.string.veterans_affairs), getString(R.string.veteran_affairs_details), getString(R.string.website_va), R.drawable.va, inflater, websitesLinearLayout);
+                insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
+            }
             insertWebCard(getString(R.string.nimh_title), getString(R.string.nimh_details), getString(R.string.website_nimh), R.drawable.nimh, inflater, websitesLinearLayout);
             insertWebCard(getString(R.string.ptsd_coach), getString(R.string.ptsd_coach_details), getString(R.string.website_coach), R.drawable.ptsd_coach, inflater, websitesLinearLayout);
         }
@@ -116,8 +120,12 @@ public class WebsiteFragment extends AnalyticsFragment {
                         if(rootView != null) {
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                            for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertFirebaseWebCard(child, websitesLinearLayout, inflater);
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                boolean veteranOnly = snapshot.hasChild("veteran_only") && snapshot.child("veteran_only").getValue(Boolean.class);
+
+                                if(!veteranOnly || isVeteran(getActivity())) {
+                                    insertFirebaseWebCard(snapshot, websitesLinearLayout, inflater);
+                                }
                             }
                         }
                     }

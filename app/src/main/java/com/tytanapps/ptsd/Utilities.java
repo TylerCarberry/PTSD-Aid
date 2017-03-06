@@ -400,5 +400,9 @@ public class Utilities {
         return BitmapFactory.decodeStream(url.openConnection().getInputStream());
     }
 
+    public static boolean isVeteran(Activity activity) {
+        return activity.getPreferences(Context.MODE_PRIVATE).getBoolean(activity.getString(R.string.pref_veteran), true);
+    }
+
 
 }

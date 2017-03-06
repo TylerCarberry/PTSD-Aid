@@ -156,6 +156,7 @@
     <string name="pref_news_notification">news_notification</string>
     <string name="nav_settings">Settings</string>
     <string name="pref_daily_notification">daily_notification</string>
+    <string name="pref_veteran">is_veteran</string>
     <string name="feedback_message_hint">What would you like to tell me?</string>
     <string name="licenses">Licenses</string>
     <string name="recommendation_update_app">Update your app for the newest information and recommendations</string>
@@ -164,5 +165,19 @@
     <string name="your_current_trusted_contact_is">Your current trusted contact is</string>
     <string name="error_news_network">Unable to load the news. Check you internet connection.</string>
     <string name="error_va_facilities">Unable to load VA facilities</string>
+    <string name="preference_notifications">Notifications</string>
+    <string name="veteran_pref_title">I am a veteran</string>
+    <string name="veteran_pref_summary">Receive personalized recommendations</string>
+    <string name="pref_news_title">News Articles</string>
+    <string name="pref_news_summary">Receive notifications for VA news</string>
+    <string name="pref_trusted_contact_title">Enable trusted contact</string>
+    <string name="pref_trusted_contact_summary">Show the trusted contact button</string>
+    <string name="pref_change_contact_summary">Change your trusted contact</string>
+    <string name="play_store_link">https://play.google.com/store/apps/details?id=com.tytanapps.ptsd</string>
+    <string name="rate_app_title">Enjoying the app?</string>
+    <string name="rate_app_summary">Please rate on Google Play</string>
+    <string name="feedback_title">Provide Feedback</string>
+    <string name="feedback_summary">Contact developer</string>
+    <string name="feedback_category_title">Feedback</string>
 
 </resources>

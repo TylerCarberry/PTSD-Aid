@@ -50,6 +50,7 @@ public class SettingsFragment extends PreferenceFragment {
             Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
         }
 
+        setupIsVeteranPref();
         setupNewsNotificationPref();
         setupEnableTrustedContactPref();
         setupChangeTrustedContactPref();
@@ -82,6 +83,19 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
     }
+
+    private void setupIsVeteranPref() {
+        CheckBoxPreference newsPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_veteran));
+        newsPreference.setChecked(getSharedPreferenceBoolean(getString(R.string.pref_veteran), true));
+        newsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                saveSharedPreference(getString(R.string.pref_veteran), (Boolean) newValue);
+                return true;
+            }
+        });
+    }
+
 
     private void setupChangeTrustedContactPref() {
         Preference changeTrustedContactPreference = findPreference("change_trusted_contact");
