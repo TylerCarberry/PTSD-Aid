@@ -82,6 +82,14 @@
         </PreferenceScreen>
 
         <PreferenceScreen
+            android:title="Privacy Policy">
+
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://tylercarberry.me/ptsd-privacy/" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
             android:key="app_info"
             android:title="PTSD Aid"
             android:summary="Version: #">
