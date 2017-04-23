@@ -20,26 +20,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.ExternalAppUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
-import static com.tytanapps.ptsd.Utilities.isVeteran;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.isVeteran;
 
 
 /**
  * Displays a list of common veteran hotlines. Shows a brief description for each hotline and
  * the phone number to call. Tapping on the hotline calls them.
  */
-public class PhoneFragment extends AnalyticsFragment {
+public class PhoneFragment extends BaseFragment {
 
     private static final String LOG_TAG = PhoneFragment.class.getSimpleName();
 
-    private Unbinder unbinder;
     @BindView(R.id.phone_linear_layout) LinearLayout phoneNumbersLinearLayout;
-
 
     public PhoneFragment() {
         // Required empty public constructor
@@ -47,16 +44,9 @@ public class PhoneFragment extends AnalyticsFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_phone, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -247,7 +237,7 @@ public class PhoneFragment extends AnalyticsFragment {
         phoneCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utilities.openDialer(PhoneFragment.this, phoneNumber);
+                ExternalAppUtils.openDialer(PhoneFragment.this, phoneNumber);
             }
         });
 

@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.news;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ms.square.android.expandabletextview.ExpandableTextView;
+import com.tytanapps.ptsd.R;
 
 import java.util.ArrayList;
 import java.util.List;

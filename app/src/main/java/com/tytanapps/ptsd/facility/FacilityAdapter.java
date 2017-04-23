@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.facility;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.utils.ExternalAppUtils;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -88,7 +92,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utilities.openDialer(fragment, Utilities.getFirstPhoneNumber(facility.getPhoneNumber()));
+                    ExternalAppUtils.openDialer(fragment, PtsdUtilities.getFirstPhoneNumber(facility.getPhoneNumber()));
                 }
             };
 
@@ -103,7 +107,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     try {
-                        Utilities.openMapIntent(fragment, Utilities.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        ExternalAppUtils.openMapIntent(fragment, ExternalAppUtils.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -131,8 +135,8 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             moreInfoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String url = Utilities.getFirstPhoneNumber(facility.getUrl());
-                    Utilities.openBrowserIntent(fragment, url);
+                    String url = PtsdUtilities.getFirstPhoneNumber(facility.getUrl());
+                    ExternalAppUtils.openBrowserIntent(fragment, url);
                 }
             });
 

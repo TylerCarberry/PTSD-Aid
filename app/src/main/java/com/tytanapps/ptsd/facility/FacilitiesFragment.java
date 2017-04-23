@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd.fragments;
+package com.tytanapps.ptsd.facility;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -26,12 +26,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.tytanapps.ptsd.Facility;
-import com.tytanapps.ptsd.FacilityAdapter;
-import com.tytanapps.ptsd.FacilityLoader;
 import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.fragments.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,7 @@ import butterknife.Unbinder;
  * Displays the address, phone number, programs, and an image for each facility.
  * You can call them, get directions, or load the website for each VA facility.
  */
-public class FacilitiesFragment extends AnalyticsFragment {
+public class FacilitiesFragment extends BaseFragment {
 
     private static final String LOG_TAG = FacilitiesFragment.class.getSimpleName();
 
@@ -162,23 +160,10 @@ public class FacilitiesFragment extends AnalyticsFragment {
     }
 
     /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * This is needed when inflating views
-     * @return The root view of the fragment as a ViewGroup,
-     *         Null if the root view is null or not a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView != null && rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
-    }
-
-    /**
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, Utilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, PtsdUtilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -20,24 +20,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.ExternalAppUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
-import static com.tytanapps.ptsd.Utilities.isVeteran;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.isVeteran;
 
 
 /**
  * Displays a list of websites to find more information about PTSD. Shows a brief description for
  * each website. Tapping on the card opens the website.
  */
-public class WebsiteFragment extends AnalyticsFragment {
+public class WebsiteFragment extends BaseFragment {
 
     private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 
-    private Unbinder unbinder;
     @BindView(R.id.website_linear_layout) LinearLayout websitesLinearLayout;
 
     public WebsiteFragment() {
@@ -50,12 +48,6 @@ public class WebsiteFragment extends AnalyticsFragment {
         View rootView = inflater.inflate(R.layout.fragment_website, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -231,7 +223,7 @@ public class WebsiteFragment extends AnalyticsFragment {
             websiteCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utilities.openBrowserIntent(WebsiteFragment.this, url);
+                    ExternalAppUtils.openBrowserIntent(WebsiteFragment.this, url);
                 }
             });
 

@@ -1,0 +1,100 @@
+package com.tytanapps.ptsd.fragments;
+
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.R;
+
+import butterknife.Unbinder;
+
+/**
+ * A fragment that sends screen hits to Google Analytics
+ */
+public abstract class BaseFragment extends Fragment {
+
+    protected Unbinder unbinder;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Obtain the shared Tracker instance.
+        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+
+        // Send a screen hit to Google Analytics with the name of the current activity
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName(getClass().getSimpleName());
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    /**
+     * Open the navigation drawer
+     */
+    protected void openDrawer() {
+        DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        drawer.openDrawer(Gravity.LEFT);
+    }
+
+    /**
+     * Sign in to the user's Google Account
+     */
+    protected void signIn() {
+        Activity parentActivity = getActivity();
+        if(parentActivity instanceof MainActivity)
+            ((MainActivity) getActivity()).signIn();
+    }
+
+    /**
+     * Send an analytics event to Google Analytics
+     * @param category The category of the event
+     * @param action The action of the event
+     */
+    public void sendAnalyticsEvent(String category, String action) {
+        // Obtain the shared Tracker instance.
+        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory(category)
+                .setAction(action)
+                .build());
+    }
+
+    /**
+     * Get the root view of the fragment casted to a ViewGroup
+     * @return The root view of the fragment as a ViewGroup
+     */
+    protected ViewGroup getViewGroup() {
+        View rootView = getView();
+        if(rootView instanceof ViewGroup)
+            return (ViewGroup) getView();
+        return null;
+    }
+
+    /**
+     * Get a shared preference String from a saved file
+     * @param prefKey The key of the String
+     * @param defaultValue The default value if no key exists
+     * @return The shared preference String with the given key
+     */
+    protected String getSharedPreferenceString(String prefKey, String defaultValue) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(prefKey, defaultValue);
+    }
+}

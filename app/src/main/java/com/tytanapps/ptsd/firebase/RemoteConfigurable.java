@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.firebase;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 

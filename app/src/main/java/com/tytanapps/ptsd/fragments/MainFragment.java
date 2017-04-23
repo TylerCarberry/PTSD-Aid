@@ -2,16 +2,9 @@ package com.tytanapps.ptsd.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,25 +21,25 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.utils.ExternalAppUtils;
 
 import java.io.UnsupportedEncodingException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 
 /**
  * The main fragment displayed when you launch the app. Prompts the user for their emotion
  * and gives them recommendations based on their answer.
  */
-public class MainFragment extends AnalyticsFragment {
+public class MainFragment extends BaseFragment {
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
     private boolean firebaseDatabaseLoaded = false;
 
-    private Unbinder unbinder;
     @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
     @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
     @BindView(R.id.main_header_text_view) TextView headerTextView;
@@ -84,49 +77,15 @@ public class MainFragment extends AnalyticsFragment {
         navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
-    }
-
     /**
      * Add listeners to the emoji buttons to show the suggestions when tapped
      * Hides the extra emoji if show_extra_emoji is false on remote config
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if(!Utilities.getRemoteConfigBoolean(this, R.string.rc_show_extra_emoji)) {
+        if(!PtsdUtilities.getRemoteConfigBoolean(this, R.string.rc_show_extra_emoji)) {
             rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
-    }
-
-    /**
-     * Open the navigation drawer
-     */
-    private void openDrawer() {
-        DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        drawer.openDrawer(Gravity.LEFT);
-    }
-
-    /**
-     * Sign in to the user's Google Account
-     */
-    private void signIn() {
-        Activity parentActivity = getActivity();
-        if(parentActivity instanceof MainActivity)
-            ((MainActivity) getActivity()).signIn();
     }
 
     /**
@@ -197,8 +156,8 @@ public class MainFragment extends AnalyticsFragment {
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
-                    int newestAppVersion = Utilities.getRemoteConfigInt(this, R.string.rc_newest_app_version);
-                    int currentAppVersion = getApkVersion();
+                    int newestAppVersion = PtsdUtilities.getRemoteConfigInt(this, R.string.rc_newest_app_version);
+                    int currentAppVersion = ExternalAppUtils.getApkVersion(getContext());
                     if(newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
                     }
@@ -213,7 +172,7 @@ public class MainFragment extends AnalyticsFragment {
 
                 case R.id.sad_face:
                     emotionName = "sad";
-                    if (trustedContactCreated())
+                    if (isTrustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
                     recommendationsLinearLayout.addView(getSuggestionCallVeteranFoundation());
@@ -222,24 +181,24 @@ public class MainFragment extends AnalyticsFragment {
                 case R.id.sick_face:
                     emotionName = "sick";
                     recommendationsLinearLayout.addView(getSuggestionFindFacility());
-                    if (trustedContactCreated())
+                    if (isTrustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
                     break;
 
                 case R.id.poop_emoji:
                     emotionName = "poop";
-                    if (trustedContactCreated())
+                    if (isTrustedContactCreated())
                         recommendationsLinearLayout.addView(getSuggestionCallTrustedContact());
                     recommendationsLinearLayout.addView(getSuggestionCallVeteransCrisisLine());
                     recommendationsLinearLayout.addView(getSuggestionJoinVeteranAssociation());
                     break;
             }
 
-            if (!trustedContactCreated())
+            if (!isTrustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-            if(firebaseDatabaseLoaded && Utilities.getRemoteConfigBoolean(this, R.string.rc_check_recommendations_database)) {
+            if(firebaseDatabaseLoaded && PtsdUtilities.getRemoteConfigBoolean(this, R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
@@ -339,7 +298,7 @@ public class MainFragment extends AnalyticsFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utilities.openBrowserIntent(MainFragment.this, (getString(R.string.website_va)));
+                ExternalAppUtils.openBrowserIntent(MainFragment.this, (getString(R.string.website_va)));
             }
         });
     }
@@ -353,7 +312,7 @@ public class MainFragment extends AnalyticsFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utilities.openBrowserIntent(MainFragment.this, (getString(R.string.veterans_network_website)));
+                ExternalAppUtils.openBrowserIntent(MainFragment.this, (getString(R.string.veterans_network_website)));
             }
         });
     }
@@ -369,7 +328,7 @@ public class MainFragment extends AnalyticsFragment {
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
-                    Utilities.openDialer(MainFragment.this, phoneNumber);
+                    ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
                 else
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
             }
@@ -386,7 +345,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
-                Utilities.openDialer(MainFragment.this, phoneNumber);
+                ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
             }
         });
     }
@@ -401,7 +360,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
-                Utilities.openDialer(MainFragment.this, phoneNumber);
+                ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
             }
         });
     }
@@ -416,7 +375,7 @@ public class MainFragment extends AnalyticsFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Utilities.openBrowserIntent(MainFragment.this, url);
+                        ExternalAppUtils.openBrowserIntent(MainFragment.this, url);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -433,7 +392,7 @@ public class MainFragment extends AnalyticsFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Utilities.openDialer(MainFragment.this, phoneNumber);
+                        ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -451,7 +410,7 @@ public class MainFragment extends AnalyticsFragment {
                     public void onClick(View v) {
 
                         try {
-                            Utilities.openMapIntent(MainFragment.this, Utilities.getMapUri(location));
+                            ExternalAppUtils.openMapIntent(MainFragment.this, ExternalAppUtils.getMapUri(location));
                         } catch (UnsupportedEncodingException e) {
                             FirebaseCrash.report(e);
                             e.printStackTrace();
@@ -525,7 +484,7 @@ public class MainFragment extends AnalyticsFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    Utilities.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
+                    ExternalAppUtils.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
                 } catch(Exception e) {
                     FirebaseCrash.report(e);
                     openDrawer();
@@ -550,22 +509,10 @@ public class MainFragment extends AnalyticsFragment {
         return suggestionLayout;
     }
 
-    private int getApkVersion() {
-        try {
-            PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
-            return pInfo.versionCode;
-
-        } catch (PackageManager.NameNotFoundException e) {
-            FirebaseCrash.report(e);
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     /**
      * @return Whether the trusted contact has been created
      */
-    private boolean trustedContactCreated() {
+    private boolean isTrustedContactCreated() {
         String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
         return !trustedContactPhone.equals("");
     }
@@ -632,17 +579,6 @@ public class MainFragment extends AnalyticsFragment {
                         .alpha(1.0f).setDuration(500);
             }
         });
-    }
-
-    /**
-     * Get a shared preference String from a saved file
-     * @param prefKey The key of the String
-     * @param defaultValue The default value if no key exists
-     * @return The shared preference String with the given key
-     */
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(prefKey, defaultValue);
     }
 
 }

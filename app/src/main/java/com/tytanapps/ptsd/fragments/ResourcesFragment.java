@@ -15,13 +15,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 
 /**
  * Shows information about PTSD. Gives symptoms, causes, and treatment for PTSD.
  */
-public class ResourcesFragment extends AnalyticsFragment {
+public class ResourcesFragment extends BaseFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
@@ -130,7 +130,7 @@ public class ResourcesFragment extends AnalyticsFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if(Utilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+        if(PtsdUtilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 

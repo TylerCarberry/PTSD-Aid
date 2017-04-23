@@ -18,13 +18,13 @@ import android.widget.TextView;
 
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.facility.FacilitiesFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.techery.progresshint.ProgressHintDelegate;
 
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigBoolean;
 
 
 /**
@@ -32,9 +32,8 @@ import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
  * you recommendations on what to do next. Find a professional is always a recommendation even if
  * the user shows no signs of PTSD.
  */
-public class PTSDTestFragment extends AnalyticsFragment {
+public class PTSDTestFragment extends BaseFragment {
 
-    private Unbinder unbinder;
     @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
 
 
@@ -52,28 +51,11 @@ public class PTSDTestFragment extends AnalyticsFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
-    }
-
-    /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
     }
 
     /**

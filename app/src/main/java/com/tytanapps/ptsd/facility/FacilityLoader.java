@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.facility;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,15 +36,15 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static com.tytanapps.ptsd.Utilities.distanceBetweenCoordinates;
-import static com.tytanapps.ptsd.Utilities.getFirstPhoneNumber;
-import static com.tytanapps.ptsd.Utilities.getGPSLocation;
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
-import static com.tytanapps.ptsd.Utilities.loadBitmapFromFile;
-import static com.tytanapps.ptsd.Utilities.readBitmapFromUrl;
-import static com.tytanapps.ptsd.Utilities.readFromUrl;
-import static com.tytanapps.ptsd.Utilities.saveBitmapToFile;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.distanceBetweenCoordinates;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.getFirstPhoneNumber;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.getGPSLocation;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigBoolean;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigInt;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.loadBitmapFromFile;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.readBitmapFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.readFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtilities.saveBitmapToFile;
 import static rx.Observable.just;
 
 /**

@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd.fragments;
+package com.tytanapps.ptsd.news;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,11 +21,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bhargavms.dotloader.DotLoader;
-import com.tytanapps.ptsd.News;
-import com.tytanapps.ptsd.NewsAdapter;
-import com.tytanapps.ptsd.NewsLoader;
+import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 
-public class NewsFragment extends AnalyticsFragment {
+public class NewsFragment extends BaseFragment {
 
     private static final String LOG_TAG = NewsFragment.class.getSimpleName();
 
@@ -179,7 +177,7 @@ public class NewsFragment extends AnalyticsFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), PtsdUtilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

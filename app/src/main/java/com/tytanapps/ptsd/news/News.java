@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.news;
 
 import android.support.annotation.NonNull;
 

@@ -63,14 +63,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-import com.tytanapps.ptsd.fragments.FacilitiesFragment;
+import com.tytanapps.ptsd.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.firebase.MyFirebaseMessagingService;
+import com.tytanapps.ptsd.firebase.RemoteConfigurable;
 import com.tytanapps.ptsd.fragments.MainFragment;
-import com.tytanapps.ptsd.fragments.NewsFragment;
+import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.fragments.SettingsFragment;
 import com.tytanapps.ptsd.fragments.WebsiteFragment;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
@@ -590,7 +593,7 @@ public class MainActivity extends AppCompatActivity
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
-                        imageView.setImageBitmap(Utilities.getCircularBitmap(bitmap, 200, 200));
+                        imageView.setImageBitmap(PtsdUtilities.getCircularBitmap(bitmap, 200, 200));
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {

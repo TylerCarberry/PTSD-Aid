@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.firebase;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
 
 /**
  * Handles messages received by Firebase Messaging Service

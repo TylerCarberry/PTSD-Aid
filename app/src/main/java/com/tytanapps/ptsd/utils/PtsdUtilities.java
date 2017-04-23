@@ -1,10 +1,8 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.utils;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,16 +14,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.util.Base64;
-import android.widget.Toast;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfigurable;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -33,15 +29,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**
  * A collection of methods that do not apply to a specific fragment
  */
-public class Utilities {
+public class PtsdUtilities {
 
     /**
      * Crop a bitmap to a circle and scale it
@@ -214,7 +208,7 @@ public class Utilities {
     }
 
     public static String drawableToBase64 (Drawable drawable) {
-        Bitmap bitmap = Utilities.drawableToBitmap(drawable);
+        Bitmap bitmap = PtsdUtilities.drawableToBitmap(drawable);
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         Canvas canvas = new Canvas(mutableBitmap);
@@ -256,120 +250,6 @@ public class Utilities {
     public static String getRemoteConfigString(@NonNull Fragment fragment, int resId) {
         FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
         return firebaseRemoteConfig.getString(fragment.getString(resId));
-    }
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    public static void openDialer(Context context, String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            context.startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(context.getApplicationContext(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    public static void openDialer(Fragment fragment, String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            fragment.startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(fragment.getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Open a website in the browser
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    public static void openBrowserIntent(Context context, String url) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        context.startActivity(i);
-    }
-
-    /**
-     * Open a website in the browser
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    public static void openBrowserIntent(Fragment fragment, String url) {
-        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(fragment.getActivity(), R.color.colorPrimary));
-        CustomTabsIntent customTabsIntent = builder.build();
-        customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
-
-        /*
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        fragment.startActivity(i);
-        */
-    }
-
-    /**
-     * Open the maps app to a specified location
-     * @param geoLocation The uri of the location to open
-     */
-    public static void openMapIntent(Context context, Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-        }
-    }
-
-    /**
-     * Open the maps app to a specified location
-     * @param geoLocation The uri of the location to open
-     */
-    public static void openMapIntent(Fragment fragment, Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(fragment.getActivity().getPackageManager()) != null) {
-            fragment.startActivity(intent);
-        }
-    }
-
-    /**
-     * Get the url for the Google Maps Api
-     * @param name The street address
-     * @param town The town
-     * @param state The state. Can be initials or full name
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    public static Uri getMapUri(String name, String town, String state) throws UnsupportedEncodingException {
-        // Encode the address
-        String location = name + ", " + town + ", " + state;
-        location = URLEncoder.encode(location, "UTF-8");
-
-        return Uri.parse("geo:0,0?q=" + location);
-    }
-
-    /**
-     * Get the url for the Google Maps Api
-     * @param location The location to encode
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    public static Uri getMapUri(String location) throws UnsupportedEncodingException {
-        // Encode the address
-        location = URLEncoder.encode(location, "UTF-8");
-
-        return Uri.parse("geo:0,0?q=" + location);
     }
 
     @SuppressWarnings("deprecation")
