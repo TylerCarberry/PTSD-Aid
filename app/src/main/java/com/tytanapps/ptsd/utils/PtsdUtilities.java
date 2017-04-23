@@ -18,6 +18,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.util.Base64;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.tytanapps.ptsd.R;
@@ -282,6 +283,13 @@ public class PtsdUtilities {
 
     public static boolean isVeteran(Activity activity) {
         return activity.getPreferences(Context.MODE_PRIVATE).getBoolean(activity.getString(R.string.pref_veteran), true);
+    }
+
+    public static void dismissKeyboard(Activity activity) {
+        if(activity.getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
 

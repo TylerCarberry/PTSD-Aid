@@ -180,4 +180,12 @@
     <string name="feedback_summary">Contact developer</string>
     <string name="feedback_category_title">Feedback</string>
 
+    <string name="settings_title">Settings</string>
+    <string name="resources_title">Resources</string>
+    <string name="ptsd_test_title">PTSD Test</string>
+    <string name="phone_title">Phone Resources</string>
+    <string name="web_title">Online Resources</string>
+    <string name="facilities_title">VA Facilities</string>
+    <string name="news_title">VA News</string>
+
 </resources>

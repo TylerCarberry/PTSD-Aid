@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.StringRes;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.View;
@@ -24,9 +25,13 @@ public abstract class BaseFragment extends Fragment {
 
     protected Unbinder unbinder;
 
+    protected abstract @StringRes int getTitle();
+
     @Override
     public void onResume() {
         super.onResume();
+
+        getActivity().setTitle(getTitle());
 
         // Obtain the shared Tracker instance.
         PTSDApplication application = (PTSDApplication) getActivity().getApplication();
@@ -40,7 +45,9 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
     }
 
     /**
@@ -56,7 +63,7 @@ public abstract class BaseFragment extends Fragment {
      */
     protected void signIn() {
         Activity parentActivity = getActivity();
-        if(parentActivity instanceof MainActivity)
+        if (parentActivity instanceof MainActivity)
             ((MainActivity) getActivity()).signIn();
     }
 
@@ -77,10 +84,9 @@ public abstract class BaseFragment extends Fragment {
     }
 
     /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
+     * @return The root view of the fragment casted to a ViewGroup
      */
-    protected ViewGroup getViewGroup() {
+    protected ViewGroup getRootViewGroup() {
         View rootView = getView();
         if(rootView instanceof ViewGroup)
             return (ViewGroup) getView();

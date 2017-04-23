@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
@@ -58,6 +59,11 @@ public class PTSDTestFragment extends BaseFragment {
         navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
     }
 
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.ptsd_test_title;
+    }
+
     /**
      * Add the prompt and the questions to the layout
      */
@@ -79,7 +85,7 @@ public class PTSDTestFragment extends BaseFragment {
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         for(String question : questions) {
-            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getViewGroup(), false);
+            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getRootViewGroup(), false);
 
             TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
             questionTextView.setText(question);
@@ -178,7 +184,7 @@ public class PTSDTestFragment extends BaseFragment {
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getViewGroup(), false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getRootViewGroup(), false);
 
         String resultText;
         String nextActions;

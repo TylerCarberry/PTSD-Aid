@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -70,6 +71,11 @@ public class WebsiteFragment extends BaseFragment {
                 readFirebaseWebsites(database);
             }
         }).start();
+    }
+
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.web_title;
     }
 
     /**

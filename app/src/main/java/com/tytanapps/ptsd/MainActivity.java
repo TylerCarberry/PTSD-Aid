@@ -67,17 +67,18 @@ import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.MyFirebaseMessagingService;
 import com.tytanapps.ptsd.firebase.RemoteConfigurable;
 import com.tytanapps.ptsd.fragments.MainFragment;
-import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.fragments.SettingsFragment;
 import com.tytanapps.ptsd.fragments.WebsiteFragment;
+import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
@@ -115,6 +116,8 @@ public class MainActivity extends AppCompatActivity
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     private Fragment currentFragment;
+
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -456,7 +459,6 @@ public class MainActivity extends AppCompatActivity
      * Set up the side drawer layout and populate it with the header and navigation items
      */
     private void setupDrawerLayout() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
@@ -943,6 +945,10 @@ public class MainActivity extends AppCompatActivity
                 currentFragment = newFragment;
             }
         }
+    }
+
+    public void setToolbarTitle(String toolbarTitle) {
+        toolbar.setTitle(toolbarTitle);
     }
 
     private ViewGroup rootViewGroup() {

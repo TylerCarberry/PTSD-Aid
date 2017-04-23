@@ -3,6 +3,7 @@ package com.tytanapps.ptsd.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -75,6 +76,11 @@ public class MainFragment extends BaseFragment {
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);
+    }
+
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.recommendations_title;
     }
 
     /**
@@ -157,7 +163,7 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
                     int newestAppVersion = PtsdUtilities.getRemoteConfigInt(this, R.string.rc_newest_app_version);
-                    int currentAppVersion = ExternalAppUtils.getApkVersion(getContext());
+                    int currentAppVersion = ExternalAppUtils.getApkVersion(getActivity());
                     if(newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
                     }
@@ -258,7 +264,7 @@ public class MainFragment extends BaseFragment {
      */
     private RelativeLayout getSuggestionLayoutTemplate() {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        return (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getViewGroup(), false);
+        return (RelativeLayout) inflater.inflate(R.layout.recommendation_view, getRootViewGroup(), false);
     }
 
     /**

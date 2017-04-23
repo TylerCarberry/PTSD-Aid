@@ -1,7 +1,7 @@
 package com.tytanapps.ptsd.news;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
@@ -16,13 +16,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.bhargavms.dotloader.DotLoader;
-import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import java.util.ArrayList;
@@ -117,17 +116,12 @@ public class NewsFragment extends BaseFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismissKeyboard();
+        PtsdUtilities.dismissKeyboard(getActivity());
     }
 
-    /**
-     * Close the on screen keyboard
-     */
-    private void dismissKeyboard() {
-        if(getActivity().getCurrentFocus() != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-        }
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.news_title;
     }
 
     private NewsLoader setupNewsLoader() {

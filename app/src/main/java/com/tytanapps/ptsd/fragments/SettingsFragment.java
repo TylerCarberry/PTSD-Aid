@@ -60,6 +60,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
+
+        getActivity().setTitle(R.string.settings_title);
     }
 
     private void setupNewsNotificationPref() {

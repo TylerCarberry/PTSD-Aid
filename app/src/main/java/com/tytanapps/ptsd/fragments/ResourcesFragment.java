@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,7 +49,11 @@ public class ResourcesFragment extends BaseFragment {
 
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_resources).setChecked(true);
+    }
 
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.resources_title;
     }
 
     private void insertDefaultResources() {

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -28,8 +29,8 @@ import android.widget.TextView;
 
 import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
 import com.tytanapps.ptsd.fragments.BaseFragment;
+import com.tytanapps.ptsd.utils.PtsdUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +151,11 @@ public class FacilitiesFragment extends BaseFragment {
     public void onStop() {
         super.onStop();
         dismissKeyboard();
+    }
+
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.facilities_title;
     }
 
     /**
