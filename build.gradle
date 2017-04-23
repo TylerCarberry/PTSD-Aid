@@ -21,6 +21,11 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+
+    ext {
+        googlePlayServicesVersion = '10.2.1'
+        supportLibVersion = '25.3.0'
+    }
 }
 
 task clean(type: Delete) {
