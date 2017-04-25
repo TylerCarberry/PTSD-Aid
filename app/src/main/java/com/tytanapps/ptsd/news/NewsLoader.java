@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +64,7 @@ public abstract class NewsLoader {
             @Override
             public JSONObject call(String url) {
                 try {
-                    String response = PtsdUtilities.readFromUrl(url).substring(2);
+                    String response = PtsdUtil.readFromUrl(url).substring(2);
                     Log.d(TAG, "call() called with: url = [" + url + "]");
                     Log.d(TAG, "call: " + response);
                     return new JSONObject(response);
@@ -174,7 +174,7 @@ public abstract class NewsLoader {
             @Override
             public News call(Integer integer) {
                 try {
-                    String response = PtsdUtilities.readFromUrl(calculateArticleURL(pressId));
+                    String response = PtsdUtil.readFromUrl(calculateArticleURL(pressId));
                     response = response.substring(2);
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
                     return parseJSONNews(rootJson);
@@ -199,7 +199,7 @@ public abstract class NewsLoader {
         String title = rootJson.getString("PRESS_TITLE");
 
         String article = rootJson.getString("PRESS_TEXT");
-        article = PtsdUtilities.htmlToText(article);
+        article = PtsdUtil.htmlToText(article);
         article = article.substring(article.indexOf("–") + 1).trim();
 
         // Remove the extra space at the end of the text

@@ -1,16 +1,11 @@
 package com.tytanapps.ptsd.facility;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -23,14 +18,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.utils.PermissionUtil;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +34,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
+
+import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_LOCATION_PERMISSION;
 
 /**
  * Loads a list of nearby VA facilities that offer PTSD programs.
@@ -47,16 +44,10 @@ import butterknife.Unbinder;
  */
 public class FacilitiesFragment extends BaseFragment {
 
-    private static final String LOG_TAG = FacilitiesFragment.class.getSimpleName();
-
-    private static final int PERMISSION_LOCATION_REQUEST = 3;
-
     private FacilityLoader facilityLoader;
-
     private final List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
-    private Unbinder unbinder;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.facility_loading_textview) TextView loadingTextView;
@@ -64,7 +55,7 @@ public class FacilitiesFragment extends BaseFragment {
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
     public FacilitiesFragment() {
-        // Required default constructor
+
     }
 
     @Override
@@ -79,7 +70,7 @@ public class FacilitiesFragment extends BaseFragment {
 
             @Override
             public void onSuccess(List<Facility> loadedFacilities) {
-                FacilitiesFragment.this.allFacilitiesHaveLoaded(loadedFacilities);
+                FacilitiesFragment.this.onAllFacilitiesLoaded(loadedFacilities);
             }
 
             @Override
@@ -93,30 +84,25 @@ public class FacilitiesFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        swipeRefreshLayout.setEnabled(false);
         return rootView;
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        swipeRefreshLayout.setEnabled(false);
     }
 
-    /**
-     * When the fragment becomes visible, start loading the VA facilities
-     */
     @Override
     public void onStart() {
         super.onStart();
 
         // Load the VA facilities if they have not yet been loaded
         if(facilityList.size() == 0) {
-            loadFacilities();
+            loadVaFacilities();
         }
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_nearby).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_nearby);
     }
 
     @Override
@@ -150,7 +136,7 @@ public class FacilitiesFragment extends BaseFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismissKeyboard();
+        PtsdUtil.dismissKeyboard(getActivity());
     }
 
     @Override
@@ -169,7 +155,7 @@ public class FacilitiesFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, PtsdUtilities.getRemoteConfigInt(this, R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, RemoteConfig.getInt(this, R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -194,7 +180,7 @@ public class FacilitiesFragment extends BaseFragment {
     /**
      * When all of the facilities have fully loaded, sort them by distance and display them to the user
      */
-    private void allFacilitiesHaveLoaded(final List<Facility> facilities) {
+    private void onAllFacilitiesLoaded(final List<Facility> facilities) {
         hideLoadingBar();
 
         facilityList.clear();
@@ -219,32 +205,11 @@ public class FacilitiesFragment extends BaseFragment {
         }
     }
 
-    /**
-     * @return Whether the location permission has been granted
-     */
-    private boolean locationPermissionGranted() {
-        return ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * Request the location permission
-     * Only needed in Android version 6.0 and up
-     */
-    @TargetApi(Build.VERSION_CODES.M)
-    private void requestLocationPermission() {
-        if (!locationPermissionGranted()) {
-            requestPermissions(
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSION_LOCATION_REQUEST);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
 
         switch (requestCode) {
-            case PERMISSION_LOCATION_REQUEST: {
+            case REQUEST_LOCATION_PERMISSION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -301,18 +266,14 @@ public class FacilitiesFragment extends BaseFragment {
         loadingTextView.setVisibility(View.INVISIBLE);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
-        loadFacilities();
+        loadVaFacilities();
     }
 
-    /**
-     * Load the VA facilities
-     */
-    private void loadFacilities() {
-        if(locationPermissionGranted())
+    private void loadVaFacilities() {
+        if(PermissionUtil.locationPermissionGranted(getActivity()))
             facilityLoader.loadPTSDPrograms();
-        // Request the location permission before loading the facilities
         else
-            requestLocationPermission();
+            PermissionUtil.requestLocationPermission(getActivity());
     }
 
     /**
@@ -322,17 +283,6 @@ public class FacilitiesFragment extends BaseFragment {
         if(loadingTextView != null) {
             loadingTextView.setVisibility(View.GONE);
             loadingProgressBar.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * Close the on screen keyboard
-     * See http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard/1109108#1109108
-     */
-    private void dismissKeyboard() {
-        if(getActivity().getCurrentFocus() != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
     

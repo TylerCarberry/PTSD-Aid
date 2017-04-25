@@ -12,7 +12,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +24,7 @@ import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
 import com.tytanapps.ptsd.BuildConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class SettingsFragment extends PreferenceFragment {
         super.onStart();
 
         if(BuildConfig.DEBUG && getView() != null) {
-            ((MainActivity)getActivity()).fetchRemoteConfig(0);
+            RemoteConfig.fetchRemoteConfig(0);
             Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
         }
 
@@ -72,13 +72,10 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 saveSharedPreference(getString(R.string.pref_news_notification), (Boolean) newValue);
 
-                if((Boolean) newValue) {
+                if ((Boolean) newValue) {
                     FirebaseMessaging.getInstance().subscribeToTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: subscribed");
-                }
-                else {
+                } else {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: unsubscribed");
                 }
 
                 return true;
@@ -218,22 +215,10 @@ public class SettingsFragment extends PreferenceFragment {
 
     }
 
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         return getActivity().getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
     }
 
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
     private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
         return getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
     }

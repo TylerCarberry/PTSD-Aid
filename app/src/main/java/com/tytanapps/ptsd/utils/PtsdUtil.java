@@ -1,8 +1,9 @@
 package com.tytanapps.ptsd.utils;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,14 +16,12 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.Html;
 import android.util.Base64;
 import android.view.inputmethod.InputMethodManager;
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.firebase.RemoteConfigurable;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +35,7 @@ import java.util.List;
 /**
  * A collection of methods that do not apply to a specific fragment
  */
-public class PtsdUtilities {
+public class PtsdUtil {
 
     /**
      * Crop a bitmap to a circle and scale it
@@ -209,7 +208,7 @@ public class PtsdUtilities {
     }
 
     public static String drawableToBase64 (Drawable drawable) {
-        Bitmap bitmap = PtsdUtilities.drawableToBitmap(drawable);
+        Bitmap bitmap = PtsdUtil.drawableToBitmap(drawable);
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         Canvas canvas = new Canvas(mutableBitmap);
@@ -221,36 +220,6 @@ public class PtsdUtilities {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream .toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    /**
-     * Get the FirebaseRemoteConfig of a fragment's parent activity
-     * PRECONDITION: The activity containing fragment implements RemoteConfigurable
-     * @param fragment The fragment to get the remote config from
-     * @return The FirebaseRemoteConfig of fragment's activity
-     */
-    private static FirebaseRemoteConfig getRemoteConfig(@NonNull Fragment fragment) {
-        return ((RemoteConfigurable)fragment.getActivity()).getRemoteConfig();
-    }
-
-    public static boolean getRemoteConfigBoolean(@NonNull Fragment fragment, int resId) {
-        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
-        return firebaseRemoteConfig.getBoolean(fragment.getString(resId));
-    }
-
-    public static int getRemoteConfigInt(@NonNull Fragment fragment, int resId) {
-        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
-        return (int) firebaseRemoteConfig.getDouble(fragment.getString(resId));
-    }
-
-    public static double getRemoteConfigDouble(@NonNull Fragment fragment, int resId) {
-        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
-        return firebaseRemoteConfig.getDouble(fragment.getString(resId));
-    }
-
-    public static String getRemoteConfigString(@NonNull Fragment fragment, int resId) {
-        FirebaseRemoteConfig firebaseRemoteConfig = getRemoteConfig(fragment);
-        return firebaseRemoteConfig.getString(fragment.getString(resId));
     }
 
     @SuppressWarnings("deprecation")
@@ -290,6 +259,51 @@ public class PtsdUtilities {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
+    }
+
+    /**
+     * @return debug information about the phone and app
+     */
+    public static String getDeviceInformation(Activity activity) {
+        String deviceInformation = "";
+
+        try {
+            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            String version = pInfo.versionName;
+            int verCode = pInfo.versionCode;
+
+            deviceInformation += "APP VERSION: " + version + " (" + verCode + ")\n";
+
+        } catch (PackageManager.NameNotFoundException e) {
+            FirebaseCrash.report(e);
+            e.printStackTrace();
+        }
+
+        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
+        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
+        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
+        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
+        deviceInformation += "BOARD: " + Build.BOARD + "\n";
+        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
+        deviceInformation += "BRAND: " + Build.BRAND + "\n";
+        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
+        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
+        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
+        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
+        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
+        deviceInformation += "HOST: " + Build.HOST + "\n";
+        deviceInformation += "ID: " + Build.ID + "\n";
+        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
+        deviceInformation += "MODEL: " + Build.MODEL + "\n";
+        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
+        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
+        deviceInformation += "TAGS: " + Build.TAGS + "\n";
+        deviceInformation += "TYPE: " + Build.TYPE + "\n";
+        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
+        deviceInformation += "USER: " + Build.USER + "\n";
+        deviceInformation += "TIME: " + Build.TIME + "\n";
+
+        return deviceInformation;
     }
 
 

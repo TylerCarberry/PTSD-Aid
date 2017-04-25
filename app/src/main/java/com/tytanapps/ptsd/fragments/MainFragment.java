@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +21,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.utils.ExternalAppUtils;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import java.io.UnsupportedEncodingException;
 
@@ -74,8 +73,7 @@ public class MainFragment extends BaseFragment {
         if(isUserSignedIn())
             hideSignInButton();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_simple_test).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_recommendations);
     }
 
     @Override
@@ -89,7 +87,7 @@ public class MainFragment extends BaseFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if(!PtsdUtilities.getRemoteConfigBoolean(this, R.string.rc_show_extra_emoji)) {
+        if(!RemoteConfig.getBoolean(this, R.string.rc_show_extra_emoji)) {
             rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
@@ -162,9 +160,9 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
-                    int newestAppVersion = PtsdUtilities.getRemoteConfigInt(this, R.string.rc_newest_app_version);
-                    int currentAppVersion = ExternalAppUtils.getApkVersion(getActivity());
-                    if(newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
+                    int newestAppVersion = RemoteConfig.getInt(this, R.string.rc_newest_app_version);
+                    int currentAppVersion = ExternalAppUtil.getApkVersion(getActivity());
+                    if (newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
                     }
 
@@ -204,7 +202,7 @@ public class MainFragment extends BaseFragment {
             if (!isTrustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-            if(firebaseDatabaseLoaded && PtsdUtilities.getRemoteConfigBoolean(this, R.string.rc_check_recommendations_database)) {
+            if(firebaseDatabaseLoaded && RemoteConfig.getBoolean(this, R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
@@ -290,7 +288,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_sign_in), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                signInGoogle();
             }
         });
     }
@@ -304,7 +302,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_benefits), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExternalAppUtils.openBrowserIntent(MainFragment.this, (getString(R.string.website_va)));
+                ExternalAppUtil.openBrowserIntent(MainFragment.this, (getString(R.string.website_va)));
             }
         });
     }
@@ -318,7 +316,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_veteran_association), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExternalAppUtils.openBrowserIntent(MainFragment.this, (getString(R.string.veterans_network_website)));
+                ExternalAppUtil.openBrowserIntent(MainFragment.this, (getString(R.string.veterans_network_website)));
             }
         });
     }
@@ -334,7 +332,7 @@ public class MainFragment extends BaseFragment {
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
                 if (!phoneNumber.equals(""))
-                    ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
+                    ExternalAppUtil.openDialer(getActivity(), phoneNumber);
                 else
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
             }
@@ -351,7 +349,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
-                ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
+                ExternalAppUtil.openDialer(getActivity(), phoneNumber);
             }
         });
     }
@@ -366,7 +364,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
-                ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
+                ExternalAppUtil.openDialer(getActivity(), phoneNumber);
             }
         });
     }
@@ -381,7 +379,7 @@ public class MainFragment extends BaseFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ExternalAppUtils.openBrowserIntent(MainFragment.this, url);
+                        ExternalAppUtil.openBrowserIntent(MainFragment.this, url);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -398,7 +396,7 @@ public class MainFragment extends BaseFragment {
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ExternalAppUtils.openDialer(MainFragment.this, phoneNumber);
+                        ExternalAppUtil.openDialer(getActivity(), phoneNumber);
                     }
                 };
                 return createSuggestionLayout(message, onClickListener);
@@ -416,7 +414,7 @@ public class MainFragment extends BaseFragment {
                     public void onClick(View v) {
 
                         try {
-                            ExternalAppUtils.openMapIntent(MainFragment.this, ExternalAppUtils.getMapUri(location));
+                            ExternalAppUtil.openMapIntent(MainFragment.this, ExternalAppUtil.getMapUri(location));
                         } catch (UnsupportedEncodingException e) {
                             FirebaseCrash.report(e);
                             e.printStackTrace();
@@ -490,7 +488,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    ExternalAppUtils.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
+                    ExternalAppUtil.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
                 } catch(Exception e) {
                     FirebaseCrash.report(e);
                     openDrawer();

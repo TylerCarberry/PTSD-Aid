@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,15 +37,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static com.tytanapps.ptsd.utils.PtsdUtilities.distanceBetweenCoordinates;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.getFirstPhoneNumber;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.getGPSLocation;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigBoolean;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigInt;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.loadBitmapFromFile;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.readBitmapFromUrl;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.readFromUrl;
-import static com.tytanapps.ptsd.utils.PtsdUtilities.saveBitmapToFile;
+import static com.tytanapps.ptsd.utils.PtsdUtil.distanceBetweenCoordinates;
+import static com.tytanapps.ptsd.utils.PtsdUtil.getFirstPhoneNumber;
+import static com.tytanapps.ptsd.utils.PtsdUtil.getGPSLocation;
+import static com.tytanapps.ptsd.utils.PtsdUtil.loadBitmapFromFile;
+import static com.tytanapps.ptsd.utils.PtsdUtil.readBitmapFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtil.readFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtil.saveBitmapToFile;
 import static rx.Observable.just;
 
 /**
@@ -252,7 +251,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+        if(RemoteConfig.getBoolean(fragment, R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -290,8 +289,8 @@ public abstract class FacilityLoader {
      * @param facility The facility to load the imagery for
      */
     public void loadFacilityImage(final Facility facility) {
-        int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
-        int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
+        int imageWidth = RemoteConfig.getInt(fragment, R.string.rc_map_width);
+        int imageHeight = RemoteConfig.getInt(fragment, R.string.rc_map_height);
 
         Observable<Bitmap> bitmapObservable = Observable.concat(
                 loadCacheFacilityImage(facility.getFacilityId()),
@@ -311,9 +310,7 @@ public abstract class FacilityLoader {
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
+            public void onError(Throwable e) {}
 
             @Override
             public void onNext(Bitmap bitmap) {
@@ -508,7 +505,7 @@ public abstract class FacilityLoader {
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+            if(RemoteConfig.getBoolean(fragment, R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
                 for (String program : programs)

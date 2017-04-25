@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,12 +20,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.ExternalAppUtils;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.tytanapps.ptsd.utils.PtsdUtilities.isVeteran;
+import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
 
 
 /**
@@ -55,8 +54,7 @@ public class WebsiteFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_websites).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_websites);
     }
 
     @Override
@@ -229,7 +227,7 @@ public class WebsiteFragment extends BaseFragment {
             websiteCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExternalAppUtils.openBrowserIntent(WebsiteFragment.this, url);
+                    ExternalAppUtil.openBrowserIntent(WebsiteFragment.this, url);
                 }
             });
 

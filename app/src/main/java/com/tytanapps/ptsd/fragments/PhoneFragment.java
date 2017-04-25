@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,12 +20,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.ExternalAppUtils;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.tytanapps.ptsd.utils.PtsdUtilities.isVeteran;
+import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
 
 
 /**
@@ -53,9 +52,7 @@ public class PhoneFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_hotline).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_hotline);
     }
 
     @Override
@@ -97,14 +94,8 @@ public class PhoneFragment extends BaseFragment {
      * Load the list of phone numbers from a Firebase database
      */
     private void loadPhoneNumbersFromFirebase() {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                readPhoneNumbers(database);
-            }
-        });
-        t.start();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        readPhoneNumbers(database);
     }
 
     /**
@@ -243,7 +234,7 @@ public class PhoneFragment extends BaseFragment {
         phoneCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExternalAppUtils.openDialer(PhoneFragment.this, phoneNumber);
+                ExternalAppUtil.openDialer(getActivity(), phoneNumber);
             }
         });
 

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.View;
@@ -58,13 +60,10 @@ public abstract class BaseFragment extends Fragment {
         drawer.openDrawer(Gravity.LEFT);
     }
 
-    /**
-     * Sign in to the user's Google Account
-     */
-    protected void signIn() {
+    protected void signInGoogle() {
         Activity parentActivity = getActivity();
         if (parentActivity instanceof MainActivity)
-            ((MainActivity) getActivity()).signIn();
+            ((MainActivity) getActivity()).signInGoogle();
     }
 
     /**
@@ -91,6 +90,11 @@ public abstract class BaseFragment extends Fragment {
         if(rootView instanceof ViewGroup)
             return (ViewGroup) getView();
         return null;
+    }
+
+    protected void setCheckedNavigationItem(@IdRes int resId) {
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(resId).setChecked(true);
     }
 
     /**

@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.news;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,8 +20,9 @@ import android.widget.TextView;
 
 import com.bhargavms.dotloader.DotLoader;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 
 public class NewsFragment extends BaseFragment {
@@ -41,7 +40,6 @@ public class NewsFragment extends BaseFragment {
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
-    private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.news_progressbar) DotLoader loadingProgressBar;
@@ -68,12 +66,6 @@ public class NewsFragment extends BaseFragment {
         newsLoader = setupNewsLoader();
         setupRefreshLayout();
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -108,15 +100,13 @@ public class NewsFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         newsLoader.loadNews();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_news).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_news);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        PtsdUtilities.dismissKeyboard(getActivity());
+        PtsdUtil.dismissKeyboard(getActivity());
     }
 
     @Override
@@ -171,7 +161,7 @@ public class NewsFragment extends BaseFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), PtsdUtilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), RemoteConfig.getInt(this, R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -187,16 +177,8 @@ public class NewsFragment extends BaseFragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
                 mAdapter.notifyDataSetChanged();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        newsLoader.refresh();
-                    }
-                });
-                t.run();
+                newsLoader.refresh();
             }
         });
     }

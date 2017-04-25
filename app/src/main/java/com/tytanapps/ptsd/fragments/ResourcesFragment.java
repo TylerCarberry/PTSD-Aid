@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 
 /**
@@ -47,8 +46,7 @@ public class ResourcesFragment extends BaseFragment {
             }
         }).run();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_resources).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_resources);
     }
 
     @Override
@@ -135,7 +133,7 @@ public class ResourcesFragment extends BaseFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if(PtsdUtilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+        if(RemoteConfig.getBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 

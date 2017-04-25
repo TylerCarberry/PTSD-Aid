@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -20,12 +19,11 @@ import android.widget.TextView;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.techery.progresshint.ProgressHintDelegate;
-
-import static com.tytanapps.ptsd.utils.PtsdUtilities.getRemoteConfigBoolean;
 
 
 /**
@@ -54,9 +52,7 @@ public class PTSDTestFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_test);
     }
 
     @Override
@@ -68,7 +64,7 @@ public class PTSDTestFragment extends BaseFragment {
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(getRemoteConfigBoolean(this, R.string.rc_questions_sticky)) {
+        if(RemoteConfig.getBoolean(this, R.string.rc_questions_sticky)) {
             TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
             headerTextView.setTag("sticky");
         }

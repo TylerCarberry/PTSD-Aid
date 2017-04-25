@@ -13,11 +13,9 @@ import android.widget.ScrollView;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author Emil Sj�lander - sjolander.emil@gmail.com
- *
- */
+// --------------------------------------------------------
+// https://github.com/emilsjolander/StickyScrollViewItems
+// --------------------------------------------------------
 public class StickyScrollView extends ScrollView {
 
     /**

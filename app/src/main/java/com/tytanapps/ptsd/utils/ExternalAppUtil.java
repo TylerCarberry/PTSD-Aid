@@ -17,8 +17,11 @@ import com.tytanapps.ptsd.R;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class ExternalAppUtils {
+public class ExternalAppUtil {
 
+    /**
+     * @return the APK version of the current app. -1 if it cannot be determined
+     */
     public static int getApkVersion(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -48,33 +51,6 @@ public class ExternalAppUtils {
     }
 
     /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    public static void openDialer(Fragment fragment, String phoneNumber) {
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            fragment.startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Toast.makeText(fragment.getActivity(), R.string.error_open_dialer, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Open a website in the browser
-     * Precondition: url is a valid url
-     * @param url The url to open
-     */
-    public static void openBrowserIntent(Context context, String url) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        context.startActivity(i);
-    }
-
-    /**
      * Open a website in the browser
      * Precondition: url is a valid url
      * @param url The url to open
@@ -84,24 +60,6 @@ public class ExternalAppUtils {
         builder.setToolbarColor(ContextCompat.getColor(fragment.getActivity(), R.color.colorPrimary));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
-
-        /*
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        fragment.startActivity(i);
-        */
-    }
-
-    /**
-     * Open the maps app to a specified location
-     * @param geoLocation The uri of the location to open
-     */
-    public static void openMapIntent(Context context, Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-        }
     }
 
     /**

@@ -3,6 +3,8 @@ package com.tytanapps.ptsd.facility;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import com.tytanapps.ptsd.Searchable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,39 +12,24 @@ import java.util.Set;
 /**
  * A facility is a VA facility that offers PTSD programs
  */
-public class Facility implements Comparable<Facility>, Serializable {
+public class Facility implements Comparable<Facility>, Serializable, Searchable {
 
     private static final long serialVersionUID = 2L;
 
-    // Every VA facility has a unique id
+    // Unique VA id
     private final int FACILITY_ID;
 
-    // The name of the facility
-    private String name;
+    private String name, description;
+    private String phoneNumber, url;
+    private String streetAddress, city, state, zip;
+    private double latitude, longitude;
 
-    // The description for the facility
-    private String description;
-
-    // Contact information for the facility
-    private String phoneNumber;
-    private String url;
-
-    // The location of the facility
-    private String streetAddress;
-    private String city;
-    private String state;
-    private String zip;
-
-    // The latitude and longitude of the facility. Used to determine distance from the user.
-    private double latitude;
-    private double longitude;
-
-    // The distance from the user in miles
+    // Distance from the user in miles
     private double distance;
 
     private Bitmap facilityImage;
 
-    // The PTSD programs offered at that location
+    // PTSD programs offered at that location
     private final Set<String> programs;
 
     /**
@@ -69,10 +56,11 @@ public class Facility implements Comparable<Facility>, Serializable {
      * @param longitude The longitude of the facility
      * @param distance The distance between the user and the facility in miles
      */
-    public Facility(int facilityId, String name, String description, String phoneNumber, String url, String streetAddress,
-                    String city, String state, String zip, double latitude, double longitude, double distance) {
+    public Facility(int facilityId, String name, String description, String phoneNumber, String url,
+                    String streetAddress, String city, String state, String zip,
+                    double latitude, double longitude, double distance) {
 
-        FACILITY_ID = facilityId;
+        this.FACILITY_ID = facilityId;
         this.name = name;
         this.description = description;
         this.phoneNumber = phoneNumber;
@@ -112,115 +100,58 @@ public class Facility implements Comparable<Facility>, Serializable {
         this.name = name;
     }
 
-    /**
-     * Get the description of the facility
-     * @return The description of the facility
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Set the description of the facility
-     * @param description The new description of the facility
-     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    /**
-     * Get the phone number for the facility
-     * @return The phone number for the facility
-     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    /**
-     * Change the phone number
-     * @param phoneNumber The new phone number for the facility
-     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Get the url for more information about the facility
-     * @return The url for the facility
-     */
     public String getUrl() {
         return url;
     }
 
-    /**
-     * Set the url for the facility
-     * @param url The new url for the facility
-     */
     public void setUrl(String url) {
         this.url = url;
     }
 
-    /**
-     * Get the street address for the facility
-     * @return The street address for the facility
-     */
     public String getStreetAddress() {
         return streetAddress;
     }
 
-    /**
-     * Set the street address for the facility
-     * @param streetAddress The new street address for the facility
-     */
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
     }
 
-    /**
-     * Get the city that the facility is located in
-     * @return The facility's city
-     */
     public String getCity() {
         return city;
     }
 
-    /**
-     * Set the city of the facility
-     * @param city The new city of the facility
-     */
     public void setCity(String city) {
         this.city = city;
     }
 
-    /**
-     * Get the US state that the facility is located in.
-     * All facilities are currently located in the United States.
-     * @return The US state that the facility is located in
-     */
     public String getState() {
         return state;
     }
 
-    /**
-     * Set the US state that the facility is located in
-     * @param state The new state that the facility is located in
-     */
     public void setState(String state) {
         this.state = state;
     }
 
-    /**
-     * Get the zip code of the facility
-     * @return The zip code of the facility
-     */
     public String getZip() {
         return zip;
     }
 
-    /**
-     * Set the zip code of the facility
-     * @param zip The new zip code of the facility
-     */
     public void setZip(String zip) {
         this.zip = zip;
     }
@@ -233,34 +164,18 @@ public class Facility implements Comparable<Facility>, Serializable {
         return streetAddress + " " + city + " " + state;
     }
 
-    /**
-     * Get the latitude of the facility
-     * @return The latitude of the facility
-     */
     public double getLatitude() {
         return latitude;
     }
 
-    /**
-     * Set the latitude of the facility
-     * @param latitude The new latitude of the facility
-     */
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    /**
-     * Get the longitude of the facility
-     * @return The longitude of the facility
-     */
     public double getLongitude() {
         return longitude;
     }
 
-    /**
-     * Set the longitude of the facility
-     * @param longitude The new longitude of the facility
-     */
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
@@ -304,6 +219,14 @@ public class Facility implements Comparable<Facility>, Serializable {
         this.zip = zipCode;
     }
 
+    public Bitmap getFacilityImage() {
+        return facilityImage;
+    }
+
+    public void setFacilityImage(Bitmap facilityImage) {
+        this.facilityImage = facilityImage;
+    }
+
     /**
      * Compare two facilities by distance to the user
      * @param another The other facility to compare to
@@ -319,11 +242,54 @@ public class Facility implements Comparable<Facility>, Serializable {
         return 0;
     }
 
-    public Bitmap getFacilityImage() {
-        return facilityImage;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Facility facility = (Facility) o;
+
+        if (FACILITY_ID != facility.FACILITY_ID) return false;
+        if (Double.compare(facility.latitude, latitude) != 0) return false;
+        if (Double.compare(facility.longitude, longitude) != 0) return false;
+        if (!name.equals(facility.name)) return false;
+        if (!description.equals(facility.description)) return false;
+        if (!phoneNumber.equals(facility.phoneNumber)) return false;
+        if (!url.equals(facility.url)) return false;
+        if (!streetAddress.equals(facility.streetAddress)) return false;
+        if (!city.equals(facility.city)) return false;
+        if (!state.equals(facility.state)) return false;
+        return zip.equals(facility.zip);
+
     }
 
-    public void setFacilityImage(Bitmap facilityImage) {
-        this.facilityImage = facilityImage;
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = FACILITY_ID;
+        result = 31 * result + name.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + phoneNumber.hashCode();
+        result = 31 * result + url.hashCode();
+        result = 31 * result + streetAddress.hashCode();
+        result = 31 * result + city.hashCode();
+        result = 31 * result + state.hashCode();
+        result = 31 * result + zip.hashCode();
+        temp = Double.doubleToLongBits(latitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean search(String text) {
+        if(text == null || text.isEmpty())
+            return true;
+        text = text.toLowerCase();
+        return name.toLowerCase().contains(text) ||
+                phoneNumber.toLowerCase().contains(text) ||
+                getFullAddress().toLowerCase().contains(text);
     }
 }

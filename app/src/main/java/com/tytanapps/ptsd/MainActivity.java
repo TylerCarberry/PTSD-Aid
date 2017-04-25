@@ -1,7 +1,5 @@
 package com.tytanapps.ptsd;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.NotificationManager;
@@ -11,19 +9,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -34,19 +27,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.Cache;
-import com.android.volley.Network;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.ImageRequest;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -55,17 +38,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.firebase.MyFirebaseMessagingService;
-import com.tytanapps.ptsd.firebase.RemoteConfigurable;
+import com.tytanapps.ptsd.firebase.PtsdMessagingService;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.MainFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.PhoneFragment;
@@ -73,7 +51,9 @@ import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.fragments.SettingsFragment;
 import com.tytanapps.ptsd.fragments.WebsiteFragment;
 import com.tytanapps.ptsd.news.NewsFragment;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
+import com.tytanapps.ptsd.utils.PermissionUtil;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
@@ -85,6 +65,7 @@ import butterknife.OnLongClick;
 import io.doorbell.android.Doorbell;
 
 import static com.tytanapps.ptsd.R.id.drawer_layout;
+import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION;
 
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
@@ -92,28 +73,21 @@ import static com.tytanapps.ptsd.R.id.drawer_layout;
  */
 public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
-                    GoogleApiClient.OnConnectionFailedListener, RemoteConfigurable {
+                    GoogleApiClient.OnConnectionFailedListener {
 
-    // The tag used in log statements
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
-    // The connection to the Google API
+    // Connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
 
     // Whether the user is signed in to the app with their Google Account
     private boolean isUserSignedIn = false;
 
-    // The header image on top of the navigation view containing the user's information
+    // Header image on top of the navigation view containing the user's information
     private ViewGroup navHeader;
 
-    // The request queue used to connect with APIs in the background
-    private RequestQueue requestQueue;
-
-    private static final int RC_SIGN_IN = 1;
-    private static final int PICK_CONTACT_REQUEST = 2;
-    private static final int PERMISSION_CONTACT_REQUEST = 4;
-
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    public static final int REQUEST_SIGN_IN = 1;
+    public static final int REQUEST_PICK_TRUSTED_CONTACT = 2;
 
     private Fragment currentFragment;
 
@@ -134,7 +108,7 @@ public class MainActivity extends AppCompatActivity
 
                 // Dismiss the notification
                 NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
-                manager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID);
+                manager.cancel(PtsdMessagingService.NOTIFICATION_ID);
             }
         }
 
@@ -143,8 +117,6 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the connection to the Google API Client. This does not sign in the user.
         setupGoogleSignIn();
-
-        setupRemoteConfig();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -179,20 +151,57 @@ public class MainActivity extends AppCompatActivity
         }
 
         makeFirebaseDatabasePersistent();
-
-        if(BuildConfig.DEBUG)
-            FirebaseMessaging.getInstance().subscribeToTopic("debug");
-        else
-            FirebaseMessaging.getInstance().subscribeToTopic("release");
-
+        FirebaseMessaging.getInstance().subscribeToTopic(BuildConfig.DEBUG ? "debug" : "release");
         setupNewsNotifications();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        findViewById(R.id.fab).setVisibility(shouldShowFab() ? View.VISIBLE : View.INVISIBLE);
+    }
 
-        findViewById(R.id.fab).setVisibility(getSharedPreferenceBoolean("enable_trusted_contact", true) ? View.VISIBLE : View.INVISIBLE);
+    @Override
+    public void onResume() {
+        super.onResume();
+        silentGoogleSignIn();
+    }
+
+    /**
+     * When the back button is pressed, close the layout drawer or exit the app
+     */
+    @Override
+    public void onBackPressed() {
+        // Close the drawer layout if it is open
+        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch(requestCode) {
+            // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+            case REQUEST_SIGN_IN:
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                handleSignInResult(result);
+                break;
+            // Result returned when launching the pick trusted contact request
+            case REQUEST_PICK_TRUSTED_CONTACT:
+                if(resultCode == RESULT_OK) {
+                    Uri contactUri = data.getData();
+                    handlePickContactRequest(contactUri);
+                }
+        }
+    }
+
+    private boolean shouldShowFab() {
+        return getSharedPreferenceBoolean("enable_trusted_contact", true);
     }
 
     /**
@@ -268,9 +277,9 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        int ratingPromptShowAfter = (int) mFirebaseRemoteConfig.getDouble("rating_prompt_show_after");
-        int ratingUpperBound = (int) mFirebaseRemoteConfig.getDouble("rating_upper_bound");
-        final String supportEmailAddress = mFirebaseRemoteConfig.getString("support_email_address");
+        int ratingPromptShowAfter = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_prompt_show_after");
+        int ratingUpperBound = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_upper_bound");
+        final String supportEmailAddress = RemoteConfig.getFirebaseRemoteConfig().getString("support_email_address");
 
         if(ratingPromptShowAfter > 0) {
             FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
@@ -299,142 +308,10 @@ public class MainActivity extends AppCompatActivity
      */
     public void provideFeedback() {
         Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
-        doorbell.addProperty("device", getDeviceInformation());
+        doorbell.addProperty("device", PtsdUtil.getDeviceInformation(this));
         doorbell.setMessageHint(getString(R.string.feedback_message_hint));
         doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
         doorbell.show();
-    }
-
-    /**
-     * Get the device debug information
-     * @return Debug information about the phone and app
-     */
-    private String getDeviceInformation() {
-        String deviceInformation = "";
-
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String version = pInfo.versionName;
-            int verCode = pInfo.versionCode;
-            
-            deviceInformation += "APP VERSION: " + version + " (" + verCode + ")\n";
-
-        } catch (PackageManager.NameNotFoundException e) {
-            FirebaseCrash.report(e);
-            e.printStackTrace();
-        }
-        
-        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
-        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
-        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
-        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
-        deviceInformation += "BOARD: " + Build.BOARD + "\n";
-        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
-        deviceInformation += "BRAND: " + Build.BRAND + "\n";
-        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
-        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
-        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
-        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
-        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
-        deviceInformation += "HOST: " + Build.HOST + "\n";
-        deviceInformation += "ID: " + Build.ID + "\n";
-        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
-        deviceInformation += "MODEL: " + Build.MODEL + "\n";
-        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
-        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
-        deviceInformation += "TAGS: " + Build.TAGS + "\n";
-        deviceInformation += "TYPE: " + Build.TYPE + "\n";
-        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
-        deviceInformation += "USER: " + Build.USER + "\n";
-        deviceInformation += "TIME: " + Build.TIME + "\n";
-
-        return deviceInformation;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Attempt to sign the user in automatically
-        silentSignIn();
-    }
-
-    /**
-     * When the back button is pressed, close the layout drawer or exit the app
-     */
-    @Override
-    public void onBackPressed() {
-        // Close the drawer layout if it is open
-        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
-        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-        // Result returned when launching the pick trusted contact request
-        else if(requestCode == PICK_CONTACT_REQUEST) {
-            if(resultCode == RESULT_OK) {
-                Uri contactUri = data.getData();
-                handlePickContractRequest(contactUri);
-            }
-        }
-    }
-
-    /**
-     * Setup Firebase remote configuration
-     */
-    private void setupRemoteConfig() {
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
-
-        int cacheSeconds = getResources().getInteger(R.integer.remote_config_cache_seconds);
-        if(mFirebaseRemoteConfig.getBoolean("never_fetched"))
-            cacheSeconds = 0;
-
-        fetchRemoteConfig(cacheSeconds);
-    }
-
-    public void fetchRemoteConfig(int cacheSeconds) {
-        mFirebaseRemoteConfig.fetch(cacheSeconds)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(LOG_TAG, "Fetch Succeeded");
-                        mFirebaseRemoteConfig.activateFetched();
-                        // Once the config is successfully fetched it must be activated before
-                        // newly fetched values are returned. This is done in onStop() so values
-                        // do not change as the user is interacting with the app.
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(LOG_TAG, "Fetch failed");
-                    }
-                });
-    }
-
-    /**
-     *
-     * @return The Firebase remote configuration for the activity
-     */
-    public FirebaseRemoteConfig getRemoteConfig() {
-        return mFirebaseRemoteConfig;
     }
 
     /**
@@ -474,7 +351,7 @@ public class MainActivity extends AppCompatActivity
         navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                signInGoogle();
             }
         });
 
@@ -490,9 +367,9 @@ public class MainActivity extends AppCompatActivity
     /**
      * Sign in to the user's Google Account
      */
-    public void signIn() {
+    public void signInGoogle() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, REQUEST_SIGN_IN);
     }
 
     /**
@@ -523,7 +400,7 @@ public class MainActivity extends AppCompatActivity
      * Sign in to the user's Google Account in the background
      * Only signs the user in if they have previously granted access
      */
-    private void silentSignIn() {
+    private void silentGoogleSignIn() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
@@ -567,10 +444,6 @@ public class MainActivity extends AppCompatActivity
         drawerEmailTextView.setVisibility(View.VISIBLE);
         drawerEmailTextView.setText(email);
 
-        // Show the profile picture. If the user doesn't have one, use the app logo instead
-        ImageView profileImageView = (ImageView) navHeader.findViewById(R.id.drawer_imageview);
-        loadProfilePicture(profileImageView, profilePicture);
-
         // Hide the sign in button
         View signInButton = navHeader.findViewById(R.id.button_sign_in);
         if(signInButton != null)
@@ -578,43 +451,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Load the street view imagery for the given address.
-     * If there is no street view imagery, it uses the map view instead.
-     * You should not call this directly. Call loadFacilityImage instead
-     * @param imageView The ImageView to place the image into
-     * @param profilePictureUri The uri of the image to load
-     */
-    private void loadProfilePicture(final ImageView imageView, Uri profilePictureUri) {
-        if(profilePictureUri == null || imageView == null)
-            return;
-
-        String url = profilePictureUri.toString();
-
-        // Retrieves an image specified by the URL, displays it in the UI.
-        ImageRequest request = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        imageView.setImageBitmap(PtsdUtilities.getCircularBitmap(bitmap, 200, 200));
-                    }
-                }, 0, 0, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(LOG_TAG, "Street View Image errorListener: " + error.toString());
-                    }
-                });
-
-        // Start loading the image in the background
-        getRequestQueue().add(request);
-    }
-
-    /**
      * Call the trusted contact. Show the create trusted contact dialog if not created
      */
-    @OnClick(R.id.fab) public void callTrustedContact() {
+    @OnClick(R.id.fab)
+    public void callTrustedContact() {
         String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
         if (!phoneNumber.equals(""))
-            openDialer(phoneNumber);
+            ExternalAppUtil.openDialer(this, phoneNumber);
         else
             showCreateTrustedContactDialog();
     }
@@ -673,31 +516,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    /**
-     * @return Whether the user has granted the READ_CONTACTS permission
-     */
-    private boolean contactsPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
-    }
 
-    /**
-     * Request the contacts permission if it has not been granted
-     */
-    @TargetApi(Build.VERSION_CODES.M)
-    private void requestContactsPermission() {
-        if (!contactsPermissionGranted()) {
-            requestPermissions(
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    PERMISSION_CONTACT_REQUEST);
-        }
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_CONTACT_REQUEST: {
+            case REQUEST_CONTACT_PERMISSION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission was granted
@@ -705,14 +530,14 @@ public class MainActivity extends AppCompatActivity
                 }
                 else {
                     // Permission denied
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                    alertDialog.setTitle(R.string.contacts_permission_title);
-                    alertDialog.setMessage(R.string.contacts_permission_message);
-                    alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        // When the ok button is pressed, dismiss the dialog and do not do anything
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {}
-                    });
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                        .setTitle(R.string.contacts_permission_title)
+                        .setMessage(R.string.contacts_permission_message)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            // When the ok button is pressed, dismiss the dialog and do not do anything
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {}
+                        });
                     alertDialog.create().show();
                 }
             }
@@ -723,32 +548,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Open the dialer with a phone number entered
-     * This does not call the number directly, the user needs to press the call button
-     * @param phoneNumber The phone number to call
-     */
-    protected void openDialer(String phoneNumber) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        } catch (ActivityNotFoundException activityNotFoundException) {
-            Snackbar.make(findViewById(R.id.fragment_container), R.string.error_open_dialer, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
      * Open an intent to allow the user to pick one of their contacts
      */
     public void pickTrustedContact() {
-        if(!contactsPermissionGranted()) {
-            requestContactsPermission();
+        if(!PermissionUtil.contactsPermissionGranted(this)) {
+            PermissionUtil.requestContactsPermission(this);
         }
         else {
             try {
                 Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-                startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+                startActivityForResult(pickContactIntent, REQUEST_PICK_TRUSTED_CONTACT);
             } catch (ActivityNotFoundException activityNotFoundException) {
                 Snackbar.make(findViewById(R.id.fragment_container), R.string.error_choose_contact, Snackbar.LENGTH_LONG).show();
             }
@@ -759,7 +569,7 @@ public class MainActivity extends AppCompatActivity
      * Handle the result of choosing a trusted contact
      * @param trustedContactUri The response from the contact picker activity
      */
-    private void handlePickContractRequest(Uri trustedContactUri) {
+    private void handlePickContactRequest(Uri trustedContactUri) {
         String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
 
         Cursor cursor = getContentResolver().query(trustedContactUri, projection, null, null, null);
@@ -825,10 +635,9 @@ public class MainActivity extends AppCompatActivity
      * @param value The value to save in the shared preference
      */
     private void saveSharedPreference(String prefKey, String value) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(prefKey, value);
-        editor.apply();
+        getPreferences(Context.MODE_PRIVATE).edit()
+                .putString(prefKey, value)
+                .apply();
     }
 
     /**
@@ -837,38 +646,9 @@ public class MainActivity extends AppCompatActivity
      * @param value The value to save in the shared preference
      */
     private void saveSharedPreference(String prefKey, boolean value) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(prefKey, value);
-        editor.apply();
-    }
-
-    /**
-     * Get the request queue. Creates it if it has not yet been instantiated
-     * @return The request queue for connecting with an API
-     */
-    public RequestQueue getRequestQueue() {
-        if(requestQueue == null)
-            instantiateRequestQueue();
-
-        return requestQueue;
-    }
-
-    /**
-     * Create the request queue. This is used to connect to the API in the background
-     */
-    private void instantiateRequestQueue() {
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
+        getPreferences(Context.MODE_PRIVATE).edit()
+                .putBoolean(prefKey, value)
+                .apply();
     }
 
     /**
@@ -881,7 +661,7 @@ public class MainActivity extends AppCompatActivity
         // Switch to the appropriate fragment
         int id = item.getItemId();
         switch(id) {
-            case R.id.nav_simple_test:
+            case R.id.nav_recommendations:
                 newFragment = new MainFragment();
                 break;
             case R.id.nav_test:
@@ -911,7 +691,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        if(newFragment != null) {
+        if (newFragment != null) {
             switchFragment(newFragment);
         }
 

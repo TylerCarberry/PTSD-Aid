@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,28 +13,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.utils.ExternalAppUtils;
-import com.tytanapps.ptsd.utils.PtsdUtilities;
+import com.tytanapps.ptsd.SearchableAdapter;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyViewHolder> {
+import static android.content.ContentValues.TAG;
+
+public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
 
     private Fragment fragment;
-    private List<Facility> facilityList;
-    private List<Facility> facilityListAll;
 
-    private int facilitiesToDisplay;
+    class FacilityViewHolder extends RecyclerView.ViewHolder {
+        CardView rootCardView;
+        TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
+        ImageView facilityImageView, callIcon, addressIcon;
+        Button moreInfoButton;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public CardView rootCardView;
-        public TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
-        public ImageView facilityImageView, callIcon, addressIcon;
-        public Button moreInfoButton;
-
-        public MyViewHolder(View view) {
+        FacilityViewHolder(View view) {
             super(view);
 
             rootCardView = (CardView) view.findViewById(R.id.facility_cardview);
@@ -50,36 +49,27 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
     }
 
     public FacilityAdapter(List<Facility> facilityList, Fragment fragment) {
-        // Display 10 facilities by default
-        this(facilityList, fragment, 10);
+        super(facilityList);
+        this.fragment = fragment;
     }
 
     public FacilityAdapter(List<Facility> facilityList, Fragment fragment, int facilitiesToDisplay) {
+        super(facilityList, facilitiesToDisplay);
         this.fragment = fragment;
-        this.facilitiesToDisplay = facilitiesToDisplay;
-
-        this.facilityList = new ArrayList<>();
-        this.facilityListAll = facilityList;
-
-        for(int i = 0; i < facilitiesToDisplay; i++) {
-            Facility facility = facilityList.get(i);
-            this.facilityList.add(facility);
-        }
-
         loadFacilityImages();
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+    public FacilityViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.facility_layout, parent, false);
 
-        return new MyViewHolder(itemView);
+        return new FacilityViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-        final Facility facility = facilityList.get(position);
+    public void onBindViewHolder(final FacilityViewHolder holder, int position) {
+        final Facility facility = list.get(position);
 
         // If the facility does not have all of its information, do not show it
         if(facility.getName() != null && facility.getDescription() != null && facility.getPhoneNumber() != null) {
@@ -92,7 +82,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             View.OnClickListener callOnClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExternalAppUtils.openDialer(fragment, PtsdUtilities.getFirstPhoneNumber(facility.getPhoneNumber()));
+                    ExternalAppUtil.openDialer(fragment.getActivity(), PtsdUtil.getFirstPhoneNumber(facility.getPhoneNumber()));
                 }
             };
 
@@ -107,7 +97,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
                 @Override
                 public void onClick(View v) {
                     try {
-                        ExternalAppUtils.openMapIntent(fragment, ExternalAppUtils.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
+                        ExternalAppUtil.openMapIntent(fragment, ExternalAppUtil.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -135,57 +125,22 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
             moreInfoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String url = PtsdUtilities.getFirstPhoneNumber(facility.getUrl());
-                    ExternalAppUtils.openBrowserIntent(fragment, url);
+                    String url = PtsdUtil.getFirstPhoneNumber(facility.getUrl());
+                    ExternalAppUtil.openBrowserIntent(fragment, url);
                 }
             });
 
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return facilityList.size();
-    }
-
     public void filter(String text) {
-
-        if(text.isEmpty()){
-            facilityList.clear();
-
-            for(int i = 0; i < facilitiesToDisplay && i < facilityListAll.size(); i++) {
-                facilityList.add(facilityListAll.get(i));
-            }
-        } else {
-            ArrayList<Facility> result = new ArrayList<>();
-            text = text.toLowerCase().trim();
-            for(Facility item: facilityListAll) {
-
-                if(item.getName().toLowerCase().contains(text) ||
-                        item.getPhoneNumber().toLowerCase().contains(text) ||
-                        item.getFullAddress().toLowerCase().contains(text)) {
-                    result.add(item);
-                } else {
-                    for (String program : item.getPrograms()) {
-                        if(program.toLowerCase().contains(text)) {
-                            result.add(item);
-                            break;
-                        }
-                    }
-                }
-            }
-            facilityList.clear();
-
-            for(int i = 0; i < facilitiesToDisplay && i < result.size(); i++) {
-                facilityList.add(result.get(i));
-            }
-        }
-
+        super.filter(text);
         loadFacilityImages();
-        notifyDataSetChanged();
     }
 
     private void loadFacilityImages() {
+        Log.d(this.getClass().getSimpleName(), "loadFacilityImages() called");
+
         FacilityLoader facilityLoader = new FacilityLoader(fragment) {
             @Override
             public void errorLoadingResults(Throwable throwable) {}
@@ -194,20 +149,22 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.MyView
 
             @Override
             public void onLoadedImage(int facilityId) {
+                Log.d(TAG, "onLoadedImage() called with: facilityId = [" + facilityId + "]");
 
-                for(int i = 0; i < facilityList.size(); i++) {
-                    Facility facility = facilityList.get(i);
-                    if(facility.getFacilityId() == facilityId) {
+                for (int i = 0; i < list.size(); i++) {
+                    Facility facility = list.get(i);
+                    if (facility.getFacilityId() == facilityId) {
                         notifyItemChanged(i);
                     }
                 }
             }
         };
 
-        for(int i = 0; i < facilitiesToDisplay && i < facilityList.size(); i++) {
-            Facility facility = facilityList.get(i);
-            if(facility.getFacilityImage() == null)
-                facilityLoader.loadFacilityImage(facilityList.get(i));
+        for (int i = 0; i < numToDisplay && i < list.size(); i++) {
+            Facility facility = list.get(i);
+            if (facility.getFacilityImage() == null) {
+                facilityLoader.loadFacilityImage(list.get(i));
+            }
         }
     }
 
