@@ -22,7 +22,7 @@ import java.util.List;
 
 import static butterknife.ButterKnife.findById;
 
-public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
+class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
 
     private Fragment fragment;
 
@@ -53,7 +53,7 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
         this.fragment = fragment;
     }
 
-    public FacilityAdapter(List<Facility> facilityList, Fragment fragment, int facilitiesToDisplay) {
+    FacilityAdapter(List<Facility> facilityList, Fragment fragment, int facilitiesToDisplay) {
         super(facilityList, facilitiesToDisplay);
         this.fragment = fragment;
         loadFacilityImages();

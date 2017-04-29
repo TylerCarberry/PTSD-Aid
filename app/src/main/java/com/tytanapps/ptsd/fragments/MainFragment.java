@@ -90,7 +90,7 @@ public class MainFragment extends BaseFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if(!RemoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
+        if (!RemoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
             findById(rootView, R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
@@ -100,7 +100,7 @@ public class MainFragment extends BaseFragment {
      */
     private void hideSignInButton() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             View signInButton = findById(rootView, R.id.button_sign_in);
             if (signInButton != null) {
                 signInButton.setVisibility(View.INVISIBLE);
@@ -121,7 +121,6 @@ public class MainFragment extends BaseFragment {
      * If the Firebase database is loaded, set firebaseDatabaseLoaded to true
      */
     private void determineIfFirebaseDatabaseLoaded() {
-
         // Attempt to load a value from the database. If it cannot be loaded, then the listener
         // will never be called and firebaseDatabaseLoaded will remain false
         FirebaseDatabase myRef = FirebaseDatabase.getInstance();
@@ -147,7 +146,6 @@ public class MainFragment extends BaseFragment {
         View fragmentView = getView();
         if(fragmentView != null) {
             recommendationsContainer.setVisibility(View.INVISIBLE);
-
             recommendationsLinearLayout.removeAllViews();
 
             // Remove on click listener from the emoji
@@ -203,10 +201,11 @@ public class MainFragment extends BaseFragment {
                     break;
             }
 
-            if (!isTrustedContactCreated())
+            if (!isTrustedContactCreated()) {
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
+            }
 
-            if(firebaseDatabaseLoaded && RemoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
+            if (firebaseDatabaseLoaded && RemoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
@@ -236,7 +235,7 @@ public class MainFragment extends BaseFragment {
                     @Override
                     public void run() {
                         View rootView = getView();
-                        if(rootView != null) {
+                        if (rootView != null) {
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
                                 recommendationsLinearLayout.addView(getSuggestionFromDatabase(child));
                             }
@@ -335,10 +334,11 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-                if (!phoneNumber.equals(""))
+                if (!phoneNumber.equals("")) {
                     ExternalAppUtil.openDialer(getActivity(), phoneNumber);
-                else
+                } else {
                     ((MainActivity) getActivity()).showCreateTrustedContactDialog();
+                }
             }
         });
     }
@@ -535,15 +535,17 @@ public class MainFragment extends BaseFragment {
             LinearLayout emojiLayout1 = findById(rootView, R.id.emotions_linear_layout);
             for (int i = 0; i < emojiLayout1.getChildCount(); i++) {
                 View child = emojiLayout1.getChildAt(i);
-                if (child.getId() != emoji_id)
+                if (child.getId() != emoji_id) {
                     child.setVisibility(View.GONE);
+                }
             }
 
             LinearLayout emojiLayout2 = findById(rootView, R.id.emotions2_linear_layout);
             for (int i = 0; i < emojiLayout2.getChildCount(); i++) {
                 View child = emojiLayout2.getChildAt(i);
-                if (child.getId() != emoji_id)
+                if (child.getId() != emoji_id) {
                     child.setVisibility(View.GONE);
+                }
             }
         }
     }

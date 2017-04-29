@@ -15,16 +15,14 @@ import java.util.List;
 
 import static butterknife.ButterKnife.findById;
 
-public class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
+class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
 
-    private static final String LOG_TAG = NewsAdapter.class.getSimpleName();
+    class NewsViewHolder extends RecyclerView.ViewHolder {
+        CardView rootCardView;
+        TextView titleTextView, dateTextView;
+        ExpandableTextView messageTextView;
 
-    public class NewsViewHolder extends RecyclerView.ViewHolder {
-        public CardView rootCardView;
-        public TextView titleTextView, dateTextView;
-        public ExpandableTextView messageTextView;
-
-        public NewsViewHolder(View view) {
+        NewsViewHolder(View view) {
             super(view);
 
             rootCardView = findById(view, R.id.news_cardview);
@@ -43,7 +41,7 @@ public class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, N
      * @param newsList List of news to display
      * @param numNewsToDisplay Number of news to display on screen
      */
-    public NewsAdapter(List<News> newsList, int numNewsToDisplay) {
+    NewsAdapter(List<News> newsList, int numNewsToDisplay) {
         super(newsList, numNewsToDisplay);
     }
 

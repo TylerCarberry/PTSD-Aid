@@ -5,6 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A RecyclerView that allows you to search items
+ * @param <K> View holder
+ * @param <T> Item that the list contains (ex. Facility)
+ */
 public abstract class SearchableAdapter<K extends RecyclerView.ViewHolder, T extends Searchable> extends RecyclerView.Adapter<K> {
 
     public static final int DISPLAY_DEFAULT = 10;

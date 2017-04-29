@@ -62,8 +62,9 @@ public abstract class BaseFragment extends Fragment {
 
     protected void signInGoogle() {
         Activity parentActivity = getActivity();
-        if (parentActivity instanceof MainActivity)
+        if (parentActivity instanceof MainActivity) {
             ((MainActivity) getActivity()).signInGoogle();
+        }
     }
 
     /**
@@ -87,8 +88,9 @@ public abstract class BaseFragment extends Fragment {
      */
     protected ViewGroup getRootViewGroup() {
         View rootView = getView();
-        if(rootView instanceof ViewGroup)
+        if (rootView instanceof ViewGroup) {
             return (ViewGroup) getView();
+        }
         return null;
     }
 

@@ -12,7 +12,7 @@ public class RatingDialog extends FiveStarsDialog {
     public RatingDialog(Context context, String supportEmail) {
         super(context, supportEmail);
 
-        int ratingUpperBound = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_upper_bound");
+        int ratingUpperBound = RemoteConfig.getInt(context, R.string.rc_rating_upper_bound);
 
         setRateText(context.getString(R.string.rating_prompt_message));
         setTitle(context.getString(R.string.rating_prompt_title));

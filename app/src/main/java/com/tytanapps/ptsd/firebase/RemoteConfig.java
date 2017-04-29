@@ -37,28 +37,26 @@ public class RemoteConfig {
                 });
     }
 
-    public static FirebaseRemoteConfig getFirebaseRemoteConfig() {
-        if(firebaseRemoteConfig == null) setupRemoteConfig();
+    private static FirebaseRemoteConfig getFirebaseRemoteConfig() {
+        if (firebaseRemoteConfig == null) {
+            setupRemoteConfig();
+        }
         return firebaseRemoteConfig;
     }
 
     public static boolean getBoolean(@NonNull Context context, int resId) {
-        if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getBoolean(context.getString(resId));
+        return getFirebaseRemoteConfig().getBoolean(context.getString(resId));
     }
 
     public static int getInt(@NonNull Context context, int resId) {
-        if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return (int) firebaseRemoteConfig.getDouble(context.getString(resId));
+        return (int) getFirebaseRemoteConfig().getDouble(context.getString(resId));
     }
 
     public static double getDouble(@NonNull Context context, int resId) {
-        if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getDouble(context.getString(resId));
+        return getFirebaseRemoteConfig().getDouble(context.getString(resId));
     }
 
     public static String getString(@NonNull Context context, int resId) {
-        if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getString(context.getString(resId));
+        return getFirebaseRemoteConfig().getString(context.getString(resId));
     }
 }

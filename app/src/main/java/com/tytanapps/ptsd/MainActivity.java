@@ -53,7 +53,6 @@ import com.tytanapps.ptsd.fragments.WebsiteFragment;
 import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
-import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
@@ -61,10 +60,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
-import io.doorbell.android.Doorbell;
 
 import static butterknife.ButterKnife.findById;
-import static com.tytanapps.ptsd.R.id.drawer_layout;
 import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION;
 
 /**
@@ -89,9 +86,12 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_SIGN_IN = 1;
     public static final int REQUEST_PICK_TRUSTED_CONTACT = 2;
 
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+
     private Fragment currentFragment;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         // Close the drawer layout if it is open
-        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -278,8 +277,8 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        int ratingPromptShowAfter = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_prompt_show_after");
-        final String supportEmailAddress = RemoteConfig.getFirebaseRemoteConfig().getString("support_email_address");
+        int ratingPromptShowAfter = RemoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
+        final String supportEmailAddress = RemoteConfig.getString(this, R.string.rc_support_email_address);
 
         if (ratingPromptShowAfter > 0) {
             RatingDialog ratingDialog = new RatingDialog(this, supportEmailAddress);
@@ -303,11 +302,7 @@ public class MainActivity extends AppCompatActivity
      * Open a new Doorbell dialog asking the user for feedback
      */
     public void provideFeedback() {
-        Doorbell doorbell = new Doorbell(this, 3961, getString(R.string.api_key_doorbell));
-        doorbell.addProperty("device", PtsdUtil.getDeviceInformation(this));
-        doorbell.setMessageHint(getString(R.string.feedback_message_hint));
-        doorbell.setPoweredByVisibility(View.GONE); // Hide the "Powered by Doorbell.io" text
-        doorbell.show();
+        new FeedbackDialog(this).show();
     }
 
     /**
@@ -334,7 +329,6 @@ public class MainActivity extends AppCompatActivity
     private void setupDrawerLayout() {
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         if (drawer != null) {
@@ -700,9 +694,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void closeDrawerLayout() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
-        if (drawer != null)
+        if (drawer != null) {
             drawer.closeDrawer(GravityCompat.START);
+        }
     }
 
     /**
