@@ -83,6 +83,11 @@ dependencies {
     compile "com.squareup.picasso:picasso:2.5.2"
     compile "io.reactivex:rxandroid:0.25.0"
 
+    // Leak canary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+
     testCompile "junit:junit:4.12"
 
     androidTestCompile "com.android.support.test:runner:0.5"
