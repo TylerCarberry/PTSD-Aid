@@ -20,7 +20,7 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
+import static butterknife.ButterKnife.findById;
 
 public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
 
@@ -35,15 +35,15 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
         FacilityViewHolder(View view) {
             super(view);
 
-            rootCardView = (CardView) view.findViewById(R.id.facility_cardview);
-            facilityImageView = (ImageView) view.findViewById(R.id.facility_imageview);
-            nameTextView = (TextView) view.findViewById(R.id.facility_name_textview);
-            phoneTextView = (TextView) view.findViewById(R.id.facility_phone_textview);
-            addressTextView = (TextView) view.findViewById(R.id.facility_address_textview);
-            detailsTextView = (TextView) view.findViewById(R.id.facility_details);
-            moreInfoButton = (Button) view.findViewById(R.id.more_info_button);
-            callIcon = (ImageView) view.findViewById(R.id.facility_phone_icon);
-            addressIcon = (ImageView) view.findViewById(R.id.facility_address_icon);
+            rootCardView      = findById(view, R.id.facility_cardview);
+            facilityImageView = findById(view, R.id.facility_imageview);
+            nameTextView      = findById(view, R.id.facility_name_textview);
+            phoneTextView     = findById(view, R.id.facility_phone_textview);
+            addressTextView   = findById(view, R.id.facility_address_textview);
+            detailsTextView   = findById(view, R.id.facility_details);
+            moreInfoButton    = findById(view, R.id.more_info_button);
+            callIcon          = findById(view, R.id.facility_phone_icon);
+            addressIcon       = findById(view, R.id.facility_address_icon);
         }
 
     }
@@ -72,7 +72,7 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
         final Facility facility = list.get(position);
 
         // If the facility does not have all of its information, do not show it
-        if(facility.getName() != null && facility.getDescription() != null && facility.getPhoneNumber() != null) {
+        if (facility.getName() != null && facility.getDescription() != null && facility.getPhoneNumber() != null) {
             TextView nameTextView = holder.nameTextView;
             nameTextView.setText(facility.getName());
 
@@ -113,11 +113,9 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
 
             ImageView facilityImageView = holder.facilityImageView;
             Bitmap facilityImage = facility.getFacilityImage();
-            if(facilityImage != null)
+            if (facilityImage != null) {
                 facilityImageView.setImageBitmap(facility.getFacilityImage());
-            //else
-             //   facilityImageView.setImageBitmap(BitmapFactory.decodeResource(fragment.getResources(), R.drawable.default_facility_image));
-
+            }
             facilityImageView.setOnClickListener(mapOnClick);
 
             // Tapping the more info button opens the website
@@ -133,8 +131,8 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
         }
     }
 
-    public void filter(String text) {
-        super.filter(text);
+    public void filter(String search) {
+        super.filter(search);
         loadFacilityImages();
     }
 
@@ -149,8 +147,6 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
 
             @Override
             public void onLoadedImage(int facilityId) {
-                Log.d(TAG, "onLoadedImage() called with: facilityId = [" + facilityId + "]");
-
                 for (int i = 0; i < list.size(); i++) {
                     Facility facility = list.get(i);
                     if (facility.getFacilityId() == facilityId) {

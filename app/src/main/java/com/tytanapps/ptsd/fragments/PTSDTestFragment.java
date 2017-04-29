@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
@@ -20,10 +19,13 @@ import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.techery.progresshint.ProgressHintDelegate;
+
+import static butterknife.ButterKnife.findById;
 
 
 /**
@@ -64,8 +66,8 @@ public class PTSDTestFragment extends BaseFragment {
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(RemoteConfig.getBoolean(this, R.string.rc_questions_sticky)) {
-            TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+        if(RemoteConfig.getBoolean(getActivity(), R.string.rc_questions_sticky)) {
+            TextView headerTextView = findById(questionsLinearLayout, R.id.stress_textview);
             headerTextView.setTag("sticky");
         }
 
@@ -83,13 +85,13 @@ public class PTSDTestFragment extends BaseFragment {
         for(String question : questions) {
             LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getRootViewGroup(), false);
 
-            TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
+            TextView questionTextView = findById(layout, R.id.stress_question_textview);
             questionTextView.setText(question);
 
             questionsLinearLayout.addView(layout);
 
             io.techery.progresshint.addition.widget.SeekBar seekBar =
-                    (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
+                    findById(layout, R.id.result_seekbar);
 
             seekBar.getHintDelegate()
                     .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {
@@ -201,10 +203,10 @@ public class PTSDTestFragment extends BaseFragment {
             nextActions = getString(R.string.see_professional_high);
         }
 
-        TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
+        TextView resultTextView = findById(layout, R.id.results_textview);
         resultTextView.setText(resultText);
 
-        TextView nextActionsTextView = (TextView) layout.findViewById(R.id.next_steps_textview);
+        TextView nextActionsTextView = findById(layout, R.id.next_steps_textview);
         nextActionsTextView.setText(nextActions);
 
         alertDialog.setView(layout);
@@ -223,13 +225,7 @@ public class PTSDTestFragment extends BaseFragment {
      * Creates a share intent. The user can share the results with any app.
      */
     private void shareResults() {
-        String shareText = generateShareText();
-
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, shareText);
-        startActivity(Intent.createChooser(intent, getString(R.string.share_results_chooser)));
+        ExternalAppUtil.shareTextIntent(getActivity(), getShareText());
     }
 
     /**
@@ -237,7 +233,7 @@ public class PTSDTestFragment extends BaseFragment {
      * This includes each question and the answer that was selected.
      * @return A string of the text to be shared
      */
-    private String generateShareText() {
+    private String getShareText() {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
         int[] answers = getEachAnswer();
 
@@ -295,7 +291,7 @@ public class PTSDTestFragment extends BaseFragment {
                 View childView = questionsLinearLayout.getChildAt(i);
 
                 if (childView instanceof ViewGroup) {
-                    SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
+                    SeekBar seekBar = findById(childView, R.id.result_seekbar);
                     score[questionCount] = seekBar.getProgress()/((seekBar.getMax()+1)/5) + 1;
 
                     questionCount++;

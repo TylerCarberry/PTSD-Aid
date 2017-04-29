@@ -1,5 +1,6 @@
 package com.tytanapps.ptsd.utils;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -101,5 +102,13 @@ public class ExternalAppUtil {
         location = URLEncoder.encode(location, "UTF-8");
 
         return Uri.parse("geo:0,0?q=" + location);
+    }
+
+    public static void shareTextIntent(Activity activity, String text) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.share_results_chooser)));
     }
 }

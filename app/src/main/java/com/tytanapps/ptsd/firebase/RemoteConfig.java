@@ -1,6 +1,6 @@
 package com.tytanapps.ptsd.firebase;
 
-import android.app.Fragment;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,23 +42,23 @@ public class RemoteConfig {
         return firebaseRemoteConfig;
     }
 
-    public static boolean getBoolean(@NonNull Fragment fragment, int resId) {
+    public static boolean getBoolean(@NonNull Context context, int resId) {
         if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getBoolean(fragment.getString(resId));
+        return firebaseRemoteConfig.getBoolean(context.getString(resId));
     }
 
-    public static int getInt(@NonNull Fragment fragment, int resId) {
+    public static int getInt(@NonNull Context context, int resId) {
         if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return (int) firebaseRemoteConfig.getDouble(fragment.getString(resId));
+        return (int) firebaseRemoteConfig.getDouble(context.getString(resId));
     }
 
-    public static double getDouble(@NonNull Fragment fragment, int resId) {
+    public static double getDouble(@NonNull Context context, int resId) {
         if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getDouble(fragment.getString(resId));
+        return firebaseRemoteConfig.getDouble(context.getString(resId));
     }
 
-    public static String getString(@NonNull Fragment fragment, int resId) {
+    public static String getString(@NonNull Context context, int resId) {
         if(firebaseRemoteConfig == null) setupRemoteConfig();
-        return firebaseRemoteConfig.getString(fragment.getString(resId));
+        return firebaseRemoteConfig.getString(context.getString(resId));
     }
 }

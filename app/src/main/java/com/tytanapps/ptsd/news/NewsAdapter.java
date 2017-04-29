@@ -13,6 +13,8 @@ import com.tytanapps.ptsd.SearchableAdapter;
 
 import java.util.List;
 
+import static butterknife.ButterKnife.findById;
+
 public class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
 
     private static final String LOG_TAG = NewsAdapter.class.getSimpleName();
@@ -25,10 +27,10 @@ public class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, N
         public NewsViewHolder(View view) {
             super(view);
 
-            rootCardView = (CardView) view.findViewById(R.id.news_cardview);
-            titleTextView = (TextView) view.findViewById(R.id.news_title_textview);
-            messageTextView = (ExpandableTextView) view.findViewById(R.id.news_message_textview);
-            dateTextView = (TextView) view.findViewById(R.id.news_date_textview);
+            rootCardView = findById(view, R.id.news_cardview);
+            titleTextView = findById(view, R.id.news_title_textview);
+            messageTextView = findById(view, R.id.news_message_textview);
+            dateTextView = findById(view, R.id.news_date_textview);
         }
     }
 

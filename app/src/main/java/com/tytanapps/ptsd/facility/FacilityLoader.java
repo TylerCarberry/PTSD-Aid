@@ -251,7 +251,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(RemoteConfig.getBoolean(fragment, R.string.rc_show_va_programs)) {
+        if(RemoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -289,8 +289,8 @@ public abstract class FacilityLoader {
      * @param facility The facility to load the imagery for
      */
     public void loadFacilityImage(final Facility facility) {
-        int imageWidth = RemoteConfig.getInt(fragment, R.string.rc_map_width);
-        int imageHeight = RemoteConfig.getInt(fragment, R.string.rc_map_height);
+        int imageWidth = RemoteConfig.getInt(fragment.getActivity(), R.string.rc_map_width);
+        int imageHeight = RemoteConfig.getInt(fragment.getActivity(), R.string.rc_map_height);
 
         Observable<Bitmap> bitmapObservable = Observable.concat(
                 loadCacheFacilityImage(facility.getFacilityId()),
@@ -505,7 +505,7 @@ public abstract class FacilityLoader {
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(RemoteConfig.getBoolean(fragment, R.string.rc_show_va_programs)) {
+            if(RemoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
                 for (String program : programs)

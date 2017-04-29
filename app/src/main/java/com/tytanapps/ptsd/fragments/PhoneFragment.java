@@ -25,6 +25,7 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
 
 
@@ -168,13 +169,13 @@ public class PhoneFragment extends BaseFragment {
     private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, String iconUrl) {
         CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
-        TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
+        TextView descTextView = findById(phoneCardView, R.id.phone_details_textview);
         descTextView.setText(desc);
 
-        TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
+        TextView phoneTextView = findById(phoneCardView, R.id.phone_number_textview);
         phoneTextView.setText(phone);
 
-        ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
+        ImageView iconImageView = findById(phoneCardView, R.id.phone_icon_imageview);
         Picasso.with(getActivity()).load(iconUrl).into(iconImageView);
     }
 
@@ -190,13 +191,13 @@ public class PhoneFragment extends BaseFragment {
     private void insertPhoneCard(String name, String desc, String phone, LayoutInflater inflater, LinearLayout phoneNumbersLinearLayout, int imageResource) {
         CardView phoneCardView = getPhoneCardView(inflater, phoneNumbersLinearLayout, name, phone);
 
-        TextView descTextView = (TextView) phoneCardView.findViewById(R.id.phone_details_textview);
+        TextView descTextView = findById(phoneCardView, R.id.phone_details_textview);
         descTextView.setText(desc);
 
-        TextView phoneTextView = (TextView) phoneCardView.findViewById(R.id.phone_number_textview);
+        TextView phoneTextView = findById(phoneCardView, R.id.phone_number_textview);
         phoneTextView.setText(phone);
 
-        ImageView iconImageView = (ImageView) phoneCardView.findViewById(R.id.phone_icon_imageview);
+        ImageView iconImageView = findById(phoneCardView, R.id.phone_icon_imageview);
         iconImageView.setImageResource(imageResource);
     }
 

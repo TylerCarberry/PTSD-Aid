@@ -81,7 +81,6 @@ public class FacilitiesFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_nearby_facilities, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         return rootView;
@@ -98,7 +97,7 @@ public class FacilitiesFragment extends BaseFragment {
         super.onStart();
 
         // Load the VA facilities if they have not yet been loaded
-        if(facilityList.size() == 0) {
+        if (facilityList.isEmpty()) {
             loadVaFacilities();
         }
 
@@ -117,16 +116,18 @@ public class FacilitiesFragment extends BaseFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(query);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(newText);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
@@ -155,7 +156,7 @@ public class FacilitiesFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, RemoteConfig.getInt(this, R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, RemoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -166,7 +167,6 @@ public class FacilitiesFragment extends BaseFragment {
                 refreshFacilities();
             }
         });
-
     }
 
     /**
@@ -184,22 +184,21 @@ public class FacilitiesFragment extends BaseFragment {
         hideLoadingBar();
 
         facilityList.clear();
-        for(Facility facility : facilities) {
-            facilityList.add(facility);
-        }
+        facilityList.addAll(facilities);
 
         setupRecyclerView();
         enableRefreshLayout();
 
-        if(mAdapter != null)
+        if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
      * Enable the refresh layout and stop the refreshing animation
      */
     private void enableRefreshLayout() {
-        if(swipeRefreshLayout != null) {
+        if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(false);
             swipeRefreshLayout.setEnabled(true);
         }
@@ -232,10 +231,11 @@ public class FacilitiesFragment extends BaseFragment {
      * There was an error loading the VA facilities. Display an error message
      */
     private void errorLoadingResults(Throwable throwable) {
-        if(throwable instanceof LocationNotFoundException)
+        if (throwable instanceof LocationNotFoundException) {
             errorLoadingResults(getString(R.string.gps_error));
-        else
+        } else {
             errorLoadingResults(getString(R.string.va_loading_error));
+        }
     }
 
     /**
@@ -243,7 +243,7 @@ public class FacilitiesFragment extends BaseFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        if(getView() != null) {
+        if (getView() != null) {
             swipeRefreshLayout.setRefreshing(false);
             if (facilityList.size() > 0) {
                 Snackbar.make(getView(), R.string.error_va_facilities, Snackbar.LENGTH_SHORT).show();
@@ -270,17 +270,18 @@ public class FacilitiesFragment extends BaseFragment {
     }
 
     private void loadVaFacilities() {
-        if(PermissionUtil.locationPermissionGranted(getActivity()))
+        if (PermissionUtil.locationPermissionGranted(getActivity())) {
             facilityLoader.loadPTSDPrograms();
-        else
+        } else {
             PermissionUtil.requestLocationPermission(getActivity());
+        }
     }
 
     /**
      * Remove the loading progress bar and TextView
      */
     private void hideLoadingBar() {
-        if(loadingTextView != null) {
+        if (loadingTextView != null) {
             loadingTextView.setVisibility(View.GONE);
             loadingProgressBar.setVisibility(View.GONE);
         }

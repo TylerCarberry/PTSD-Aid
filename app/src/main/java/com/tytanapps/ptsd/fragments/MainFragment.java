@@ -31,6 +31,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static butterknife.ButterKnife.findById;
+
 
 /**
  * The main fragment displayed when you launch the app. Prompts the user for their emotion
@@ -70,8 +72,9 @@ public class MainFragment extends BaseFragment {
         super.onStart();
 
         // Hide the sign in button if the user is already signed in
-        if(isUserSignedIn())
+        if (isUserSignedIn()) {
             hideSignInButton();
+        }
 
         setCheckedNavigationItem(R.id.nav_recommendations);
     }
@@ -87,8 +90,8 @@ public class MainFragment extends BaseFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if(!RemoteConfig.getBoolean(this, R.string.rc_show_extra_emoji)) {
-            rootView.findViewById(R.id.emotions2_linear_layout).setVisibility(View.GONE);
+        if(!RemoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
+            findById(rootView, R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
 
@@ -98,9 +101,10 @@ public class MainFragment extends BaseFragment {
     private void hideSignInButton() {
         View rootView = getView();
         if(rootView != null) {
-            View signInButton = rootView.findViewById(R.id.button_sign_in);
-            if (signInButton != null)
+            View signInButton = findById(rootView, R.id.button_sign_in);
+            if (signInButton != null) {
                 signInButton.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -160,7 +164,7 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
-                    int newestAppVersion = RemoteConfig.getInt(this, R.string.rc_newest_app_version);
+                    int newestAppVersion = RemoteConfig.getInt(getActivity(), R.string.rc_newest_app_version);
                     int currentAppVersion = ExternalAppUtil.getApkVersion(getActivity());
                     if (newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
@@ -202,7 +206,7 @@ public class MainFragment extends BaseFragment {
             if (!isTrustedContactCreated())
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
 
-            if(firebaseDatabaseLoaded && RemoteConfig.getBoolean(this, R.string.rc_check_recommendations_database)) {
+            if(firebaseDatabaseLoaded && RemoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
@@ -506,7 +510,7 @@ public class MainFragment extends BaseFragment {
      */
     private RelativeLayout createSuggestionLayout(String text, View.OnClickListener onClickListener) {
         RelativeLayout suggestionLayout = getSuggestionLayoutTemplate();
-        TextView signInTextView = (TextView) suggestionLayout.findViewById(R.id.recommendation_textview);
+        TextView signInTextView = findById(suggestionLayout, R.id.recommendation_textview);
         signInTextView.setText(text);
         suggestionLayout.setOnClickListener(onClickListener);
 
@@ -528,15 +532,14 @@ public class MainFragment extends BaseFragment {
     private void fadeOutAllEmojiExcept(int emoji_id) {
         View rootView = getView();
         if(rootView != null) {
-
-            LinearLayout emojiLayout1 = (LinearLayout) rootView.findViewById(R.id.emotions_linear_layout);
+            LinearLayout emojiLayout1 = findById(rootView, R.id.emotions_linear_layout);
             for (int i = 0; i < emojiLayout1.getChildCount(); i++) {
                 View child = emojiLayout1.getChildAt(i);
                 if (child.getId() != emoji_id)
                     child.setVisibility(View.GONE);
             }
 
-            LinearLayout emojiLayout2 = (LinearLayout) rootView.findViewById(R.id.emotions2_linear_layout);
+            LinearLayout emojiLayout2 = findById(rootView, R.id.emotions2_linear_layout);
             for (int i = 0; i < emojiLayout2.getChildCount(); i++) {
                 View child = emojiLayout2.getChildAt(i);
                 if (child.getId() != emoji_id)
@@ -551,7 +554,7 @@ public class MainFragment extends BaseFragment {
     private void animateOutEmotionPrompt() {
         View rootView = getView();
         if(rootView != null) {
-            LinearLayout emotionsLinearLayout = (LinearLayout) rootView.findViewById(R.id.emotions_linear_layout);
+            LinearLayout emotionsLinearLayout = findById(rootView, R.id.emotions_linear_layout);
             RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
             p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);
             emotionsLinearLayout.setLayoutParams(p);
@@ -572,7 +575,9 @@ public class MainFragment extends BaseFragment {
 
         // Make it invisible and move it to the bottom of the screen
         layout.animate()
-                .translationY(800).setDuration(0).setListener(new AnimatorListenerAdapter() {
+                .translationY(800)
+                .setDuration(0)
+                .setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);

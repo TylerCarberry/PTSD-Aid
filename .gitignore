@@ -24,3 +24,5 @@ keys.json
 keystore.properties
 
 \.idea/vcs\.xml
+
+\.idea/inspectionProfiles/

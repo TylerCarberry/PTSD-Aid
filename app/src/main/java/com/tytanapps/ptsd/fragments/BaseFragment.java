@@ -107,4 +107,5 @@ public abstract class BaseFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
     }
+
 }

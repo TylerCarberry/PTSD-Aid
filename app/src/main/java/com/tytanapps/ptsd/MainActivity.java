@@ -55,7 +55,6 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
-import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
 import butterknife.BindView;
@@ -64,6 +63,7 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.doorbell.android.Doorbell;
 
+import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.R.id.drawer_layout;
 import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION;
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String value = extras.getString("notification_action");
-            if(value != null && value.equals("unsubscribe")) {
+            if (value != null && value.equals("unsubscribe")) {
                 unsubscribeNewsNotifications();
                 Snackbar.make(findViewById(R.id.fragment_container), R.string.unsubscribed_news_message, Snackbar.LENGTH_LONG).show();
 
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
                 else {
                     firstFragment = new MainFragment();
 
-                    if(!BuildConfig.DEBUG)
+                    if (!BuildConfig.DEBUG)
                         showRatingPrompt();
                 }
 
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             // Result returned when launching the pick trusted contact request
             case REQUEST_PICK_TRUSTED_CONTACT:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     Uri contactUri = data.getData();
                     handlePickContactRequest(contactUri);
                 }
@@ -265,10 +265,11 @@ public class MainActivity extends AppCompatActivity
      * Subscribe or unsubscribe the user from news notifications depending on the shared preference
      */
     private void setupNewsNotifications() {
-        if(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true))
+        if (getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true)) {
             FirebaseMessaging.getInstance().subscribeToTopic("news");
-        else
+        } else {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+        }
     }
 
     /**
@@ -278,16 +279,11 @@ public class MainActivity extends AppCompatActivity
      */
     private void showRatingPrompt() {
         int ratingPromptShowAfter = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_prompt_show_after");
-        int ratingUpperBound = (int) RemoteConfig.getFirebaseRemoteConfig().getDouble("rating_upper_bound");
         final String supportEmailAddress = RemoteConfig.getFirebaseRemoteConfig().getString("support_email_address");
 
-        if(ratingPromptShowAfter > 0) {
-            FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this, supportEmailAddress);
-            fiveStarsDialog.setRateText(getString(R.string.rating_prompt_message))
-                    .setTitle(getString(R.string.rating_prompt_title))
-                    .setForceMode(false)
-                    .setUpperBound(ratingUpperBound) // Market opened if a rating >= 4 is selected
-                    .setNegativeReviewListener(new NegativeReviewListener() {
+        if (ratingPromptShowAfter > 0) {
+            RatingDialog ratingDialog = new RatingDialog(this, supportEmailAddress);
+            ratingDialog.setNegativeReviewListener(new NegativeReviewListener() {
                         @Override
                         public void onNegativeReview(int i) {
                             provideFeedback();
@@ -341,14 +337,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        if(drawer != null)
+        if (drawer != null) {
             drawer.addDrawerListener(toggle);
+        }
         toggle.syncState();
 
         // Add the header view containing the user's information
         LayoutInflater inflater = LayoutInflater.from(this);
         ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, rootViewGroup(), false);
-        navigationHeader.findViewById(R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
+        findById(navigationHeader, R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signInGoogle();
@@ -357,7 +354,7 @@ public class MainActivity extends AppCompatActivity
 
         // The navigation view is contained within the drawer layout
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if(navigationView != null) {
+        if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
             navigationView.addHeaderView(navigationHeader);
         }
@@ -381,17 +378,16 @@ public class MainActivity extends AppCompatActivity
             isUserSignedIn = true;
 
             GoogleSignInAccount googleAccount = result.getSignInAccount();
-
-            if(googleAccount != null) {
+            if (googleAccount != null) {
                 String name = googleAccount.getDisplayName();
                 String email = googleAccount.getEmail();
-                Uri profilePicture = googleAccount.getPhotoUrl();
 
                 View signInButton = findViewById(R.id.button_sign_in);
-                if (signInButton != null)
+                if (signInButton != null) {
                     signInButton.setVisibility(View.INVISIBLE);
+                }
 
-                updateNavigationHeader(name, email, profilePicture);
+                updateNavigationHeader(name, email);
             }
         }
     }
@@ -432,22 +428,22 @@ public class MainActivity extends AppCompatActivity
      * Update the header on the navigation view with the user's information
      * @param name The name to display on the navigation view
      * @param email The email subtext to show on the navigation view
-     * @param profilePicture A url of the user's profile picture
      */
-    private void updateNavigationHeader(String name, String email, Uri profilePicture) {
+    private void updateNavigationHeader(String name, String email) {
         // Update the name
-        TextView drawerNameTextView = (TextView) navHeader.findViewById(R.id.drawer_name);
+        TextView drawerNameTextView = findById(navHeader, R.id.drawer_name);
         drawerNameTextView.setText(name);
 
         // Update the email address
-        TextView drawerEmailTextView = (TextView) navHeader.findViewById(R.id.drawer_subtext);
+        TextView drawerEmailTextView = findById(navHeader, R.id.drawer_subtext);
         drawerEmailTextView.setVisibility(View.VISIBLE);
         drawerEmailTextView.setText(email);
 
         // Hide the sign in button
-        View signInButton = navHeader.findViewById(R.id.button_sign_in);
-        if(signInButton != null)
+        View signInButton = findById(navHeader, R.id.button_sign_in);
+        if (signInButton != null) {
             signInButton.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -456,10 +452,11 @@ public class MainActivity extends AppCompatActivity
     @OnClick(R.id.fab)
     public void callTrustedContact() {
         String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-        if (!phoneNumber.equals(""))
+        if (!phoneNumber.isEmpty()) {
             ExternalAppUtil.openDialer(this, phoneNumber);
-        else
+        } else {
             showCreateTrustedContactDialog();
+        }
     }
 
     /**
@@ -503,15 +500,16 @@ public class MainActivity extends AppCompatActivity
         String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
         String contactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
 
-        if(!contactPhone.equals("")) {
+        if (!contactPhone.isEmpty()) {
             currentContactTextView.setText("Your trusted contact is\n" + contactName + "\n" + contactPhone);
 
             final AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.setView(layout);
             alertDialog.show();
         }
-        else
+        else {
             showCreateTrustedContactDialog();
+        }
 
         return true;
     }
@@ -551,7 +549,7 @@ public class MainActivity extends AppCompatActivity
      * Open an intent to allow the user to pick one of their contacts
      */
     public void pickTrustedContact() {
-        if(!PermissionUtil.contactsPermissionGranted(this)) {
+        if (!PermissionUtil.contactsPermissionGranted(this)) {
             PermissionUtil.requestContactsPermission(this);
         }
         else {
@@ -599,11 +597,12 @@ public class MainActivity extends AppCompatActivity
 
         String contactName = null;
         if (cursor != null) {
-            if (cursor.moveToFirst())
+            if (cursor.moveToFirst()) {
                 contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-
-            if (cursor != null && !cursor.isClosed())
+            }
+            if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
+            }
         }
 
         return contactName;
@@ -702,7 +701,7 @@ public class MainActivity extends AppCompatActivity
 
     private void closeDrawerLayout() {
         DrawerLayout drawer = (DrawerLayout) findViewById(drawer_layout);
-        if(drawer != null)
+        if (drawer != null)
             drawer.closeDrawer(GravityCompat.START);
     }
 
@@ -712,7 +711,7 @@ public class MainActivity extends AppCompatActivity
      * @param newFragment The fragment to switch to
      */
     public void switchFragment(Fragment newFragment) {
-        if(newFragment != null) {
+        if (newFragment != null) {
             if (!(newFragment.getClass().equals(currentFragment.getClass()))) {
                 android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
@@ -727,13 +726,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void setToolbarTitle(String toolbarTitle) {
-        toolbar.setTitle(toolbarTitle);
-    }
-
     private ViewGroup rootViewGroup() {
         View root = findViewById(R.id.drawer_layout);
-        if(root != null && root instanceof ViewGroup)
+        if (root != null && root instanceof ViewGroup)
             return (ViewGroup) root;
         return null;
     }

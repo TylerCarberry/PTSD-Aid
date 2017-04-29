@@ -56,7 +56,7 @@ public class ResourcesFragment extends BaseFragment {
 
     private void insertDefaultResources() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -86,7 +86,7 @@ public class ResourcesFragment extends BaseFragment {
                     @Override
                     public void run() {
                         View rootView = getView();
-                        if(rootView != null) {
+                        if (rootView != null) {
                             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -133,7 +133,7 @@ public class ResourcesFragment extends BaseFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if(RemoteConfig.getBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+        if (RemoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 
@@ -151,10 +151,10 @@ public class ResourcesFragment extends BaseFragment {
      */
     private LinearLayout getResourceView(LayoutInflater inflater, LinearLayout resourcesLinearLayout, String name) {
         // Find the resource view if it exists
-        for(int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
+        for (int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
             View child = resourcesLinearLayout.getChildAt(i);
 
-            if(child.getTag() != null && child.getTag().equals(name))
+            if (child.getTag() != null && child.getTag().equals(name))
                 return (LinearLayout) child;
         }
 

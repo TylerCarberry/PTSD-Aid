@@ -25,6 +25,7 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
 
 
@@ -165,15 +166,13 @@ public class WebsiteFragment extends BaseFragment {
     private void insertWebCard(String name, String desc, String url, String icon_url, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
         CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-        TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+        TextView nameTextView = findById(webCardView, R.id.website_name_textview);
         nameTextView.setText(name);
 
-        TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+        TextView detailsTextView = findById(webCardView, R.id.website_details_textview);
         detailsTextView.setText(desc);
 
-        ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-        //iconImageView.setImageBitmap(bmp);
-
+        ImageView iconImageView = findById(webCardView, R.id.website_icon_imageview);
         Picasso.with(getActivity()).load(icon_url).into(iconImageView);
     }
 
@@ -192,13 +191,13 @@ public class WebsiteFragment extends BaseFragment {
             public void run() {
                 CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-                TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+                TextView nameTextView = findById(webCardView, R.id.website_name_textview);
                 nameTextView.setText(name);
 
-                TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+                TextView detailsTextView = findById(webCardView, R.id.website_details_textview);
                 detailsTextView.setText(desc);
 
-                ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
+                ImageView iconImageView = findById(webCardView, R.id.website_icon_imageview);
                 iconImageView.setImageResource(imageResource);
             }
         });
