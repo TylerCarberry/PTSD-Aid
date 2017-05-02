@@ -1,7 +1,6 @@
 import com.android.ddmlib.DdmPreferences
 
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.google.firebase.firebase-crash'
 
@@ -56,6 +55,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+
+    // Support libs
     compile "com.android.support:appcompat-v7:$supportLibVersion"
     compile "com.android.support:design:$supportLibVersion"
     compile "com.android.support:cardview-v7:$supportLibVersion"
@@ -63,6 +64,7 @@ dependencies {
     compile "com.android.support:support-v4:$supportLibVersion"
     compile "com.android.support:customtabs:$supportLibVersion"
 
+    // Google Play Services / Firebase
     compile "com.google.android.gms:play-services-auth:$googlePlayServicesVersion"
     compile "com.google.android.gms:play-services-analytics:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-core:$googlePlayServicesVersion"
@@ -71,17 +73,23 @@ dependencies {
     compile "com.google.firebase:firebase-config:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-database:$googlePlayServicesVersion"
 
+    // Butterknife
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    // Dagger
+    compile "com.google.dagger:dagger:2.9"
+    annotationProcessor "com.google.dagger:dagger-compiler:2.9"
+    provided 'javax.annotation:jsr250-api:1.0'
+
+    compile "com.github.bhargavms:DotLoader:1.0.0"
+    compile "com.squareup.picasso:picasso:2.5.2"
+    compile "io.reactivex:rxandroid:0.25.0"
     compile "com.github.Angtrim:Android-Five-Stars-Library:v3.1"
     compile "com.github.techery.progresshint:library-addition:0.2.3"
     compile "com.ms-square:expandableTextView:0.1.4"
     compile "io.doorbell:android-sdk:0.2.6@aar"
     compile "com.github.marcoscgdev.EasyLicensesDialog:appcompatversion:1.0.4"
-    compile "com.mcxiaoke.volley:library-aar:1.0.0"
-    compile "com.jakewharton:butterknife:8.2.1"
-    apt "com.jakewharton:butterknife-compiler:8.2.1"
-    compile "com.github.bhargavms:DotLoader:1.0.0"
-    compile "com.squareup.picasso:picasso:2.5.2"
-    compile "io.reactivex:rxandroid:0.25.0"
 
     // Leak canary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'

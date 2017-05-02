@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,8 +15,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
+
+import javax.inject.Inject;
 
 
 /**
@@ -25,8 +29,16 @@ public class ResourcesFragment extends BaseFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
+    @Inject RemoteConfig remoteConfig;
+
     public ResourcesFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -133,7 +145,7 @@ public class ResourcesFragment extends BaseFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if (RemoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
+        if (remoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 

@@ -54,6 +54,8 @@ import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 
+import javax.inject.Inject;
+
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
 import butterknife.BindView;
@@ -86,15 +88,16 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_SIGN_IN = 1;
     public static final int REQUEST_PICK_TRUSTED_CONTACT = 2;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private Fragment currentFragment;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((PTSDApplication)getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -277,8 +280,8 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        int ratingPromptShowAfter = RemoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
-        final String supportEmailAddress = RemoteConfig.getString(this, R.string.rc_support_email_address);
+        int ratingPromptShowAfter = remoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
+        final String supportEmailAddress = remoteConfig.getString(this, R.string.rc_support_email_address);
 
         if (ratingPromptShowAfter > 0) {
             RatingDialog ratingDialog = new RatingDialog(this, supportEmailAddress);

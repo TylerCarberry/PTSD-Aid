@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bhargavms.dotloader.DotLoader;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
@@ -26,6 +27,8 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +43,8 @@ public class NewsFragment extends BaseFragment {
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.news_progressbar) DotLoader loadingProgressBar;
@@ -52,6 +57,7 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -161,7 +167,7 @@ public class NewsFragment extends BaseFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), RemoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

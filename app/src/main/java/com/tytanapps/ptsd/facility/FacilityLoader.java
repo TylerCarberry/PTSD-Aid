@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 
@@ -29,6 +30,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -58,8 +61,12 @@ public abstract class FacilityLoader {
     // Key: VA Id, Value: The facility with the given id
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
+    @Inject
+    RemoteConfig remoteConfig;
+
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
+        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
     }
 
     public abstract void errorLoadingResults(Throwable throwable);
@@ -251,7 +258,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(RemoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
+        if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -289,8 +296,8 @@ public abstract class FacilityLoader {
      * @param facility The facility to load the imagery for
      */
     public void loadFacilityImage(final Facility facility) {
-        int imageWidth = RemoteConfig.getInt(fragment.getActivity(), R.string.rc_map_width);
-        int imageHeight = RemoteConfig.getInt(fragment.getActivity(), R.string.rc_map_height);
+        int imageWidth = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_width);
+        int imageHeight = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_height);
 
         Observable<Bitmap> bitmapObservable = Observable.concat(
                 loadCacheFacilityImage(facility.getFacilityId()),
@@ -505,7 +512,7 @@ public abstract class FacilityLoader {
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(RemoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
+            if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
                 for (String program : programs)

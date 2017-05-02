@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
@@ -30,6 +31,8 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +51,8 @@ public class FacilitiesFragment extends BaseFragment {
     private final List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.facility_loading_textview) TextView loadingTextView;
@@ -60,6 +65,7 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         facilityLoader = new FacilityLoader(this) {
@@ -156,7 +162,7 @@ public class FacilitiesFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, RemoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, remoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

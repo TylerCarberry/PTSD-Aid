@@ -3,6 +3,7 @@ package com.tytanapps.ptsd.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
@@ -16,10 +17,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,11 +39,20 @@ import static butterknife.ButterKnife.findById;
  */
 public class PTSDTestFragment extends BaseFragment {
 
+    @Inject
+    RemoteConfig remoteConfig;
+
     @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
 
 
     public PTSDTestFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -66,7 +79,7 @@ public class PTSDTestFragment extends BaseFragment {
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(RemoteConfig.getBoolean(getActivity(), R.string.rc_questions_sticky)) {
+        if(remoteConfig.getBoolean(getActivity(), R.string.rc_questions_sticky)) {
             TextView headerTextView = findById(questionsLinearLayout, R.id.stress_textview);
             headerTextView.setTag("sticky");
         }

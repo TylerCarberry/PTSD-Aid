@@ -11,6 +11,7 @@ import com.squareup.leakcanary.LeakCanary;
  */
 public class PTSDApplication extends Application {
     private Tracker mTracker;
+    private FirebaseComponent firebaseComponent;
 
     @Override
     public void onCreate() {
@@ -23,6 +24,8 @@ public class PTSDApplication extends Application {
         LeakCanary.install(this);
 
         getDefaultTracker();
+
+        firebaseComponent = DaggerFirebaseComponent.builder().build();
     }
 
     /**
@@ -43,5 +46,9 @@ public class PTSDApplication extends Application {
 
         }
         return mTracker;
+    }
+
+    public FirebaseComponent getFirebaseComponent() {
+        return firebaseComponent;
     }
 }
