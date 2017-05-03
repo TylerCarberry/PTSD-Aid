@@ -2,11 +2,13 @@ package com.tytanapps.ptsd;
 
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.facility.FacilityLoader;
+import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.fragments.MainFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.fragments.SettingsFragment;
 import com.tytanapps.ptsd.news.NewsFragment;
+import com.tytanapps.ptsd.news.NewsLoader;
 
 import javax.inject.Singleton;
 
@@ -19,6 +21,7 @@ public interface FirebaseComponent {
 
     void inject(MainActivity mainActivity);
 
+    void inject(BaseFragment baseFragment);
     void inject(MainFragment mainFragment);
     void inject(PTSDTestFragment ptsdTestFragment);
     void inject(ResourcesFragment resourcesFragment);
@@ -29,4 +32,6 @@ public interface FirebaseComponent {
     void inject(RatingDialog ratingDialog);
 
     void inject(FacilityLoader facilityLoader);
+    void inject(NewsLoader newsLoader);
+
 }

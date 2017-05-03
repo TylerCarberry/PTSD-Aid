@@ -16,8 +16,8 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 41
-        versionName "2.0.8"
+        versionCode 42
+        versionName "2.0.9"
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

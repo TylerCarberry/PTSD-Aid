@@ -43,7 +43,6 @@ public class SettingsFragment extends PreferenceFragment {
         ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
-        // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
     }
 
@@ -56,6 +55,15 @@ public class SettingsFragment extends PreferenceFragment {
             Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
         }
 
+        setupSettings();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
+
+        getActivity().setTitle(R.string.settings_title);
+    }
+
+    private void setupSettings() {
         setupIsVeteranPref();
         setupNewsNotificationPref();
         setupEnableTrustedContactPref();
@@ -63,11 +71,6 @@ public class SettingsFragment extends PreferenceFragment {
         setupFeedbackButton();
         setupLicensesButton();
         setupInfoButton();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
-
-        getActivity().setTitle(R.string.settings_title);
     }
 
     private void setupNewsNotificationPref() {

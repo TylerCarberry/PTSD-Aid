@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.facility;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.LocationNotFoundException;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
@@ -65,7 +63,7 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         facilityLoader = new FacilityLoader(this) {
@@ -212,24 +210,15 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // Permission was granted
+                if (PermissionUtil.locationPermissionGranted(getActivity())) {
                     facilityLoader.loadPTSDPrograms();
-
                 } else {
-                    // Permission denied
                     errorLoadingResults(getString(R.string.error_location_permission));
                 }
                 break;
             }
-
-            // Other 'case' lines to check for other permissions this app might request
         }
     }
 

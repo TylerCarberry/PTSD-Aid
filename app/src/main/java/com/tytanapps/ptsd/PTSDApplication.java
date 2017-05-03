@@ -2,19 +2,24 @@ package com.tytanapps.ptsd;
 
 import android.app.Application;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.squareup.leakcanary.LeakCanary;
+
+import javax.inject.Inject;
 
 /**
  * The PTSD application. Used to connect the app with Google Analytics
  */
 public class PTSDApplication extends Application {
-    private Tracker mTracker;
     private FirebaseComponent firebaseComponent;
+
+    @Inject Tracker tracker;
 
     @Override
     public void onCreate() {
+        firebaseComponent = DaggerFirebaseComponent.builder().appModule(new AppModule(this)).build();
+        firebaseComponent.inject(this);
+
         super.onCreate();
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
@@ -22,30 +27,6 @@ public class PTSDApplication extends Application {
             return;
         }
         LeakCanary.install(this);
-
-        getDefaultTracker();
-
-        firebaseComponent = DaggerFirebaseComponent.builder().build();
-    }
-
-    /**
-     * Gets the default {@link Tracker} for this {@link Application}.
-     * @return tracker
-     */
-    synchronized public Tracker getDefaultTracker() {
-        if (mTracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            if (analytics != null) {
-                analytics.enableAutoActivityReports(this);
-                analytics.setLocalDispatchPeriod(60);
-
-                // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-                mTracker = analytics.newTracker(R.xml.global_tracker);
-                mTracker.enableAutoActivityTracking(true);
-            }
-
-        }
-        return mTracker;
     }
 
     public FirebaseComponent getFirebaseComponent() {

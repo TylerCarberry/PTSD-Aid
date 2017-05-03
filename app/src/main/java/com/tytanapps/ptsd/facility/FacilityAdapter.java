@@ -130,6 +130,7 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
         }
     }
 
+    @Override
     public void filter(String search) {
         super.filter(search);
         loadFacilityImages();

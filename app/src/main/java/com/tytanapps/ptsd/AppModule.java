@@ -1,22 +1,23 @@
 package com.tytanapps.ptsd;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
+import dagger.Provides;
 
 @Module
 public class AppModule {
 
-    //private MainActivity mainActivity;
+    private PTSDApplication ptsdApplication;
 
-    public AppModule() {
-        //this.mainActivity = mainActivity;
+    public AppModule(PTSDApplication ptsdApplication) {
+        this.ptsdApplication = ptsdApplication;
     }
 
-
-    /*
     @Provides
     @Singleton
-    MainActivity providesMainActivity() {
+    PTSDApplication providesApplication() {
+        return ptsdApplication;
+    }
 
-
-        */
 }

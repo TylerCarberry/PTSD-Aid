@@ -4,7 +4,9 @@ import android.app.Fragment;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import org.json.JSONException;
@@ -24,6 +26,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -42,16 +46,17 @@ public abstract class NewsLoader {
 
     private Fragment fragment;
 
+    @Inject
+    RemoteConfig remoteConfig;
+
     // Stores the news that have already loaded
     // Key: Press id
     // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
-    // The number of news to load from the api
-    private static final int NEWS_TO_LOAD = 50;
-
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
+        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
     }
 
     public abstract void errorLoadingResults(String errorMessage);
@@ -314,7 +319,7 @@ public abstract class NewsLoader {
      * @return The url for the PTSD Programs API
      */
     private String calculateNewsUrl() {
-        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2015&EndDate=01/01/2025&MaxRecords=" + NEWS_TO_LOAD + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
+        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2014&EndDate=01/01/2025&MaxRecords=" + remoteConfig.getInt(fragment.getActivity(), R.string.rc_news_to_load) + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {

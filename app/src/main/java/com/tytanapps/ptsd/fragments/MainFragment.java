@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.MainActivity;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -57,7 +56,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
@@ -498,7 +497,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    ExternalAppUtil.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
+                    ExternalAppUtil.openBrowserIntent(MainFragment.this, getString(R.string.play_store_url));
                 } catch(Exception e) {
                     FirebaseCrash.report(e);
                     openDrawer();

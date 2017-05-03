@@ -17,7 +17,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tytanapps.ptsd.MainActivity;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -51,7 +50,7 @@ public class PTSDTestFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -169,8 +168,7 @@ public class PTSDTestFragment extends BaseFragment {
      */
     private void submit() {
         sendAnalyticsEvent("Action", "Submit Test");
-        int score = getScore();
-        showResults(score);
+        showResults(getScore());
     }
 
     /**
@@ -324,11 +322,13 @@ public class PTSDTestFragment extends BaseFragment {
         int score = 0;
         
         for(int num : getEachAnswer()) {
-            if(num > 0)
+            if (num > 0) {
                 score += num;
-            // If a question has not been answered
-            else
+            }
+            // A question has not been answered
+            else {
                 return -1;
+            }
         }
 
         return score;

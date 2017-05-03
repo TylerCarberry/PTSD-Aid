@@ -1,9 +1,11 @@
 package com.tytanapps.ptsd.utils;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,7 +17,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.text.Html;
 import android.util.Base64;
 import android.view.inputmethod.InputMethodManager;
@@ -264,11 +268,11 @@ public class PtsdUtil {
     /**
      * @return debug information about the phone and app
      */
-    public static String getDeviceInformation(Activity activity) {
+    public static String getDeviceInformation(Context context) {
         String deviceInformation = "";
 
         try {
-            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             String version = pInfo.versionName;
             int verCode = pInfo.versionCode;
 
@@ -304,6 +308,30 @@ public class PtsdUtil {
         deviceInformation += "TIME: " + Build.TIME + "\n";
 
         return deviceInformation;
+    }
+
+
+    /**
+     * Get a contact's name given their phone number
+     * @param phoneNumber The phone number of the contact
+     * @return The contact's name
+     */
+    public static String getContactName(Context context, String phoneNumber) {
+        ContentResolver cr = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+
+        String contactName = null;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+            }
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        return contactName;
     }
 
 

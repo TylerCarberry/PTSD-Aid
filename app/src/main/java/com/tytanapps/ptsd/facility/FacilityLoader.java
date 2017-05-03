@@ -344,7 +344,7 @@ public abstract class FacilityLoader {
                     .filter(new Func1<String, Boolean>() {
                         @Override
                         public Boolean call(String s) {
-                            return streetViewAvailable(facility.getStreetAddress(), facility.getCity(), facility.getState());
+                            return isStreetViewAvailableAtAddress(facility.getStreetAddress(), facility.getCity(), facility.getState());
                         }
                     })
                     .map(new Func1<String, Bitmap>() {
@@ -563,14 +563,7 @@ public abstract class FacilityLoader {
     }
 
 
-    /**
-     * Check if street view imagery is available for the given address in the United States
-     * @param address The street address
-     * @param town The city/town
-     * @param state The state
-     * @return Whether street view imagery exists for the given address
-     */
-    private boolean streetViewAvailable(String address, String town, final String state) {
+    private boolean isStreetViewAvailableAtAddress(String address, String town, final String state) {
         try {
             String location = encodeAddress(address, town, state);
             Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
@@ -585,7 +578,7 @@ public abstract class FacilityLoader {
             return status.equalsIgnoreCase("OK");
 
         } catch (JSONException | IOException e) {
-            Log.e(LOG_TAG, "streetViewAvailable: ", e);
+            Log.e(LOG_TAG, "isStreetViewAvailableAtAddress: ", e);
             return false;
         }
     }

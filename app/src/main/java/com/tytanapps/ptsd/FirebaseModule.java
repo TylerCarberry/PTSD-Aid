@@ -1,5 +1,8 @@
 package com.tytanapps.ptsd;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -13,7 +16,7 @@ import dagger.Provides;
 public class FirebaseModule {
 
     public FirebaseModule() {
-        //this.mainActivity = mainActivity;
+
     }
 
     @Provides
@@ -32,6 +35,33 @@ public class FirebaseModule {
     @Singleton
     RemoteConfig providesRemoteConfig(FirebaseRemoteConfig firebaseRemoteConfig) {
         return new RemoteConfig(firebaseRemoteConfig);
+    }
+
+
+    @Provides
+    @Singleton
+    GoogleSignInOptions providesGoogleSignInOptions() {
+        return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    GoogleAnalytics providesGoogleAnalytics(PTSDApplication application) {
+        GoogleAnalytics analytics = GoogleAnalytics.getInstance(application);
+        analytics.enableAutoActivityReports(application);
+        analytics.setLocalDispatchPeriod(60);
+
+        return analytics;
+    }
+
+    @Provides
+    @Singleton
+    Tracker providesTracker(GoogleAnalytics analytics) {
+        Tracker tracker = analytics.newTracker(R.xml.global_tracker);
+        tracker.enableAutoActivityTracking(true);
+        return tracker;
     }
 
 }

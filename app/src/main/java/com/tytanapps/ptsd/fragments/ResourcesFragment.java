@@ -15,7 +15,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 
@@ -37,7 +36,7 @@ public class ResourcesFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 

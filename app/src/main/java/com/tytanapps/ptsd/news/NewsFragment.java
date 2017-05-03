@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bhargavms.dotloader.DotLoader;
-import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.BaseFragment;
@@ -57,7 +56,7 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -86,16 +85,18 @@ public class NewsFragment extends BaseFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(query);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(newText);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
