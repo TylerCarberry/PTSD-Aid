@@ -173,7 +173,7 @@
     <string name="pref_trusted_contact_title">Enable trusted contact</string>
     <string name="pref_trusted_contact_summary">Show the trusted contact button</string>
     <string name="pref_change_contact_summary">Change your trusted contact</string>
-    <string name="play_store_link">https://play.google.com/store/apps/details?id=com.tytanapps.ptsd</string>
+    <string name="play_store_url">https://play.google.com/store/apps/details?id=com.tytanapps.ptsd</string>
     <string name="rate_app_title">Enjoying the app?</string>
     <string name="rate_app_summary">Please rate on Google Play</string>
     <string name="feedback_title">Provide Feedback</string>

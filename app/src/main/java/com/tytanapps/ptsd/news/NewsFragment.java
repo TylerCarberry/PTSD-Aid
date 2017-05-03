@@ -27,6 +27,8 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -40,6 +42,8 @@ public class NewsFragment extends BaseFragment {
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.news_progressbar) DotLoader loadingProgressBar;
@@ -52,6 +56,7 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -80,16 +85,18 @@ public class NewsFragment extends BaseFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(query);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(newText);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
@@ -161,7 +168,7 @@ public class NewsFragment extends BaseFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), RemoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

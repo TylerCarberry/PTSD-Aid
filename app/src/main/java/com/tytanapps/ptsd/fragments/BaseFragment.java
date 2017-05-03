@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +20,8 @@ import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 
+import javax.inject.Inject;
+
 import butterknife.Unbinder;
 
 /**
@@ -27,7 +31,15 @@ public abstract class BaseFragment extends Fragment {
 
     protected Unbinder unbinder;
 
+    @Inject Tracker tracker;
+
     protected abstract @StringRes int getTitle();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public void onResume() {
@@ -35,13 +47,9 @@ public abstract class BaseFragment extends Fragment {
 
         getActivity().setTitle(getTitle());
 
-        // Obtain the shared Tracker instance.
-        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
-
         // Send a screen hit to Google Analytics with the name of the current activity
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName(getClass().getSimpleName());
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        tracker.setScreenName(getClass().getSimpleName());
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
@@ -73,11 +81,7 @@ public abstract class BaseFragment extends Fragment {
      * @param action The action of the event
      */
     public void sendAnalyticsEvent(String category, String action) {
-        // Obtain the shared Tracker instance.
-        PTSDApplication application = (PTSDApplication) getActivity().getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-
-        mTracker.send(new HitBuilders.EventBuilder()
+        tracker.send(new HitBuilders.EventBuilder()
                 .setCategory(category)
                 .setAction(action)
                 .build());
@@ -108,6 +112,10 @@ public abstract class BaseFragment extends Fragment {
     protected String getSharedPreferenceString(String prefKey, String defaultValue) {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         return sharedPref.getString(prefKey, defaultValue);
+    }
+
+    protected PTSDApplication getApplication() {
+        return ((PTSDApplication)getActivity().getApplication());
     }
 
 }

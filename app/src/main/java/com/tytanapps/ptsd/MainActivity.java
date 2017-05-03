@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,6 +52,9 @@ import com.tytanapps.ptsd.fragments.WebsiteFragment;
 import com.tytanapps.ptsd.news.NewsFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
+import com.tytanapps.ptsd.utils.PtsdUtil;
+
+import javax.inject.Inject;
 
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
@@ -86,15 +88,17 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_SIGN_IN = 1;
     public static final int REQUEST_PICK_TRUSTED_CONTACT = 2;
 
+    @Inject RemoteConfig remoteConfig;
+    @Inject GoogleSignInOptions gso;
+
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private Fragment currentFragment;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((PTSDApplication)getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -277,8 +281,8 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        int ratingPromptShowAfter = RemoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
-        final String supportEmailAddress = RemoteConfig.getString(this, R.string.rc_support_email_address);
+        int ratingPromptShowAfter = remoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
+        final String supportEmailAddress = remoteConfig.getString(this, R.string.rc_support_email_address);
 
         if (ratingPromptShowAfter > 0) {
             RatingDialog ratingDialog = new RatingDialog(this, supportEmailAddress);
@@ -309,12 +313,6 @@ public class MainActivity extends AppCompatActivity
      * Create the client to connect with the Google sign in API
      */
     private void setupGoogleSignIn() {
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -329,8 +327,13 @@ public class MainActivity extends AppCompatActivity
     private void setupDrawerLayout() {
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, 0); // disable the animation
+            }
+        };
+
         if (drawer != null) {
             drawer.addDrawerListener(toggle);
         }
@@ -572,34 +575,11 @@ public class MainActivity extends AppCompatActivity
             String phoneNumber = cursor.getString(column);
             cursor.close();
 
-            String name = getContactName(phoneNumber);
+            String name = PtsdUtil.getContactName(this, phoneNumber);
 
             saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
             saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
         }
-    }
-
-    /**
-     * Get a contact's name given their phone number
-     * @param phoneNumber The phone number of the contact
-     * @return The contact's name
-     */
-    public String getContactName(String phoneNumber) {
-        ContentResolver cr = getContentResolver();
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
-
-        String contactName = null;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-            }
-            if (cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-        }
-
-        return contactName;
     }
 
     /**

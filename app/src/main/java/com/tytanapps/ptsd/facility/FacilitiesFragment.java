@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.facility;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +30,8 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -48,6 +49,8 @@ public class FacilitiesFragment extends BaseFragment {
     private final List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.facility_loading_textview) TextView loadingTextView;
@@ -60,6 +63,7 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         facilityLoader = new FacilityLoader(this) {
@@ -156,7 +160,7 @@ public class FacilitiesFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, RemoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, remoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -206,24 +210,15 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // Permission was granted
+                if (PermissionUtil.locationPermissionGranted(getActivity())) {
                     facilityLoader.loadPTSDPrograms();
-
                 } else {
-                    // Permission denied
                     errorLoadingResults(getString(R.string.error_location_permission));
                 }
                 break;
             }
-
-            // Other 'case' lines to check for other permissions this app might request
         }
     }
 

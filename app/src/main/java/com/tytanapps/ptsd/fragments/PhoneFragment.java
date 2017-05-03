@@ -82,7 +82,7 @@ public class PhoneFragment extends BaseFragment {
         if(rootView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-            if(isVeteran(getActivity())) {
+            if (isVeteran(getActivity())) {
                 insertPhoneCard(getString(R.string.veterans_crisis_line), getString(R.string.veterans_support_phone_details), getString(R.string.phone_veterans_crisis_line), inflater, phoneNumbersLinearLayout, R.drawable.veterans_crisis_line);
                 insertPhoneCard(getString(R.string.lifeline_for_vets), getString(R.string.veterans_foundation_phone_details), getString(R.string.phone_veterans_foundation_hotline), inflater, phoneNumbersLinearLayout, R.drawable.nvf);
             }

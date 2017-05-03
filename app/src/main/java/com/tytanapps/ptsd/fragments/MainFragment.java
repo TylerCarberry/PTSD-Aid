@@ -27,6 +27,8 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import java.io.UnsupportedEncodingException;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -42,6 +44,8 @@ public class MainFragment extends BaseFragment {
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
     private boolean firebaseDatabaseLoaded = false;
 
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
     @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
     @BindView(R.id.main_header_text_view) TextView headerTextView;
@@ -52,6 +56,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
@@ -90,7 +95,7 @@ public class MainFragment extends BaseFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if (!RemoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
+        if (!remoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
             findById(rootView, R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
@@ -162,7 +167,7 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
-                    int newestAppVersion = RemoteConfig.getInt(getActivity(), R.string.rc_newest_app_version);
+                    int newestAppVersion = remoteConfig.getInt(getActivity(), R.string.rc_newest_app_version);
                     int currentAppVersion = ExternalAppUtil.getApkVersion(getActivity());
                     if (newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
@@ -205,7 +210,7 @@ public class MainFragment extends BaseFragment {
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
             }
 
-            if (firebaseDatabaseLoaded && RemoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
+            if (firebaseDatabaseLoaded && remoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {
@@ -492,7 +497,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    ExternalAppUtil.openBrowserIntent(MainFragment.this, "https://play.google.com/store/apps/details?id=com.tytanapps.ptsd");
+                    ExternalAppUtil.openBrowserIntent(MainFragment.this, getString(R.string.play_store_url));
                 } catch(Exception e) {
                     FirebaseCrash.report(e);
                     openDrawer();

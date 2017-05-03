@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,14 +130,13 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
         }
     }
 
+    @Override
     public void filter(String search) {
         super.filter(search);
         loadFacilityImages();
     }
 
     private void loadFacilityImages() {
-        Log.d(this.getClass().getSimpleName(), "loadFacilityImages() called");
-
         FacilityLoader facilityLoader = new FacilityLoader(fragment) {
             @Override
             public void errorLoadingResults(Throwable throwable) {}
