@@ -1,7 +1,8 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +16,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
+
+import javax.inject.Inject;
 
 
 /**
  * Shows information about PTSD. Gives symptoms, causes, and treatment for PTSD.
  */
-public class ResourcesFragment extends AnalyticsFragment {
+public class ResourcesFragment extends BaseFragment {
 
     private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
+    @Inject RemoteConfig remoteConfig;
+
     public ResourcesFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -46,14 +57,17 @@ public class ResourcesFragment extends AnalyticsFragment {
             }
         }).run();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_resources).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_resources);
+    }
 
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.resources_title;
     }
 
     private void insertDefaultResources() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -83,7 +97,7 @@ public class ResourcesFragment extends AnalyticsFragment {
                     @Override
                     public void run() {
                         View rootView = getView();
-                        if(rootView != null) {
+                        if (rootView != null) {
                             LinearLayout phoneNumbersLinearLayout = (LinearLayout) rootView.findViewById(R.id.resources_linear_layout);
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -130,7 +144,7 @@ public class ResourcesFragment extends AnalyticsFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if(Utilities.getRemoteConfigBoolean(ResourcesFragment.this, R.string.rc_resource_sticky)) {
+        if (remoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 
@@ -148,10 +162,10 @@ public class ResourcesFragment extends AnalyticsFragment {
      */
     private LinearLayout getResourceView(LayoutInflater inflater, LinearLayout resourcesLinearLayout, String name) {
         // Find the resource view if it exists
-        for(int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
+        for (int i = 0; i < resourcesLinearLayout.getChildCount(); i++) {
             View child = resourcesLinearLayout.getChildAt(i);
 
-            if(child.getTag() != null && child.getTag().equals(name))
+            if (child.getTag() != null && child.getTag().equals(name))
                 return (LinearLayout) child;
         }
 

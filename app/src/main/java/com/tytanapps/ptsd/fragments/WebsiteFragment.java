@@ -1,7 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,22 +20,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
+
+import static butterknife.ButterKnife.findById;
+import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
 
 
 /**
  * Displays a list of websites to find more information about PTSD. Shows a brief description for
  * each website. Tapping on the card opens the website.
  */
-public class WebsiteFragment extends AnalyticsFragment {
+public class WebsiteFragment extends BaseFragment {
 
     private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 
-    private Unbinder unbinder;
     @BindView(R.id.website_linear_layout) LinearLayout websitesLinearLayout;
 
     public WebsiteFragment() {
@@ -51,17 +52,10 @@ public class WebsiteFragment extends AnalyticsFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_websites).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_websites);
     }
 
     @Override
@@ -78,6 +72,11 @@ public class WebsiteFragment extends AnalyticsFragment {
         }).start();
     }
 
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.web_title;
+    }
+
     /**
      * Add the default websites to be used offline
      */
@@ -86,9 +85,11 @@ public class WebsiteFragment extends AnalyticsFragment {
         if(rootView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-            insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
-            insertWebCard(getString(R.string.veterans_affairs), getString(R.string.veteran_affairs_details), getString(R.string.website_va), R.drawable.va, inflater, websitesLinearLayout);
-            insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
+            if(isVeteran(getActivity())) {
+                insertWebCard(getString(R.string.veterans_chat_title), getString(R.string.veterans_chat_details), getString(R.string.website_chat), R.drawable.veterans_crisis_line, inflater, websitesLinearLayout);
+                insertWebCard(getString(R.string.veterans_affairs), getString(R.string.veteran_affairs_details), getString(R.string.website_va), R.drawable.va, inflater, websitesLinearLayout);
+                insertWebCard(getString(R.string.self_quiz), getString(R.string.quiz_details), getString(R.string.website_self_check), R.drawable.veterans_quiz, inflater, websitesLinearLayout);
+            }
             insertWebCard(getString(R.string.nimh_title), getString(R.string.nimh_details), getString(R.string.website_nimh), R.drawable.nimh, inflater, websitesLinearLayout);
             insertWebCard(getString(R.string.ptsd_coach), getString(R.string.ptsd_coach_details), getString(R.string.website_coach), R.drawable.ptsd_coach, inflater, websitesLinearLayout);
         }
@@ -116,8 +117,12 @@ public class WebsiteFragment extends AnalyticsFragment {
                         if(rootView != null) {
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                            for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                insertFirebaseWebCard(child, websitesLinearLayout, inflater);
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                boolean veteranOnly = snapshot.hasChild("veteran_only") && snapshot.child("veteran_only").getValue(Boolean.class);
+
+                                if(!veteranOnly || isVeteran(getActivity())) {
+                                    insertFirebaseWebCard(snapshot, websitesLinearLayout, inflater);
+                                }
                             }
                         }
                     }
@@ -161,15 +166,13 @@ public class WebsiteFragment extends AnalyticsFragment {
     private void insertWebCard(String name, String desc, String url, String icon_url, LayoutInflater inflater, LinearLayout websitesLinearLayout) {
         CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-        TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+        TextView nameTextView = findById(webCardView, R.id.website_name_textview);
         nameTextView.setText(name);
 
-        TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+        TextView detailsTextView = findById(webCardView, R.id.website_details_textview);
         detailsTextView.setText(desc);
 
-        ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
-        //iconImageView.setImageBitmap(bmp);
-
+        ImageView iconImageView = findById(webCardView, R.id.website_icon_imageview);
         Picasso.with(getActivity()).load(icon_url).into(iconImageView);
     }
 
@@ -188,13 +191,13 @@ public class WebsiteFragment extends AnalyticsFragment {
             public void run() {
                 CardView webCardView = getWebCardView(inflater, websitesLinearLayout, name, url);
 
-                TextView nameTextView = (TextView) webCardView.findViewById(R.id.website_name_textview);
+                TextView nameTextView = findById(webCardView, R.id.website_name_textview);
                 nameTextView.setText(name);
 
-                TextView detailsTextView = (TextView) webCardView.findViewById(R.id.website_details_textview);
+                TextView detailsTextView = findById(webCardView, R.id.website_details_textview);
                 detailsTextView.setText(desc);
 
-                ImageView iconImageView = (ImageView) webCardView.findViewById(R.id.website_icon_imageview);
+                ImageView iconImageView = findById(webCardView, R.id.website_icon_imageview);
                 iconImageView.setImageResource(imageResource);
             }
         });
@@ -223,7 +226,7 @@ public class WebsiteFragment extends AnalyticsFragment {
             websiteCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utilities.openBrowserIntent(WebsiteFragment.this, url);
+                    ExternalAppUtil.openBrowserIntent(WebsiteFragment.this, url);
                 }
             });
 

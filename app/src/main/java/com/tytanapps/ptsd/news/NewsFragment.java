@@ -1,8 +1,7 @@
-package com.tytanapps.ptsd.fragments;
+package com.tytanapps.ptsd.news;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,26 +15,26 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.tytanapps.ptsd.News;
-import com.tytanapps.ptsd.NewsAdapter;
-import com.tytanapps.ptsd.NewsLoader;
+import com.bhargavms.dotloader.DotLoader;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.Utilities;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.fragments.BaseFragment;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 
-public class NewsFragment extends AnalyticsFragment {
+public class NewsFragment extends BaseFragment {
 
     private static final String LOG_TAG = NewsFragment.class.getSimpleName();
 
@@ -43,10 +42,11 @@ public class NewsFragment extends AnalyticsFragment {
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
-    private Unbinder unbinder;
+    @Inject RemoteConfig remoteConfig;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.news_progressbar) View loadingProgressBar;
+    @BindView(R.id.news_progressbar) DotLoader loadingProgressBar;
     @BindView(R.id.news_loading_textview) TextView loadingTextView;
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
@@ -56,6 +56,7 @@ public class NewsFragment extends AnalyticsFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -67,15 +68,9 @@ public class NewsFragment extends AnalyticsFragment {
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        newsLoader = setupNewsLoader(rootView);
+        newsLoader = setupNewsLoader();
         setupRefreshLayout();
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -90,16 +85,18 @@ public class NewsFragment extends AnalyticsFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(query);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null)
+                if (mAdapter != null) {
                     mAdapter.filter(newText);
+                }
                 scrollFacilityListToTop();
                 return true;
             }
@@ -110,26 +107,21 @@ public class NewsFragment extends AnalyticsFragment {
     public void onStart() {
         super.onStart();
         newsLoader.loadNews();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_news).setChecked(true);
+        setCheckedNavigationItem(R.id.nav_news);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        dismissKeyboard();
+        PtsdUtil.dismissKeyboard(getActivity());
     }
 
-    /**
-     * Close the on screen keyboard
-     */
-    private void dismissKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+    @Override
+    protected @StringRes int getTitle() {
+        return R.string.news_title;
     }
 
-    private NewsLoader setupNewsLoader(final View rootView) {
+    private NewsLoader setupNewsLoader() {
         return new NewsLoader(this) {
             @Override
             public void errorLoadingResults(String errorMessage) {
@@ -138,7 +130,7 @@ public class NewsFragment extends AnalyticsFragment {
 
             @Override
             public void onSuccess(List<News> loadedNews) {
-                NewsFragment.this.onSuccess(loadedNews, rootView);
+                NewsFragment.this.onSuccess(loadedNews);
             }
         };
     }
@@ -146,9 +138,8 @@ public class NewsFragment extends AnalyticsFragment {
     /**
      * When all of the news have loaded, add them to the recycler view and display them
      * @param loadedNews The loaded news
-     * @param rootView The root view of the fragment
      */
-    private void onSuccess(List<News> loadedNews, View rootView) {
+    private void onSuccess(List<News> loadedNews) {
         newsList.clear();
         for(News news : loadedNews) {
             newsList.add(news);
@@ -158,15 +149,18 @@ public class NewsFragment extends AnalyticsFragment {
         enableRefreshLayout();
 
         // Hide the progress bar
-        loadingProgressBar.setVisibility(View.GONE);
+        if(loadingProgressBar != null)
+            loadingProgressBar.setVisibility(View.GONE);
 
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }
 
     private void enableRefreshLayout() {
-        swipeRefreshLayout.setRefreshing(false);
-        swipeRefreshLayout.setEnabled(true);
+        if(swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setEnabled(true);
+        }
     }
 
     /**
@@ -174,7 +168,7 @@ public class NewsFragment extends AnalyticsFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), Utilities.getRemoteConfigInt(this, R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -190,16 +184,8 @@ public class NewsFragment extends AnalyticsFragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
                 mAdapter.notifyDataSetChanged();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        newsLoader.refresh();
-                    }
-                });
-                t.run();
+                newsLoader.refresh();
             }
         });
     }
@@ -216,20 +202,22 @@ public class NewsFragment extends AnalyticsFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        swipeRefreshLayout.setRefreshing(false);
-        if (newsList.size() > 0) {
-            Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
-        } else {
-            loadingTextView.setVisibility(View.VISIBLE);
-        loadingTextView.setText(errorMessage);
-        loadingProgressBar.setVisibility(View.INVISIBLE);
-        retryLoadButton.setVisibility(View.VISIBLE);
-    }
+        if(getView() != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            if (newsList.size() > 0) {
+                Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
+            } else {
+                loadingTextView.setVisibility(View.VISIBLE);
+                loadingTextView.setText(errorMessage);
+                loadingProgressBar.setVisibility(View.INVISIBLE);
+                retryLoadButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
-    @OnClick(R.id.retry_load_button) public void retryLoadNews() {
+    @OnClick(R.id.retry_load_button)
+    public void retryLoadNews() {
         retryLoadButton.setVisibility(View.INVISIBLE);
-
         loadingTextView.setText("");
         loadingTextView.setVisibility(View.INVISIBLE);
         loadingProgressBar.setVisibility(View.VISIBLE);

@@ -12,7 +12,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,20 +23,26 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
 import com.tytanapps.ptsd.BuildConfig;
 import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class SettingsFragment extends PreferenceFragment {
 
     private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
 
+    @Inject RemoteConfig remoteConfig;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
 
-        // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
     }
 
@@ -45,20 +50,27 @@ public class SettingsFragment extends PreferenceFragment {
     public void onStart() {
         super.onStart();
 
-        if(BuildConfig.DEBUG) {
-            ((MainActivity)getActivity()).fetchRemoteConfig(0);
+        if (BuildConfig.DEBUG && getView() != null) {
+            remoteConfig.fetch(0);
             Snackbar.make(getView(), "Fetched remote config", Snackbar.LENGTH_SHORT).show();
         }
 
+        setupSettings();
+
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
+
+        getActivity().setTitle(R.string.settings_title);
+    }
+
+    private void setupSettings() {
+        setupIsVeteranPref();
         setupNewsNotificationPref();
         setupEnableTrustedContactPref();
         setupChangeTrustedContactPref();
         setupFeedbackButton();
         setupLicensesButton();
         setupInfoButton();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
     }
 
     private void setupNewsNotificationPref() {
@@ -69,19 +81,29 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 saveSharedPreference(getString(R.string.pref_news_notification), (Boolean) newValue);
 
-                if((Boolean) newValue) {
+                if ((Boolean) newValue) {
                     FirebaseMessaging.getInstance().subscribeToTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: subscribed");
-                }
-                else {
+                } else {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
-                    Log.d(LOG_TAG, "onCheckedChanged: unsubscribed");
                 }
 
                 return true;
             }
         });
     }
+
+    private void setupIsVeteranPref() {
+        CheckBoxPreference newsPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_veteran));
+        newsPreference.setChecked(getSharedPreferenceBoolean(getString(R.string.pref_veteran), true));
+        newsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                saveSharedPreference(getString(R.string.pref_veteran), (Boolean) newValue);
+                return true;
+            }
+        });
+    }
+
 
     private void setupChangeTrustedContactPref() {
         Preference changeTrustedContactPreference = findPreference("change_trusted_contact");
@@ -202,22 +224,10 @@ public class SettingsFragment extends PreferenceFragment {
 
     }
 
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
     private String getSharedPreferenceString(String prefKey, String defaultValue) {
         return getActivity().getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
     }
 
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
     private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
         return getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
     }

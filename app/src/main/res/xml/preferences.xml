@@ -2,12 +2,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="Notifications">
+        android:title="My Info">
+
+        <CheckBoxPreference
+            android:key="@string/pref_veteran"
+            android:title="@string/veteran_pref_title"
+            android:summary="@string/veteran_pref_summary"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_notifications">
 
         <CheckBoxPreference
             android:key="@string/pref_news_notification"
-            android:title="News Articles"
-            android:summary="Receive notifications for VA news" />
+            android:title="@string/pref_news_title"
+            android:summary="@string/pref_news_summary" />
 
     </PreferenceCategory>
 
@@ -17,13 +28,13 @@
         <CheckBoxPreference
             android:key="enable_trusted_contact"
             android:defaultValue="true"
-            android:title="Enable trusted contact"
-            android:summary="Show the trusted contact button" />
+            android:title="@string/pref_trusted_contact_title"
+            android:summary="@string/pref_trusted_contact_summary" />
 
         <PreferenceScreen
             android:key="change_trusted_contact"
-            android:title="Modify trusted contact"
-            android:summary="Change your trusted contact"
+            android:title="pref_change_contact_title"
+            android:summary="@string/pref_change_contact_summary"
             android:layout="?android:attr/preferenceLayoutChild"
             android:dependency="enable_trusted_contact">
 
@@ -32,20 +43,20 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Feedback">
+        android:title="@string/feedback_category_title">
 
         <PreferenceScreen
             android:key="provide_feedback"
-            android:title="Provide Feedback"
-            android:summary="Contact developer">
+            android:title="@string/feedback_title"
+            android:summary="@string/feedback_summary">
         </PreferenceScreen>
 
         <PreferenceScreen
-            android:title="Enjoying the app?"
-            android:summary="Please rate on Google Play">
+            android:title="@string/rate_app_title"
+            android:summary="@string/rate_app_summary">
 
             <intent android:action="android.intent.action.VIEW"
-                android:data="https://play.google.com/store/apps/details?id=com.tytanapps.ptsd" />
+                android:data="@string/play_store_url" />
 
         </PreferenceScreen>
 
@@ -68,6 +79,14 @@
             android:key="licenses"
             android:title="View licenses"
             android:summary="View the licenses used">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="Privacy Policy">
+
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://tylercarberry.me/ptsd-privacy/" />
+
         </PreferenceScreen>
 
         <PreferenceScreen

@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.firebase;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,13 +10,15 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.R;
 
 /**
  * Handles messages received by Firebase Messaging Service
  */
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+public class PtsdMessagingService extends FirebaseMessagingService {
 
-    private static final String LOG_TAG = MyFirebaseMessagingService.class.getSimpleName();
+    private static final String LOG_TAG = PtsdMessagingService.class.getSimpleName();
     public static final int NOTIFICATION_ID = 5000;
 
     @Override
@@ -41,7 +43,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, MainActivity.class);
         resultIntent.putExtra("fragment", "news");
-
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.

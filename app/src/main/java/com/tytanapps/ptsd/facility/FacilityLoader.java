@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.facility;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -6,6 +6,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -34,15 +40,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static com.tytanapps.ptsd.Utilities.distanceBetweenCoordinates;
-import static com.tytanapps.ptsd.Utilities.getFirstPhoneNumber;
-import static com.tytanapps.ptsd.Utilities.getGPSLocation;
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigInt;
-import static com.tytanapps.ptsd.Utilities.loadBitmapFromFile;
-import static com.tytanapps.ptsd.Utilities.readBitmapFromUrl;
-import static com.tytanapps.ptsd.Utilities.readFromUrl;
-import static com.tytanapps.ptsd.Utilities.saveBitmapToFile;
+import static com.tytanapps.ptsd.utils.PtsdUtil.distanceBetweenCoordinates;
+import static com.tytanapps.ptsd.utils.PtsdUtil.getFirstPhoneNumber;
+import static com.tytanapps.ptsd.utils.PtsdUtil.getGPSLocation;
+import static com.tytanapps.ptsd.utils.PtsdUtil.loadBitmapFromFile;
+import static com.tytanapps.ptsd.utils.PtsdUtil.readBitmapFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtil.readFromUrl;
+import static com.tytanapps.ptsd.utils.PtsdUtil.saveBitmapToFile;
 import static rx.Observable.just;
 
 /**
@@ -57,11 +61,15 @@ public abstract class FacilityLoader {
     // Key: VA Id, Value: The facility with the given id
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
+    @Inject
+    RemoteConfig remoteConfig;
+
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
+        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
     }
 
-    public abstract void errorLoadingResults(String errorMessage);
+    public abstract void errorLoadingResults(Throwable throwable);
     public abstract void onSuccess(List<Facility> loadedFacilities);
     public abstract void onLoadedImage(int facilityId);
 
@@ -95,15 +103,13 @@ public abstract class FacilityLoader {
                             int numberOfResults = new JSONObject(response).getInt("MATCHES");
 
                             if (numberOfResults == 0) {
-                                errorLoadingResults("Error");
-                                return null;
+                                throw new RuntimeException(fragment.getString(R.string.va_loading_error));
                             }
 
                             double[] userLocation = getGPSLocation(fragment.getActivity());
                             // If the user's GPS location cannot be found
                             if (userLocation[0] == 0 && userLocation[1] == 0) {
-                                errorLoadingResults(fragment.getString(R.string.gps_error));
-                                return null;
+                                throw new LocationNotFoundException();
                             }
 
                             // Add each PTSD program to the correct VA facility
@@ -138,7 +144,7 @@ public abstract class FacilityLoader {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, "onError: ", e);
-                        errorLoadingResults(e.getMessage());
+                        errorLoadingResults(e);
                     }
 
                     @Override
@@ -169,8 +175,16 @@ public abstract class FacilityLoader {
         knownFacilities.put(facilityID, facility);
     }
 
-    private Observable<Facility> loadFacility(int facility) {
-        return Observable.concat(Observable.just(readCachedFacility(facility)), loadFacilityFromNetwork(facility))
+
+    /**
+     * Load a VA facility from the VA api, using cache if available
+     * @param facilityId The id of the facility to load
+     * @return An observable for the facility
+     */
+    private Observable<Facility> loadFacility(int facilityId) {
+        return Observable.concat(
+                    Observable.just(readCachedFacility(facilityId)),
+                    loadFacilityFromNetwork(facilityId))
                 .filter(new Func1<Facility, Boolean>() {
                     @Override
                     public Boolean call(Facility facility) {
@@ -179,19 +193,26 @@ public abstract class FacilityLoader {
                 }).first();
     }
 
+
+    /**
+     * Load a VA facility from the VA api
+     * @param facilityId The id of the facility to fetch
+     * @return An observable for the facility
+     */
     private Observable<Facility> loadFacilityFromNetwork(int facilityId) {
-        Observable<Facility> facilityObservable = just(facilityId).map(new Func1<Integer, Facility>() {
+
+        return just(facilityId).map(new Func1<Integer, Facility>() {
             @Override
-            public Facility call(Integer facilityId) {
+            public Facility call(Integer facilityId1) {
                 try {
-                    String response = readFromUrl(buildFacilityUrl(facilityId, fragment.getString(R.string.api_key_va_facilities)));
+                    String response = readFromUrl(buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
                     // The JSON that the sever responds starts with //
                     // I am cropping the first two characters to create valid JSON.
                     response = response.substring(2);
 
                     // Get all of the information about the facility
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS");
-                    Facility facility =  parseJSONFacility(facilityId, rootJson);
+                    Facility facility =  parseJSONFacility(facilityId1, rootJson);
                     cacheFacility(facility);
                     return facility;
                 } catch (IOException | JSONException e) {
@@ -200,11 +221,16 @@ public abstract class FacilityLoader {
                 }
             }
         });
-
-        return facilityObservable;
     }
 
 
+    /**
+     * Convert a JSON VA facility into a Facility object
+     * @param facilityId The unique id of the facility
+     * @param rootJson The json representing the facility
+     * @return The converted Facility
+     * @throws JSONException If the JSON is improperly formed
+     */
     private Facility parseJSONFacility(int facilityId, JSONObject rootJson) throws JSONException {
         Facility facility = new Facility(facilityId);
 
@@ -232,7 +258,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+        if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -257,17 +283,21 @@ public abstract class FacilityLoader {
      * @throws JSONException The facility json is not valid
      */
     private String getFacilityUrl(JSONObject locationJson) throws JSONException {
-        // For some reason the facility urls start with vaww. instead of www.
-        // These cannot be loaded on my phone so use www. instead.
+        // The facility urls start with vaww. instead of www.
+        // These cannot be loaded on the public internet so use www. instead.
         String url = (String) locationJson.get("FANDL_URL");
         url = url.replace("vaww", "www");
         return url;
     }
 
 
+    /**
+     * Load the Google Maps imagery for the given facility
+     * @param facility The facility to load the imagery for
+     */
     public void loadFacilityImage(final Facility facility) {
-        int imageWidth = getRemoteConfigInt(fragment, R.string.rc_map_width);
-        int imageHeight = getRemoteConfigInt(fragment, R.string.rc_map_height);
+        int imageWidth = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_width);
+        int imageHeight = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_height);
 
         Observable<Bitmap> bitmapObservable = Observable.concat(
                 loadCacheFacilityImage(facility.getFacilityId()),
@@ -287,9 +317,7 @@ public abstract class FacilityLoader {
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
+            public void onError(Throwable e) {}
 
             @Override
             public void onNext(Bitmap bitmap) {
@@ -316,7 +344,7 @@ public abstract class FacilityLoader {
                     .filter(new Func1<String, Boolean>() {
                         @Override
                         public Boolean call(String s) {
-                            return streetViewAvailable(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight);
+                            return isStreetViewAvailableAtAddress(facility.getStreetAddress(), facility.getCity(), facility.getState());
                         }
                     })
                     .map(new Func1<String, Bitmap>() {
@@ -368,7 +396,7 @@ public abstract class FacilityLoader {
     /**
      * Called when all facilities have loaded and knownValues is fully populated
      */
-    public void allFacilitiesHaveLoaded() {
+    private void allFacilitiesHaveLoaded() {
         ArrayList<Facility> facilitiesList = new ArrayList<>();
         for(Facility facility : knownFacilities.values()) {
             facilitiesList.add(facility);
@@ -380,6 +408,9 @@ public abstract class FacilityLoader {
         onSuccess(facilitiesList);
     }
 
+    /**
+     * Clear the cache and reload the facilities from the network
+     */
     public void refresh() {
         clearFacilityCache();
         knownFacilities.clear();
@@ -439,13 +470,13 @@ public abstract class FacilityLoader {
      * Clear the cached news articles
      */
     private void clearFacilityCache() {
-        for(int facilityid : knownFacilities.keySet()) {
-            File file = getFacilityFile(facilityid);
+        for(int facilityId : knownFacilities.keySet()) {
+            File file = getFacilityFile(facilityId);
             if(file.exists()) {
                 file.delete();
             }
 
-            file = getFacilityImageFile(facilityid);
+            file = getFacilityImageFile(facilityId);
             if(file.exists()) {
                 file.delete();
             }
@@ -481,7 +512,7 @@ public abstract class FacilityLoader {
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(getRemoteConfigBoolean(fragment, R.string.rc_show_va_programs)) {
+            if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
                 for (String program : programs)
@@ -532,12 +563,11 @@ public abstract class FacilityLoader {
     }
 
 
-    private boolean streetViewAvailable(String address, String town, final String state, int imageWidth, int imageHeight) {
+    private boolean isStreetViewAvailableAtAddress(String address, String town, final String state) {
         try {
             String location = encodeAddress(address, town, state);
             Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
                     .buildUpon()
-                    .appendQueryParameter("size", imageWidth + "x" + imageHeight)
                     .appendQueryParameter("location", location)
                     .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
                     .build();
@@ -548,7 +578,7 @@ public abstract class FacilityLoader {
             return status.equalsIgnoreCase("OK");
 
         } catch (JSONException | IOException e) {
-            Log.e(LOG_TAG, "streetViewAvailable: ", e);
+            Log.e(LOG_TAG, "isStreetViewAvailableAtAddress: ", e);
             return false;
         }
     }
@@ -610,6 +640,14 @@ public abstract class FacilityLoader {
         return builtUri.toString();
     }
 
+    /**
+     * Encode an address to be used in Google Maps
+     * @param address The street address
+     * @param town The city/town
+     * @param state Can be represented with either the full name or initials (New Jersey or NJ)
+     * @return The encoded address to be used with the Google Maps API
+     * @throws UnsupportedEncodingException The address was unable to be encoded
+     */
     private String encodeAddress(String address, String town, String state) throws UnsupportedEncodingException {
         // Encode the address
         String location = address + ", " + town + ", " + state;

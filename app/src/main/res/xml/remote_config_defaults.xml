@@ -82,6 +82,11 @@
         <value>-1</value>
     </entry>
 
+    <entry>
+        <key>news_to_load</key>
+        <value>50</value>
+    </entry>
+
 
 </defaultsMap>
 <!-- END xml_defaults -->

@@ -2,9 +2,10 @@ package com.tytanapps.ptsd.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +18,17 @@ import android.widget.TextView;
 
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.techery.progresshint.ProgressHintDelegate;
 
-import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
+import static butterknife.ButterKnife.findById;
 
 
 /**
@@ -31,16 +36,22 @@ import static com.tytanapps.ptsd.Utilities.getRemoteConfigBoolean;
  * you recommendations on what to do next. Find a professional is always a recommendation even if
  * the user shows no signs of PTSD.
  */
-public class PTSDTestFragment extends AnalyticsFragment {
+public class PTSDTestFragment extends BaseFragment {
 
-    private static final String LOG_TAG = PTSDTestFragment.class.getSimpleName();
+    @Inject
+    RemoteConfig remoteConfig;
 
-    private Unbinder unbinder;
     @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
 
 
     public PTSDTestFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        getApplication().getFirebaseComponent().inject(this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -53,36 +64,22 @@ public class PTSDTestFragment extends AnalyticsFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    public void onStart() {
+        super.onStart();
+        setCheckedNavigationItem(R.id.nav_test);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_test).setChecked(true);
-    }
-
-    /**
-     * Get the root view of the fragment casted to a ViewGroup
-     * @return The root view of the fragment as a ViewGroup
-     */
-    private ViewGroup getViewGroup() {
-        View rootView = getView();
-        if(rootView instanceof ViewGroup)
-            return (ViewGroup) getView();
-        return null;
+    protected @StringRes int getTitle() {
+        return R.string.ptsd_test_title;
     }
 
     /**
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(getRemoteConfigBoolean(this, R.string.rc_questions_sticky)) {
-            TextView headerTextView = (TextView) questionsLinearLayout.findViewById(R.id.stress_textview);
+        if(remoteConfig.getBoolean(getActivity(), R.string.rc_questions_sticky)) {
+            TextView headerTextView = findById(questionsLinearLayout, R.id.stress_textview);
             headerTextView.setTag("sticky");
         }
 
@@ -98,15 +95,15 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         for(String question : questions) {
-            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getViewGroup(), false);
+            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getRootViewGroup(), false);
 
-            TextView questionTextView = (TextView) layout.findViewById(R.id.stress_question_textview);
+            TextView questionTextView = findById(layout, R.id.stress_question_textview);
             questionTextView.setText(question);
 
             questionsLinearLayout.addView(layout);
 
             io.techery.progresshint.addition.widget.SeekBar seekBar =
-                    (io.techery.progresshint.addition.widget.SeekBar) layout.findViewById(R.id.result_seekbar);
+                    findById(layout, R.id.result_seekbar);
 
             seekBar.getHintDelegate()
                     .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {
@@ -150,8 +147,8 @@ public class PTSDTestFragment extends AnalyticsFragment {
 
         // Set the appearance of the button
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
-        submitButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        submitButton.setTextColor(getResources().getColor(R.color.white));
+        submitButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+        submitButton.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         submitButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         submitButton.setText(getString(R.string.submit_test));
 
@@ -171,8 +168,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
      */
     private void submit() {
         sendAnalyticsEvent("Action", "Submit Test");
-        int score = getScore();
-        showResults(score);
+        showResults(getScore());
     }
 
     /**
@@ -197,7 +193,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getViewGroup(), false);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.ptsd_result_dialog, getRootViewGroup(), false);
 
         String resultText;
         String nextActions;
@@ -218,10 +214,10 @@ public class PTSDTestFragment extends AnalyticsFragment {
             nextActions = getString(R.string.see_professional_high);
         }
 
-        TextView resultTextView = (TextView) layout.findViewById(R.id.results_textview);
+        TextView resultTextView = findById(layout, R.id.results_textview);
         resultTextView.setText(resultText);
 
-        TextView nextActionsTextView = (TextView) layout.findViewById(R.id.next_steps_textview);
+        TextView nextActionsTextView = findById(layout, R.id.next_steps_textview);
         nextActionsTextView.setText(nextActions);
 
         alertDialog.setView(layout);
@@ -240,13 +236,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
      * Creates a share intent. The user can share the results with any app.
      */
     private void shareResults() {
-        String shareText = generateShareText();
-
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, shareText);
-        startActivity(Intent.createChooser(intent, getString(R.string.share_results_chooser)));
+        ExternalAppUtil.shareTextIntent(getActivity(), getShareText());
     }
 
     /**
@@ -254,7 +244,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
      * This includes each question and the answer that was selected.
      * @return A string of the text to be shared
      */
-    private String generateShareText() {
+    private String getShareText() {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
         int[] answers = getEachAnswer();
 
@@ -312,7 +302,7 @@ public class PTSDTestFragment extends AnalyticsFragment {
                 View childView = questionsLinearLayout.getChildAt(i);
 
                 if (childView instanceof ViewGroup) {
-                    SeekBar seekBar = (SeekBar) childView.findViewById(R.id.result_seekbar);
+                    SeekBar seekBar = findById(childView, R.id.result_seekbar);
                     score[questionCount] = seekBar.getProgress()/((seekBar.getMax()+1)/5) + 1;
 
                     questionCount++;
@@ -332,11 +322,13 @@ public class PTSDTestFragment extends AnalyticsFragment {
         int score = 0;
         
         for(int num : getEachAnswer()) {
-            if(num > 0)
+            if (num > 0) {
                 score += num;
-            // If a question has not been answered
-            else
+            }
+            // A question has not been answered
+            else {
                 return -1;
+            }
         }
 
         return score;

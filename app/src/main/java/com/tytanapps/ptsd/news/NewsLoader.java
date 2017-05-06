@@ -1,9 +1,13 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.news;
 
 import android.app.Fragment;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.R;
+import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -40,16 +46,17 @@ public abstract class NewsLoader {
 
     private Fragment fragment;
 
+    @Inject
+    RemoteConfig remoteConfig;
+
     // Stores the news that have already loaded
     // Key: Press id
     // Value: The News with the given id
     private HashMap<Integer, News> knownNews = new HashMap<>();
 
-    // The number of news to load from the api
-    private static final int NEWS_TO_LOAD = 50;
-
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
+        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
     }
 
     public abstract void errorLoadingResults(String errorMessage);
@@ -62,7 +69,7 @@ public abstract class NewsLoader {
             @Override
             public JSONObject call(String url) {
                 try {
-                    String response = Utilities.readFromUrl(url).substring(2);
+                    String response = PtsdUtil.readFromUrl(url).substring(2);
                     Log.d(TAG, "call() called with: url = [" + url + "]");
                     Log.d(TAG, "call: " + response);
                     return new JSONObject(response);
@@ -172,7 +179,7 @@ public abstract class NewsLoader {
             @Override
             public News call(Integer integer) {
                 try {
-                    String response = Utilities.readFromUrl(calculateArticleURL(pressId));
+                    String response = PtsdUtil.readFromUrl(calculateArticleURL(pressId));
                     response = response.substring(2);
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
                     return parseJSONNews(rootJson);
@@ -197,7 +204,7 @@ public abstract class NewsLoader {
         String title = rootJson.getString("PRESS_TITLE");
 
         String article = rootJson.getString("PRESS_TEXT");
-        article = Utilities.htmlToText(article);
+        article = PtsdUtil.htmlToText(article);
         article = article.substring(article.indexOf("–") + 1).trim();
 
         // Remove the extra space at the end of the text
@@ -312,7 +319,7 @@ public abstract class NewsLoader {
      * @return The url for the PTSD Programs API
      */
     private String calculateNewsUrl() {
-        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2015&EndDate=01/01/2025&MaxRecords=" + NEWS_TO_LOAD + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
+        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2014&EndDate=01/01/2025&MaxRecords=" + remoteConfig.getInt(fragment.getActivity(), R.string.rc_news_to_load) + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {

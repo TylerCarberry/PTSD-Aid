@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_simple_test" android:icon="@drawable/ic_account_circle_black_24px"
-            android:title="@string/nav_simple_test" />
+        <item android:id="@+id/nav_recommendations" android:icon="@drawable/ic_account_circle_black_24px"
+              android:title="@string/nav_simple_test" />
         <item android:id="@+id/nav_test" android:icon="@drawable/ic_assessment_black_24px"
             android:title="@string/nav_test" />
         <item android:id="@+id/nav_resources" android:icon="@drawable/ic_subject_black_24px"

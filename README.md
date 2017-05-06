@@ -4,7 +4,7 @@
 
 #### Finalist in the [2015 AT&T Civic App Challenge](http://njcivicapp.com/)
 
-Learn more about Post Traumatic Stress Disorder (PTSD) and determine if you or a loved one suffers from it. Also recieve personalized recommendations and find PTSD programs offered free of charge at local VA facilities. Quickly find programs, call and make an appointment, and get directions all within the app.
+Learn more about Post Traumatic Stress Disorder (PTSD) and determine if you or a loved one suffers from it. Also receive personalized recommendations and find PTSD programs offered free of charge at local VA facilities. Quickly find programs, call and make an appointment, and get directions all within the app.
 
 PTSD Aid also features a trusted contact button. Quickly call your trusted contact from every screen in the app. If you want to speak with a professional, PTSD Aid also provides phone numbers for veteran hotlines.
 

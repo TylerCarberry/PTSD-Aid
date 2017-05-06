@@ -1,13 +1,15 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.news;
 
 import android.support.annotation.NonNull;
+
+import com.tytanapps.ptsd.Searchable;
 
 import java.io.Serializable;
 
 /**
  * A VA news article that has a title, message, pressId, and a published date
  */
-public class News implements Comparable<News>, Serializable {
+public class News implements Comparable<News>, Serializable, Searchable {
 
     private static final long serialVersionUID = 1L;
 
@@ -71,5 +73,15 @@ public class News implements Comparable<News>, Serializable {
     @Override
     public int compareTo(@NonNull News another) {
         return 0-((Integer)this.getPressId()).compareTo(another.getPressId());
+    }
+
+    public boolean search(String searchTerm) {
+        if(searchTerm == null || searchTerm.isEmpty())
+            return true;
+        searchTerm = searchTerm.toLowerCase();
+        return  title.toLowerCase().contains(searchTerm) ||
+                message.toLowerCase().contains(searchTerm) ||
+                pressDate.toLowerCase().contains(searchTerm);
+
     }
 }
