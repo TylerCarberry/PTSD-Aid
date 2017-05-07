@@ -18,7 +18,7 @@ public class RatingDialog extends FiveStarsDialog {
         super(context, supportEmail);
         ((PTSDApplication)context.getApplicationContext()).getFirebaseComponent().inject(this);
 
-        int ratingUpperBound = remoteConfig.getInt(context, R.string.rc_rating_upper_bound);
+        int ratingUpperBound = remoteConfig.getInt(R.string.rc_rating_upper_bound);
 
         setRateText(context.getString(R.string.rating_prompt_message));
         setTitle(context.getString(R.string.rating_prompt_title));

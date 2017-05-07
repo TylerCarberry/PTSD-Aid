@@ -95,7 +95,7 @@ public class MainFragment extends BaseFragment {
      * @param rootView The root view of the fragment, containing the emotion buttons
      */
     private void setupEmotions(View rootView) {
-        if (!remoteConfig.getBoolean(getActivity(), R.string.rc_show_extra_emoji)) {
+        if (!remoteConfig.getBoolean(R.string.rc_show_extra_emoji)) {
             findById(rootView, R.id.emotions2_linear_layout).setVisibility(View.GONE);
         }
     }
@@ -167,7 +167,7 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVAWebsite());
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
-                    int newestAppVersion = remoteConfig.getInt(getActivity(), R.string.rc_newest_app_version);
+                    int newestAppVersion = remoteConfig.getInt(R.string.rc_newest_app_version);
                     int currentAppVersion = ExternalAppUtil.getApkVersion(getActivity());
                     if (newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
@@ -210,7 +210,7 @@ public class MainFragment extends BaseFragment {
                 recommendationsLinearLayout.addView(getSuggestionAddTrustedContact());
             }
 
-            if (firebaseDatabaseLoaded && remoteConfig.getBoolean(getActivity(), R.string.rc_check_recommendations_database)) {
+            if (firebaseDatabaseLoaded && remoteConfig.getBoolean(R.string.rc_check_recommendations_database)) {
                 getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
             }
             else {

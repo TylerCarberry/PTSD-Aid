@@ -1,5 +1,7 @@
 package com.tytanapps.ptsd;
 
+import android.content.Context;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,8 +35,8 @@ public class FirebaseModule {
 
     @Provides
     @Singleton
-    RemoteConfig providesRemoteConfig(FirebaseRemoteConfig firebaseRemoteConfig) {
-        return new RemoteConfig(firebaseRemoteConfig);
+    RemoteConfig providesRemoteConfig(FirebaseRemoteConfig firebaseRemoteConfig, Context context) {
+        return new RemoteConfig(firebaseRemoteConfig, context);
     }
 
 

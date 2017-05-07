@@ -78,7 +78,7 @@ public class PTSDTestFragment extends BaseFragment {
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(remoteConfig.getBoolean(getActivity(), R.string.rc_questions_sticky)) {
+        if(remoteConfig.getBoolean(R.string.rc_questions_sticky)) {
             TextView headerTextView = findById(questionsLinearLayout, R.id.stress_textview);
             headerTextView.setTag("sticky");
         }

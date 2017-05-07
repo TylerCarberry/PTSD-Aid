@@ -144,7 +144,7 @@ public class ResourcesFragment extends BaseFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if (remoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
+        if (remoteConfig.getBoolean(R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 

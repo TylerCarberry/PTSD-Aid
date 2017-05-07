@@ -151,7 +151,7 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
     }
-
+    
     private void setupLicensesButton() {
         Preference provideFeedback = findPreference("licenses");
         provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

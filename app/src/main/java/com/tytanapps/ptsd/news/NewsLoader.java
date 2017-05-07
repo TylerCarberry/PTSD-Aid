@@ -319,7 +319,7 @@ public abstract class NewsLoader {
      * @return The url for the PTSD Programs API
      */
     private String calculateNewsUrl() {
-        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2014&EndDate=01/01/2025&MaxRecords=" + remoteConfig.getInt(fragment.getActivity(), R.string.rc_news_to_load) + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
+        return "https://www.va.gov/webservices/press/releases.cfc?method=getPress_array&StartDate=01/01/2014&EndDate=01/01/2025&MaxRecords=" + remoteConfig.getInt(R.string.rc_news_to_load) + "&license=" + fragment.getString(R.string.api_key_press_release) + "&returnFormat=json";
     }
 
     private String calculateArticleURL(int pressId) {

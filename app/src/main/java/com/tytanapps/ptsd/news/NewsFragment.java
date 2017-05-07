@@ -168,7 +168,7 @@ public class NewsFragment extends BaseFragment {
      */
     private void setupRecyclerView() {
         if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -281,8 +281,8 @@ public class MainActivity extends AppCompatActivity
      * If they select 1-3 it opens an email intent
      */
     private void showRatingPrompt() {
-        int ratingPromptShowAfter = remoteConfig.getInt(this, R.string.rc_rating_prompt_show_after);
-        final String supportEmailAddress = remoteConfig.getString(this, R.string.rc_support_email_address);
+        int ratingPromptShowAfter = remoteConfig.getInt(R.string.rc_rating_prompt_show_after);
+        final String supportEmailAddress = remoteConfig.getString(R.string.rc_support_email_address);
 
         if (ratingPromptShowAfter > 0) {
             RatingDialog ratingDialog = new RatingDialog(this, supportEmailAddress);
