@@ -13,12 +13,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.SignInButton;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tytanapps.ptsd.EmptyClickListener;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
@@ -45,6 +47,7 @@ public class MainFragment extends BaseFragment {
     private boolean firebaseDatabaseLoaded = false;
 
     @Inject RemoteConfig remoteConfig;
+    @Inject FirebaseDatabase database;
 
     @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
     @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
@@ -65,7 +68,6 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         setupEmotions(rootView);
@@ -76,17 +78,22 @@ public class MainFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        // Hide the sign in button if the user is already signed in
-        if (isUserSignedIn()) {
-            hideSignInButton();
+        if (isUserSignedIn() && getView() != null) {
+            SignInButton signInButton = findById(getView(), R.id.button_sign_in);
+            if (signInButton != null) {
+                signInButton.setVisibility(View.INVISIBLE);
+            }
         }
-
-        setCheckedNavigationItem(R.id.nav_recommendations);
     }
 
     @Override
     protected @StringRes int getTitle() {
         return R.string.recommendations_title;
+    }
+
+    @Override
+    protected int getNavigationItem() {
+        return R.id.nav_recommendations;
     }
 
     /**
@@ -97,19 +104,6 @@ public class MainFragment extends BaseFragment {
     private void setupEmotions(View rootView) {
         if (!remoteConfig.getBoolean(R.string.rc_show_extra_emoji)) {
             findById(rootView, R.id.emotions2_linear_layout).setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * Hide the sign in button on the navigation drawer
-     */
-    private void hideSignInButton() {
-        View rootView = getView();
-        if (rootView != null) {
-            View signInButton = findById(rootView, R.id.button_sign_in);
-            if (signInButton != null) {
-                signInButton.setVisibility(View.INVISIBLE);
-            }
         }
     }
 
@@ -128,8 +122,7 @@ public class MainFragment extends BaseFragment {
     private void determineIfFirebaseDatabaseLoaded() {
         // Attempt to load a value from the database. If it cannot be loaded, then the listener
         // will never be called and firebaseDatabaseLoaded will remain false
-        FirebaseDatabase myRef = FirebaseDatabase.getInstance();
-        myRef.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference("recommendations").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 firebaseDatabaseLoaded = true;
@@ -154,10 +147,7 @@ public class MainFragment extends BaseFragment {
             recommendationsLinearLayout.removeAllViews();
 
             // Remove on click listener from the emoji
-            emotionPressed.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {}
-            });
+            emotionPressed.setOnClickListener(new EmptyClickListener());
 
             String emotionName = "";
             // Show the suggestions for each emotion
@@ -168,7 +158,7 @@ public class MainFragment extends BaseFragment {
                     recommendationsLinearLayout.addView(getSuggestionVisitResources());
 
                     int newestAppVersion = remoteConfig.getInt(R.string.rc_newest_app_version);
-                    int currentAppVersion = ExternalAppUtil.getApkVersion(getActivity());
+                    int currentAppVersion = ExternalAppUtil.getApkVersionCode(getActivity());
                     if (newestAppVersion > 0 && currentAppVersion > 0 && newestAppVersion > currentAppVersion) {
                         recommendationsLinearLayout.addView(getSuggestionUpdateApp());
                     }
@@ -211,9 +201,8 @@ public class MainFragment extends BaseFragment {
             }
 
             if (firebaseDatabaseLoaded && remoteConfig.getBoolean(R.string.rc_check_recommendations_database)) {
-                getRecommendationsFromDatabase(FirebaseDatabase.getInstance(), emotionName, emotionPressed.getId());
-            }
-            else {
+                getRecommendationsFromDatabase(emotionName, emotionPressed.getId());
+            } else {
                 fadeOutAllEmojiExcept(emotionPressed.getId());
                 animateOutEmotionPrompt();
                 animateInRecommendations(recommendationsContainer);
@@ -221,12 +210,7 @@ public class MainFragment extends BaseFragment {
         }
     }
 
-    /**
-     * Read the phone numbers from a Firebase database
-     * @param database The database containing the phone number information
-     * @param id The id of the
-     */
-    private void getRecommendationsFromDatabase(final FirebaseDatabase database, String emotion, final int id) {
+    private void getRecommendationsFromDatabase(String emotion, final int id) {
         DatabaseReference myRef = database.getReference("recommendations").child(emotion);
 
         // Read from the database

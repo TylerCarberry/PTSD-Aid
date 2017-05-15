@@ -5,6 +5,8 @@ import android.content.Context;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -13,6 +15,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 
 @Module
 public class FirebaseModule {
@@ -64,6 +68,35 @@ public class FirebaseModule {
         Tracker tracker = analytics.newTracker(R.xml.global_tracker);
         tracker.enableAutoActivityTracking(true);
         return tracker;
+    }
+
+    @Provides
+    @Singleton
+    Cache provideOkHttpCache(PTSDApplication application) {
+        int cacheSize = 10 * 1024 * 1024; // 10 MiB
+        return new Cache(application.getCacheDir(), cacheSize);
+    }
+
+    @Provides
+    @Singleton
+    OkHttpClient provideOkHttpClient(Cache cache) {
+         return new OkHttpClient.Builder()
+                .cache(cache)
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    FirebaseDatabase provideFirebaseDatabase() {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase.setPersistenceEnabled(true);
+        return firebaseDatabase;
+    }
+
+    @Provides
+    @Singleton
+    FirebaseMessaging provideFirebaseMessaging() {
+        return FirebaseMessaging.getInstance();
     }
 
 }

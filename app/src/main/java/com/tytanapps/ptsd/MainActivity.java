@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -37,8 +38,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.firebase.database.DatabaseException;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.PtsdMessagingService;
@@ -90,9 +89,11 @@ public class MainActivity extends AppCompatActivity
 
     @Inject RemoteConfig remoteConfig;
     @Inject GoogleSignInOptions gso;
+    @Inject FirebaseMessaging firebaseMessaging;
 
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.fab) FloatingActionButton fab;
 
     private Fragment currentFragment;
 
@@ -154,15 +155,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        makeFirebaseDatabasePersistent();
-        FirebaseMessaging.getInstance().subscribeToTopic(BuildConfig.DEBUG ? "debug" : "release");
+        firebaseMessaging.subscribeToTopic(BuildConfig.DEBUG ? "debug" : "release");
         setupNewsNotifications();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        findViewById(R.id.fab).setVisibility(shouldShowFab() ? View.VISIBLE : View.INVISIBLE);
+        fab.setVisibility(shouldShowFab() ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -212,19 +212,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void unsubscribeNewsNotifications() {
         saveSharedPreference(getString(R.string.pref_news_notification), false);
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
-    }
-
-    /**
-     * Make the firebase database persistent and cache it for offline use
-     */
-    private void makeFirebaseDatabasePersistent() {
-        try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        } catch (DatabaseException e) {
-            // If the persistence has already been set, it will throw an error.
-            // There is no way to determine if it has been set beforehand.
-        }
+        firebaseMessaging.unsubscribeFromTopic("news");
     }
 
     /**
@@ -269,9 +257,9 @@ public class MainActivity extends AppCompatActivity
      */
     private void setupNewsNotifications() {
         if (getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true)) {
-            FirebaseMessaging.getInstance().subscribeToTopic("news");
+            firebaseMessaging.subscribeToTopic("news");
         } else {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+            firebaseMessaging.unsubscribeFromTopic("news");
         }
     }
 
@@ -652,7 +640,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_settings:
                 newFragment = new SettingsFragment();
                 break;
-            case R.id.nav_nearby:
+            case R.id.nav_facilities:
                 newFragment = new FacilitiesFragment();
                 break;
             case R.id.nav_news:

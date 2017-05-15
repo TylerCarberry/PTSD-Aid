@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import okhttp3.OkHttpClient;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -49,6 +50,9 @@ public abstract class NewsLoader {
     @Inject
     RemoteConfig remoteConfig;
 
+    @Inject
+    OkHttpClient okHttpClient;
+
     // Stores the news that have already loaded
     // Key: Press id
     // Value: The News with the given id
@@ -69,7 +73,7 @@ public abstract class NewsLoader {
             @Override
             public JSONObject call(String url) {
                 try {
-                    String response = PtsdUtil.readFromUrl(url).substring(2);
+                    String response = PtsdUtil.readFromUrl(okHttpClient, url).substring(2);
                     Log.d(TAG, "call() called with: url = [" + url + "]");
                     Log.d(TAG, "call: " + response);
                     return new JSONObject(response);
@@ -179,7 +183,7 @@ public abstract class NewsLoader {
             @Override
             public News call(Integer integer) {
                 try {
-                    String response = PtsdUtil.readFromUrl(calculateArticleURL(pressId));
+                    String response = PtsdUtil.readFromUrl(okHttpClient, calculateArticleURL(pressId));
                     response = response.substring(2);
                     JSONObject rootJson = new JSONObject(response).getJSONObject("RESULTS").getJSONObject("1");
                     return parseJSONNews(rootJson);

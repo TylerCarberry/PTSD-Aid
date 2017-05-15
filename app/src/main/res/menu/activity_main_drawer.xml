@@ -8,8 +8,8 @@
             android:title="@string/nav_test" />
         <item android:id="@+id/nav_resources" android:icon="@drawable/ic_subject_black_24px"
             android:title="@string/Resources" />
-        <item android:id="@+id/nav_nearby" android:icon="@drawable/ic_local_pharmacy_black_24px"
-            android:title="@string/nav_nearby" />
+        <item android:id="@+id/nav_facilities" android:icon="@drawable/ic_local_pharmacy_black_24px"
+              android:title="@string/nav_nearby" />
         <item android:id="@+id/nav_news" android:icon="@drawable/ic_library_books_black_24px"
             android:title="@string/nav_news" />
 

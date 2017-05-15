@@ -56,8 +56,11 @@ public class ResourcesFragment extends BaseFragment {
                 readResourcesFromFirebase(FirebaseDatabase.getInstance());
             }
         }).run();
+    }
 
-        setCheckedNavigationItem(R.id.nav_resources);
+    @Override
+    protected int getNavigationItem() {
+        return R.id.nav_resources;
     }
 
     @Override

@@ -64,9 +64,8 @@ public class PTSDTestFragment extends BaseFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        setCheckedNavigationItem(R.id.nav_test);
+    protected int getNavigationItem() {
+        return R.id.nav_test;
     }
 
     @Override

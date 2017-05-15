@@ -27,14 +27,16 @@ import android.view.inputmethod.InputMethodManager;
 import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.R;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * A collection of methods that do not apply to a specific fragment
@@ -235,18 +237,10 @@ public class PtsdUtil {
         }
     }
 
-    public static String readFromUrl(String urlString) throws IOException {
-        String response = "";
-
-        URL url = new URL(urlString);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            response += line;
-        }
-        reader.close();
-
-        return response;
+    public static String readFromUrl(OkHttpClient client, String url) throws IOException {
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
     }
 
     public static Bitmap readBitmapFromUrl(String urlString) throws IOException {
@@ -283,29 +277,29 @@ public class PtsdUtil {
             e.printStackTrace();
         }
 
-        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
-        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
-        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
-        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
-        deviceInformation += "BOARD: " + Build.BOARD + "\n";
-        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
-        deviceInformation += "BRAND: " + Build.BRAND + "\n";
-        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
-        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
-        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
-        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
-        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
-        deviceInformation += "HOST: " + Build.HOST + "\n";
-        deviceInformation += "ID: " + Build.ID + "\n";
-        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
-        deviceInformation += "MODEL: " + Build.MODEL + "\n";
-        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
-        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
-        deviceInformation += "TAGS: " + Build.TAGS + "\n";
-        deviceInformation += "TYPE: " + Build.TYPE + "\n";
-        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
-        deviceInformation += "USER: " + Build.USER + "\n";
-        deviceInformation += "TIME: " + Build.TIME + "\n";
+        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n" +
+                "CODENAME: " + Build.VERSION.CODENAME + "\n" +
+                "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n" +
+                "RELEASE: " + Build.VERSION.RELEASE + "\n" +
+                "BOARD: " + Build.BOARD + "\n" +
+                "BOOTLOADER: " + Build.BOOTLOADER + "\n" +
+                "BRAND: " + Build.BRAND + "\n" +
+                "DEVICE: " + Build.DEVICE + "\n" +
+                "DISPLAY: " + Build.DISPLAY + "\n" +
+                "FP: " + Build.FINGERPRINT + "\n" +
+                "RADIO VERSION: " + Build.getRadioVersion() + "\n" +
+                "HARDWARE: " + Build.HARDWARE + "\n" +
+                "HOST: " + Build.HOST + "\n" +
+                "ID: " + Build.ID + "\n" +
+                "MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+                "MODEL: " + Build.MODEL + "\n" +
+                "PRODUCT: " + Build.PRODUCT + "\n" +
+                "SERIAL: " + Build.SERIAL + "\n" +
+                "TAGS: " + Build.TAGS + "\n" +
+                "TYPE: " + Build.TYPE + "\n" +
+                "UNKNOWN: " + Build.UNKNOWN + "\n" +
+                "USER: " + Build.USER + "\n" +
+                "TIME: " + Build.TIME + "\n";
 
         return deviceInformation;
     }

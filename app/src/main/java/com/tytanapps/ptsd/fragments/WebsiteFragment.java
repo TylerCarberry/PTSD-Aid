@@ -52,13 +52,6 @@ public class WebsiteFragment extends BaseFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        setCheckedNavigationItem(R.id.nav_websites);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -70,6 +63,11 @@ public class WebsiteFragment extends BaseFragment {
                 readFirebaseWebsites(database);
             }
         }).start();
+    }
+
+    @Override
+    protected int getNavigationItem() {
+        return R.id.nav_websites;
     }
 
     @Override
@@ -231,7 +229,7 @@ public class WebsiteFragment extends BaseFragment {
             });
 
             websitesLinearLayout.addView(websiteCardView);
-            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_up);
+            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_to_top);
             websiteCardView.startAnimation(bottomUp);
         }
 

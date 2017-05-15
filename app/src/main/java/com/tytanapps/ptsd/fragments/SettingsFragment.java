@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -20,23 +18,29 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.tytanapps.ptsd.BuildConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import static butterknife.ButterKnife.findById;
+
 public class SettingsFragment extends PreferenceFragment {
 
     private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
 
     @Inject RemoteConfig remoteConfig;
+    @Inject FirebaseMessaging firebaseMessaging;
+    @Inject FirebaseDatabase database;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         setupSettings();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        NavigationView navigationView = findById(getActivity(), R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(true);
 
         getActivity().setTitle(R.string.settings_title);
@@ -71,6 +75,8 @@ public class SettingsFragment extends PreferenceFragment {
         setupFeedbackButton();
         setupLicensesButton();
         setupInfoButton();
+        setupGithubButton();
+        setupPrivacyPolicyButton();
     }
 
     private void setupNewsNotificationPref() {
@@ -82,9 +88,9 @@ public class SettingsFragment extends PreferenceFragment {
                 saveSharedPreference(getString(R.string.pref_news_notification), (Boolean) newValue);
 
                 if ((Boolean) newValue) {
-                    FirebaseMessaging.getInstance().subscribeToTopic("news");
+                    firebaseMessaging.subscribeToTopic("news");
                 } else {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic("news");
+                    firebaseMessaging.unsubscribeFromTopic("news");
                 }
 
                 return true;
@@ -106,14 +112,14 @@ public class SettingsFragment extends PreferenceFragment {
 
 
     private void setupChangeTrustedContactPref() {
-        Preference changeTrustedContactPreference = findPreference("change_trusted_contact");
+        Preference changeTrustedContactPreference = findPreference(getString(R.string.pref_change_trusted_contact));
 
         final String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
-        if(contactName.equals("")) {
-            changeTrustedContactPreference.setTitle("Add trusted contact");
+        if (contactName.equals("")) {
+            changeTrustedContactPreference.setTitle(getString(R.string.add_trusted_contact));
             changeTrustedContactPreference.setSummary("");
         } else {
-            changeTrustedContactPreference.setTitle("Change trusted contact");
+            changeTrustedContactPreference.setTitle(getString(R.string.change_trusted_contact));
             changeTrustedContactPreference.setSummary("Your trusted contact is " + contactName);
         }
 
@@ -127,21 +133,34 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void setupEnableTrustedContactPref() {
-        Preference enableTrustedContactPreference = findPreference("enable_trusted_contact");
+        Preference enableTrustedContactPreference = findPreference(getString(R.string.pref_enable_trusted_contact));
 
         enableTrustedContactPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                getActivity().findViewById(R.id.fab).setVisibility(((Boolean)newValue) ? View.VISIBLE : View.INVISIBLE);
-                saveSharedPreference("enable_trusted_contact", (Boolean) newValue);
+                findById(getActivity(), R.id.fab).setVisibility(((Boolean)newValue) ? View.VISIBLE : View.INVISIBLE);
+                saveSharedPreference(getString(R.string.pref_enable_trusted_contact), (Boolean) newValue);
 
                 return true;
             }
         });
     }
 
+    private void setupGithubButton() {
+        Preference pref = findPreference(getString(R.string.pref_github));
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                ExternalAppUtil.openBrowserIntent(SettingsFragment.this, getString(R.string.github_url));
+
+                return true;
+            }
+        });
+    }
+
+
     private void setupFeedbackButton() {
-        Preference provideFeedback = findPreference("provide_feedback");
+        Preference provideFeedback = findPreference(getString(R.string.pref_feedback));
         provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -151,16 +170,30 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
     }
-    
-    private void setupLicensesButton() {
-        Preference provideFeedback = findPreference("licenses");
+
+    private void setupPrivacyPolicyButton() {
+        Preference provideFeedback = findPreference(getString(R.string.pref_privacy_policy));
         provideFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                EasyLicensesDialog easyLicensesDialog = new EasyLicensesDialog(getActivity());
-                easyLicensesDialog.setTitle(getString(R.string.licenses));
-                easyLicensesDialog.setCancelable(true);
-                easyLicensesDialog.show(); //show the dialog
+                ExternalAppUtil.openBrowserIntent(SettingsFragment.this, getString(R.string.privacy_policy_url));
+
+                return true;
+            }
+        });
+    }
+    
+    private void setupLicensesButton() {
+        Preference preference = findPreference(getString(R.string.pref_licenses));
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                new LibsBuilder()
+                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                        .withActivityTitle(getString(R.string.open_source_libraries))
+                        .withAutoDetect(true)
+                        .start(getActivity());
 
                 return true;
             }
@@ -168,26 +201,21 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void setupInfoButton() {
-        Preference appInfo = findPreference("app_info");
-        appInfo.setTitle("PTSD Aid");
+        Preference appInfo = findPreference(getString(R.string.pref_app_info));
+        appInfo.setTitle(getString(R.string.app_name));
 
-        try {
-            PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
-            String version = pInfo.versionName;
-            appInfo.setSummary("Version: " + version);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            appInfo.setSummary("Version: " + "unknown");
-        }
+        String version = ExternalAppUtil.getApkVersionName(getActivity());
+        appInfo.setSummary("Version: " + version);
 
         // Load database from Firebase
         final List<String> responses = new ArrayList<>();
-        FirebaseDatabase.getInstance().getReference("responses").orderByChild("order")
+        database.getReference("responses").orderByChild("order")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data : dataSnapshot.getChildren())
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     responses.add(data.child("text").getValue().toString());
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}

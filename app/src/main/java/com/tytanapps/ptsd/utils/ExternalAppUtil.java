@@ -23,7 +23,7 @@ public class ExternalAppUtil {
     /**
      * @return the APK version of the current app. -1 if it cannot be determined
      */
-    public static int getApkVersion(Context context) {
+    public static int getApkVersionCode(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionCode;
@@ -33,6 +33,21 @@ public class ExternalAppUtil {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    /**
+     * @return the APK version of the current app. -1 if it cannot be determined
+     */
+    public static String getApkVersionName(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            FirebaseCrash.report(e);
+            e.printStackTrace();
+        }
+        return "unknown";
     }
 
     /**

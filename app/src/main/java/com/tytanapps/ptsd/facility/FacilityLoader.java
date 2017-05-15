@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import okhttp3.OkHttpClient;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -64,6 +65,9 @@ public abstract class FacilityLoader {
     @Inject
     RemoteConfig remoteConfig;
 
+    @Inject
+    OkHttpClient okHttpClient;
+
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
         ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
@@ -83,7 +87,7 @@ public abstract class FacilityLoader {
                     @Override
                     public String call(String s) {
                         try {
-                            return readFromUrl(s);
+                            return readFromUrl(okHttpClient, s);
                         } catch (IOException e) {
                             e.printStackTrace();
                             return null;
@@ -205,7 +209,7 @@ public abstract class FacilityLoader {
             @Override
             public Facility call(Integer facilityId1) {
                 try {
-                    String response = readFromUrl(buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
+                    String response = readFromUrl(okHttpClient, buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
                     // The JSON that the sever responds starts with //
                     // I am cropping the first two characters to create valid JSON.
                     response = response.substring(2);
@@ -573,7 +577,7 @@ public abstract class FacilityLoader {
                     .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
                     .build();
 
-            String response = readFromUrl(builtUri.toString());
+            String response = readFromUrl(okHttpClient, builtUri.toString());
             String status = new JSONObject(response).getString("status");
 
             return status.equalsIgnoreCase("OK");

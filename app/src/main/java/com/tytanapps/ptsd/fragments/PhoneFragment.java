@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -51,12 +52,6 @@ public class PhoneFragment extends BaseFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        setCheckedNavigationItem(R.id.nav_hotline);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         Thread t = new Thread(new Runnable() {
@@ -73,6 +68,13 @@ public class PhoneFragment extends BaseFragment {
     protected @StringRes int getTitle() {
         return R.string.phone_title;
     }
+
+    @Override
+    protected @IdRes int getNavigationItem() {
+        return R.id.nav_hotline;
+    }
+
+
 
     /**
      * Add the phone numbers that are to be used offline
@@ -149,10 +151,10 @@ public class PhoneFragment extends BaseFragment {
      * @param inflater The layout inflater to inflate the card from xml
      */
     private void insertFirebasePhoneCard(final DataSnapshot phoneDataSnapshot, final LinearLayout phoneNumbersLinearLayout, final LayoutInflater inflater) {
-        String name = (String) phoneDataSnapshot.child("name").getValue();
-        String desc = (String) phoneDataSnapshot.child("description").getValue();
-        String phone = (String) phoneDataSnapshot.child("phone_number").getValue();
-        String iconUrl = (String) phoneDataSnapshot.child("icon_url").getValue();
+        String name = phoneDataSnapshot.child("name").getValue(String.class);
+        String desc = phoneDataSnapshot.child("description").getValue(String.class);
+        String phone = phoneDataSnapshot.child("phone_number").getValue(String.class);
+        String iconUrl = phoneDataSnapshot.child("icon_url").getValue(String.class);
 
         insertPhoneCard(name, desc, phone, inflater, phoneNumbersLinearLayout, iconUrl);
     }
@@ -240,7 +242,7 @@ public class PhoneFragment extends BaseFragment {
         });
 
         phoneNumbersLinearLayout.addView(phoneCardView);
-        Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_up);
+        Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.bottom_to_top);
         phoneCardView.startAnimation(bottomUp);
 
         return phoneCardView;

@@ -24,6 +24,8 @@ import javax.inject.Inject;
 
 import butterknife.Unbinder;
 
+import static butterknife.ButterKnife.findById;
+
 /**
  * A fragment that sends screen hits to Google Analytics
  */
@@ -39,6 +41,15 @@ public abstract class BaseFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getApplication().getFirebaseComponent().inject(this);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        @IdRes int navigationItemId = getNavigationItem();
+        if (navigationItemId != -1) {
+            setCheckedNavigationItem(navigationItemId);
+        }
     }
 
     @Override
@@ -98,8 +109,12 @@ public abstract class BaseFragment extends Fragment {
         return null;
     }
 
+    protected @IdRes int getNavigationItem() {
+        return -1;
+    }
+
     protected void setCheckedNavigationItem(@IdRes int resId) {
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        NavigationView navigationView = findById(getActivity(), R.id.nav_view);
         navigationView.getMenu().findItem(resId).setChecked(true);
     }
 

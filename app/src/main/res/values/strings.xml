@@ -150,7 +150,7 @@
     <string name="gps_error">Your GPS location can not be determined</string>
     <string name="share_results_chooser">Share with</string>
     <string name="action_search">Search</string>
-    <string name="open_website">Open Website</string>
+    <string name="open_website">More Info</string>
     <string name="unsubscribe_news_notifications">Unsubscribe</string>
     <string name="unsubscribed_news_message">You have unsubscribed from news notifications</string>
     <string name="pref_news_notification">news_notification</string>
@@ -179,6 +179,7 @@
     <string name="feedback_title">Provide Feedback</string>
     <string name="feedback_summary">Contact developer</string>
     <string name="feedback_category_title">Feedback</string>
+    <string name="privacy_policy">Privacy Policy</string>
 
     <string name="settings_title">Settings</string>
     <string name="resources_title">Resources</string>
@@ -187,5 +188,12 @@
     <string name="web_title">Online Resources</string>
     <string name="facilities_title">VA Facilities</string>
     <string name="news_title">VA News</string>
+    <string name="open_source_libraries">Open Source Libraries</string>
+    <string name="my_info">My Info</string>
+    <string name="open_source_title">This app is open source</string>
+    <string name="open_source_summary">View the code on github</string>
+    <string name="licenses_title">View licenses</string>
+    <string name="licenses_summary">View the licenses used</string>
+    <string name="about">About</string>
 
 </resources>

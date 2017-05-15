@@ -104,8 +104,6 @@ public class FacilitiesFragment extends BaseFragment {
         if (facilityList.isEmpty()) {
             loadVaFacilities();
         }
-
-        setCheckedNavigationItem(R.id.nav_nearby);
     }
 
     @Override
@@ -142,6 +140,11 @@ public class FacilitiesFragment extends BaseFragment {
     public void onStop() {
         super.onStop();
         PtsdUtil.dismissKeyboard(getActivity());
+    }
+
+    @Override
+    protected int getNavigationItem() {
+        return R.id.nav_facilities;
     }
 
     @Override
