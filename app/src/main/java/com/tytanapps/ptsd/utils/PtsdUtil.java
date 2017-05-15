@@ -27,16 +27,16 @@ import android.view.inputmethod.InputMethodManager;
 import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.R;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * A collection of methods that do not apply to a specific fragment
@@ -237,10 +237,21 @@ public class PtsdUtil {
         }
     }
 
-    public static String readFromUrl(OkHttpClient client, String url) throws IOException {
-        Request request = new Request.Builder().url(url).build();
+    public static String readFromUrl(OkHttpClient client, String urlString) throws IOException {
+        String response = "";
+
+        URL url = new URL(urlString);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            response += line;
+        }
+        reader.close();
+        return response;
+
+        /*Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
-        return response.body().string();
+        return response.body().string(); */
     }
 
     public static Bitmap readBitmapFromUrl(String urlString) throws IOException {
