@@ -16,7 +16,6 @@ machine:
 dependencies:
     cache_directories:
         - ~/.android
-        - ~/android
     pre:
         # The files containing API keys are not tracked in git
         # Write them from environment variables
