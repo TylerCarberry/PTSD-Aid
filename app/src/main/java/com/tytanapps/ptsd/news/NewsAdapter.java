@@ -13,27 +13,22 @@ import com.tytanapps.ptsd.SearchableAdapter;
 
 import java.util.List;
 
-import static butterknife.ButterKnife.findById;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
 
     class NewsViewHolder extends RecyclerView.ViewHolder {
-        CardView rootCardView;
-        TextView titleTextView, dateTextView;
-        ExpandableTextView messageTextView;
+
+        @BindView(R.id.news_cardview) CardView rootCardView;
+        @BindView(R.id.news_title_textview) TextView titleTextView;
+        @BindView(R.id.news_message_textview) TextView dateTextView;
+        @BindView(R.id.news_date_textview) ExpandableTextView messageTextView;
 
         NewsViewHolder(View view) {
             super(view);
-
-            rootCardView = findById(view, R.id.news_cardview);
-            titleTextView = findById(view, R.id.news_title_textview);
-            messageTextView = findById(view, R.id.news_message_textview);
-            dateTextView = findById(view, R.id.news_date_textview);
+            ButterKnife.bind(this, view);
         }
-    }
-
-    public NewsAdapter(List<News> newsList) {
-        super(newsList);
     }
 
     /**
@@ -59,14 +54,9 @@ class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
 
         // If the news does not have all of its information, do not show it
         if(news.getTitle() != null && news.getMessage() != null) {
-            TextView titleTextView = holder.titleTextView;
-            titleTextView.setText(news.getTitle());
-
-            ExpandableTextView messageTextView = holder.messageTextView;
-            messageTextView.setText(news.getMessage());
-
-            TextView dateTextViewTextView = holder.dateTextView;
-            dateTextViewTextView.setText(news.getPressDate());
+            holder.titleTextView.setText(news.getTitle());
+            holder.messageTextView.setText(news.getMessage());
+            holder.dateTextView.setText(news.getPressDate());
         }
     }
 

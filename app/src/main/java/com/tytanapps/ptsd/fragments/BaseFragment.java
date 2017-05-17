@@ -2,8 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -39,7 +37,7 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -116,17 +114,6 @@ public abstract class BaseFragment extends Fragment {
     protected void setCheckedNavigationItem(@IdRes int resId) {
         NavigationView navigationView = findById(getActivity(), R.id.nav_view);
         navigationView.getMenu().findItem(resId).setChecked(true);
-    }
-
-    /**
-     * Get a shared preference String from a saved file
-     * @param prefKey The key of the String
-     * @param defaultValue The default value if no key exists
-     * @return The shared preference String with the given key
-     */
-    protected String getSharedPreferenceString(String prefKey, String defaultValue) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(prefKey, defaultValue);
     }
 
     protected PTSDApplication getApplication() {

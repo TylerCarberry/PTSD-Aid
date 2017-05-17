@@ -19,9 +19,9 @@ import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 @Module
-public class FirebaseModule {
+public class PtsdModule {
 
-    public FirebaseModule() {
+    public PtsdModule() {
 
     }
 
@@ -97,6 +97,12 @@ public class FirebaseModule {
     @Singleton
     FirebaseMessaging provideFirebaseMessaging() {
         return FirebaseMessaging.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    Preferences providesPreference(Context context) {
+        return new Preferences(context);
     }
 
 }

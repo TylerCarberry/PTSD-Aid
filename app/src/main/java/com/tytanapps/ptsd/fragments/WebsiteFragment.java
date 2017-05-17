@@ -118,7 +118,7 @@ public class WebsiteFragment extends BaseFragment {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 boolean veteranOnly = snapshot.hasChild("veteran_only") && snapshot.child("veteran_only").getValue(Boolean.class);
 
-                                if(!veteranOnly || isVeteran(getActivity())) {
+                                if (!veteranOnly || isVeteran(getActivity())) {
                                     insertFirebaseWebCard(snapshot, websitesLinearLayout, inflater);
                                 }
                             }
@@ -204,12 +204,12 @@ public class WebsiteFragment extends BaseFragment {
     private CardView getWebCardView(LayoutInflater inflater, LinearLayout websitesLinearLayout, String name, final String url) {
         CardView websiteCardView = null;
 
-        for(int i = 0; i < websitesLinearLayout.getChildCount(); i++) {
+        for (int i = 0; i < websitesLinearLayout.getChildCount(); i++) {
             View child = websitesLinearLayout.getChildAt(i);
             if(child.getTag() != null && child.getTag().equals(name))
                 websiteCardView = (CardView) child;
         }
-        if(websiteCardView == null) {
+        if (websiteCardView == null) {
             websiteCardView = (CardView) inflater.inflate(R.layout.web_cardview, (ViewGroup) getView(), false);
 
             websiteCardView.setTag(name);

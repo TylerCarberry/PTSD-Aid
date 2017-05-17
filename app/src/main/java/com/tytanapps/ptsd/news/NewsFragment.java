@@ -56,7 +56,7 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -149,11 +149,13 @@ public class NewsFragment extends BaseFragment {
         enableRefreshLayout();
 
         // Hide the progress bar
-        if(loadingProgressBar != null)
+        if (loadingProgressBar != null) {
             loadingProgressBar.setVisibility(View.GONE);
+        }
 
-        if(mAdapter != null)
+        if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+        }
     }
 
     private void enableRefreshLayout() {
@@ -202,10 +204,10 @@ public class NewsFragment extends BaseFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        if(getView() != null) {
+        if (getView() != null) {
             swipeRefreshLayout.setRefreshing(false);
             if (newsList.size() > 0) {
-                Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), R.string.error_refresh_news, Snackbar.LENGTH_SHORT).show();
             } else {
                 loadingTextView.setVisibility(View.VISIBLE);
                 loadingTextView.setText(errorMessage);

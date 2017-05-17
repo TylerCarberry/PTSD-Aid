@@ -95,6 +95,7 @@ dependencies {
     compile "com.ms-square:expandableTextView:0.1.4"
     compile "io.doorbell:android-sdk:0.2.6@aar"
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    compile 'se.emilsjolander:StickyScrollViewItems:1.1.0'
 
     compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true

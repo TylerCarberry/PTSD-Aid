@@ -2,8 +2,6 @@ package com.tytanapps.ptsd.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -23,9 +21,11 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.tytanapps.ptsd.BuildConfig;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.Preferences;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
+import com.tytanapps.ptsd.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +41,11 @@ public class SettingsFragment extends PreferenceFragment {
     @Inject RemoteConfig remoteConfig;
     @Inject FirebaseMessaging firebaseMessaging;
     @Inject FirebaseDatabase database;
+    @Inject Preferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ((PTSDApplication)getActivity().getApplication()).getFirebaseComponent().inject(this);
+        ((PTSDApplication)getActivity().getApplication()).getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
@@ -81,11 +82,11 @@ public class SettingsFragment extends PreferenceFragment {
 
     private void setupNewsNotificationPref() {
         CheckBoxPreference newsPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_news_notification));
-        newsPreference.setChecked(getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true));
+        newsPreference.setChecked(preferences.getBoolean(R.string.pref_news_notification, true));
         newsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                saveSharedPreference(getString(R.string.pref_news_notification), (Boolean) newValue);
+                preferences.set(R.string.pref_news_notification, (Boolean) newValue);
 
                 if ((Boolean) newValue) {
                     firebaseMessaging.subscribeToTopic("news");
@@ -100,11 +101,11 @@ public class SettingsFragment extends PreferenceFragment {
 
     private void setupIsVeteranPref() {
         CheckBoxPreference newsPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_veteran));
-        newsPreference.setChecked(getSharedPreferenceBoolean(getString(R.string.pref_veteran), true));
+        newsPreference.setChecked(preferences.getBoolean(R.string.pref_veteran, true));
         newsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                saveSharedPreference(getString(R.string.pref_veteran), (Boolean) newValue);
+                preferences.set(R.string.pref_veteran, (Boolean) newValue);
                 return true;
             }
         });
@@ -114,8 +115,8 @@ public class SettingsFragment extends PreferenceFragment {
     private void setupChangeTrustedContactPref() {
         Preference changeTrustedContactPreference = findPreference(getString(R.string.pref_change_trusted_contact));
 
-        final String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
-        if (contactName.equals("")) {
+        final String contactName = preferences.getString(R.string.pref_trusted_name_key);
+        if (StringUtil.isNullOrEmpty(contactName)) {
             changeTrustedContactPreference.setTitle(getString(R.string.add_trusted_contact));
             changeTrustedContactPreference.setSummary("");
         } else {
@@ -139,7 +140,7 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 findById(getActivity(), R.id.fab).setVisibility(((Boolean)newValue) ? View.VISIBLE : View.INVISIBLE);
-                saveSharedPreference(getString(R.string.pref_enable_trusted_contact), (Boolean) newValue);
+                preferences.set(R.string.pref_enable_trusted_contact, (Boolean) newValue);
 
                 return true;
             }
@@ -251,38 +252,5 @@ public class SettingsFragment extends PreferenceFragment {
         });
 
     }
-
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        return getActivity().getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
-    }
-
-    private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
-        return getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
-    }
-
-    /**
-     * Save a String to a SharedPreference
-     * @param prefKey The key of the shared preference
-     * @param value The value to save in the shared preference
-     */
-    private void saveSharedPreference(String prefKey, String value) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(prefKey, value);
-        editor.apply();
-    }
-
-    /**
-     * Save a String to a SharedPreference
-     * @param prefKey The key of the shared preference
-     * @param value The value to save in the shared preference
-     */
-    private void saveSharedPreference(String prefKey, boolean value) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(prefKey, value);
-        editor.apply();
-    }
-
 
 }

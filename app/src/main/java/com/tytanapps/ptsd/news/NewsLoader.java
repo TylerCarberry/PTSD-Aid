@@ -60,7 +60,7 @@ public abstract class NewsLoader {
 
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
-        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
+        ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
     }
 
     public abstract void errorLoadingResults(String errorMessage);

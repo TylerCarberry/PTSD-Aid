@@ -195,5 +195,6 @@
     <string name="licenses_title">View licenses</string>
     <string name="licenses_summary">View the licenses used</string>
     <string name="about">About</string>
+    <string name="error_refresh_news">Unable to refresh news articles</string>
 
 </resources>

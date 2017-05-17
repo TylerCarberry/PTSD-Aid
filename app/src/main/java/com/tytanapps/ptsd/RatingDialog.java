@@ -11,12 +11,11 @@ import angtrim.com.fivestarslibrary.FiveStarsDialog;
 
 public class RatingDialog extends FiveStarsDialog {
 
-    @Inject
-    RemoteConfig remoteConfig;
+    @Inject RemoteConfig remoteConfig;
 
     public RatingDialog(Context context, String supportEmail) {
         super(context, supportEmail);
-        ((PTSDApplication)context.getApplicationContext()).getFirebaseComponent().inject(this);
+        ((PTSDApplication)context.getApplicationContext()).getPtsdComponent().inject(this);
 
         int ratingUpperBound = remoteConfig.getInt(R.string.rc_rating_upper_bound);
 

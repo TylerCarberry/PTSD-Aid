@@ -63,7 +63,7 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         facilityLoader = new FacilityLoader(this) {

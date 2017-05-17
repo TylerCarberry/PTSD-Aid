@@ -36,7 +36,7 @@ public class ResourcesFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 

@@ -70,7 +70,7 @@ public abstract class FacilityLoader {
 
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
-        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
+        ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
     }
 
     public abstract void errorLoadingResults(Throwable throwable);
@@ -170,10 +170,11 @@ public abstract class FacilityLoader {
         // There are multiple programs at the same facility.
         // Combine them if necessary.
         Facility facility;
-        if (knownFacilities.containsKey(facilityID))
+        if (knownFacilities.containsKey(facilityID)) {
             facility = knownFacilities.get(facilityID);
-        else
+        } else {
             facility = new Facility(facilityID);
+        }
 
         facility.addProgram(programName);
         knownFacilities.put(facilityID, facility);
@@ -240,12 +241,12 @@ public abstract class FacilityLoader {
 
         JSONObject locationJson = rootJson.getJSONObject("1");
 
-        String name = (String) locationJson.get("FAC_NAME");
-        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
-        String address = (String) locationJson.get("ADDRESS");
-        String city = (String) locationJson.get("CITY");
-        String state = (String) locationJson.get("STATE");
-        String zip = ""+locationJson.get("ZIP");
+        String name = locationJson.getString("FAC_NAME");
+        String phoneNumber = locationJson.getString("PHONE_NUMBER");
+        String address = locationJson.getString("ADDRESS");
+        String city = locationJson.getString("CITY");
+        String state = locationJson.getString("STATE");
+        String zip = locationJson.getString("ZIP");
         double locationLat = locationJson.getDouble("LATITUDE");
         double locationLong = locationJson.getDouble("LONGITUDE");
         String description = "";
@@ -262,7 +263,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(remoteConfig.getBoolean(R.string.rc_show_va_programs)) {
+        if (remoteConfig.getBoolean(R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -402,9 +403,7 @@ public abstract class FacilityLoader {
      */
     private void allFacilitiesHaveLoaded() {
         ArrayList<Facility> facilitiesList = new ArrayList<>();
-        for(Facility facility : knownFacilities.values()) {
-            facilitiesList.add(facility);
-        }
+        facilitiesList.addAll(knownFacilities.values());
 
         // Sort the facilities by distance
         Collections.sort(facilitiesList);

@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.EmptyClickListener;
 import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.Preferences;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -48,6 +49,7 @@ public class MainFragment extends BaseFragment {
 
     @Inject RemoteConfig remoteConfig;
     @Inject FirebaseDatabase database;
+    @Inject Preferences preferences;
 
     @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
     @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
@@ -59,7 +61,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         // If the Firebase database is loaded, set the field firebaseDatabaseLoaded to true
@@ -142,7 +144,7 @@ public class MainFragment extends BaseFragment {
     @OnClick({R.id.happy_face, R.id.ok_face, R.id.sad_face, R.id.sick_face, R.id.poop_emoji})
     public void emotionSelected(final View emotionPressed) {
         View fragmentView = getView();
-        if(fragmentView != null) {
+        if (fragmentView != null) {
             recommendationsContainer.setVisibility(View.INVISIBLE);
             recommendationsLinearLayout.removeAllViews();
 
@@ -322,7 +324,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_call_trusted_contact), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+                String phoneNumber = preferences.getString(R.string.pref_trusted_phone_key);
                 if (!phoneNumber.equals("")) {
                     ExternalAppUtil.openDialer(getActivity(), phoneNumber);
                 } else {
@@ -341,7 +343,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_call_veterans_crisis_line), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String phoneNumber = getSharedPreferenceString(getString(R.string.phone_suicide_lifeline), "");
+                String phoneNumber = preferences.getString(R.string.phone_suicide_lifeline);
                 ExternalAppUtil.openDialer(getActivity(), phoneNumber);
             }
         });
@@ -356,7 +358,7 @@ public class MainFragment extends BaseFragment {
         return createSuggestionLayout(getString(R.string.recommendation_call_veterans_foundation), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String phoneNumber = getSharedPreferenceString(getString(R.string.phone_veterans_foundation_hotline), "");
+                String phoneNumber = preferences.getString(R.string.phone_veterans_foundation_hotline);
                 ExternalAppUtil.openDialer(getActivity(), phoneNumber);
             }
         });
@@ -421,14 +423,8 @@ public class MainFragment extends BaseFragment {
             FirebaseCrash.report(e);
         }
 
-
         // There is no website or phone number associated with the recommendation
-        return createSuggestionLayout(message, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Do nothing when tapped
-            }
-        });
+        return createSuggestionLayout(message, new EmptyClickListener());
     }
 
     /**
@@ -510,7 +506,7 @@ public class MainFragment extends BaseFragment {
      * @return Whether the trusted contact has been created
      */
     private boolean isTrustedContactCreated() {
-        String trustedContactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        String trustedContactPhone = preferences.getString(R.string.pref_trusted_phone_key);
         return !trustedContactPhone.equals("");
     }
 
@@ -520,7 +516,7 @@ public class MainFragment extends BaseFragment {
      */
     private void fadeOutAllEmojiExcept(int emoji_id) {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LinearLayout emojiLayout1 = findById(rootView, R.id.emotions_linear_layout);
             for (int i = 0; i < emojiLayout1.getChildCount(); i++) {
                 View child = emojiLayout1.getChildAt(i);
@@ -544,7 +540,7 @@ public class MainFragment extends BaseFragment {
      */
     private void animateOutEmotionPrompt() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LinearLayout emotionsLinearLayout = findById(rootView, R.id.emotions_linear_layout);
             RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) emotionsLinearLayout.getLayoutParams();
             p.addRule(RelativeLayout.BELOW, R.id.main_header_text_view);

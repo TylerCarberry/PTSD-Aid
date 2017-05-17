@@ -38,10 +38,10 @@ import static butterknife.ButterKnife.findById;
  */
 public class PTSDTestFragment extends BaseFragment {
 
-    @Inject
-    RemoteConfig remoteConfig;
+    @Inject RemoteConfig remoteConfig;
 
     @BindView(R.id.questions_linearlayout) LinearLayout questionsLinearLayout;
+    @BindView(R.id.stress_textview) TextView headerTextView;
 
 
     public PTSDTestFragment() {
@@ -50,7 +50,7 @@ public class PTSDTestFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -77,8 +77,7 @@ public class PTSDTestFragment extends BaseFragment {
      * Add the prompt and the questions to the layout
      */
     private void setupQuestionsLayout() {
-        if(remoteConfig.getBoolean(R.string.rc_questions_sticky)) {
-            TextView headerTextView = findById(questionsLinearLayout, R.id.stress_textview);
+        if (remoteConfig.getBoolean(R.string.rc_questions_sticky)) {
             headerTextView.setTag("sticky");
         }
 
@@ -93,7 +92,7 @@ public class PTSDTestFragment extends BaseFragment {
         String[] questions = getResources().getStringArray(R.array.stress_questions);
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        for(String question : questions) {
+        for (String question : questions) {
             LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_box, getRootViewGroup(), false);
 
             TextView questionTextView = findById(layout, R.id.stress_question_textview);
@@ -108,13 +107,13 @@ public class PTSDTestFragment extends BaseFragment {
                     .setHintAdapter(new ProgressHintDelegate.SeekBarHintAdapter() {
                         @Override public String getHint(android.widget.SeekBar seekBar, int progress) {
                             String progressHint;
-                            if(progress < seekBar.getMax() / 5.0)
+                            if (progress < seekBar.getMax() / 5.0)
                                 progressHint = getString(R.string.not_at_all);
-                            else if(progress < seekBar.getMax() * 2.0/5)
+                            else if (progress < seekBar.getMax() * 2.0/5)
                                 progressHint = getString(R.string.little_bit);
-                            else if(progress < seekBar.getMax() * 3.0/5)
+                            else if (progress < seekBar.getMax() * 3.0/5)
                                 progressHint = getString(R.string.moderately);
-                            else if(progress < seekBar.getMax() * 4.0/5)
+                            else if (progress < seekBar.getMax() * 4.0/5)
                                 progressHint = getString(R.string.quite_a_bit);
                             else
                                 progressHint = getString(R.string.extremely);
@@ -198,12 +197,12 @@ public class PTSDTestFragment extends BaseFragment {
         String nextActions;
 
         // Low
-        if(score <= 20) {
+        if (score <= 20) {
             resultText = getString(R.string.result_minimal);
             nextActions = getString(R.string.see_professional_low);
         }
         // Medium
-        else if(score <= 29) {
+        else if (score <= 29) {
             resultText = getString(R.string.result_medium);
             nextActions = getString(R.string.see_professional_medium);
         }
@@ -249,7 +248,7 @@ public class PTSDTestFragment extends BaseFragment {
 
         String shareText = getString(R.string.stress_prompt) + "\n\n";
 
-        for(int i = 0; i < questions.length; i++) {
+        for (int i = 0; i < questions.length; i++) {
             // Include each question prompt
             shareText += (i+1) + ") ";
             shareText += questions[i] + "\n";
@@ -296,7 +295,7 @@ public class PTSDTestFragment extends BaseFragment {
         int questionCount = 0;
 
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
                 View childView = questionsLinearLayout.getChildAt(i);
 
@@ -312,24 +311,15 @@ public class PTSDTestFragment extends BaseFragment {
     }
 
     /**
-     * Determine the total score of the answered questions.
-     * If not every question has been answered, return -1
+     * Determine the total score of the answered questions
      * Not at all: 1, A little bit: 2, Moderately: 3, Quite a bit: 4, Extremely: 5
      * @return The total score of the questions
      */
     private int getScore() {
         int score = 0;
-        
-        for(int num : getEachAnswer()) {
-            if (num > 0) {
-                score += num;
-            }
-            // A question has not been answered
-            else {
-                return -1;
-            }
+        for (int num : getEachAnswer()) {
+            score += num;
         }
-
         return score;
     }
 
