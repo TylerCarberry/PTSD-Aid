@@ -22,8 +22,8 @@ class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
 
         @BindView(R.id.news_cardview) CardView rootCardView;
         @BindView(R.id.news_title_textview) TextView titleTextView;
-        @BindView(R.id.news_message_textview) TextView dateTextView;
-        @BindView(R.id.news_date_textview) ExpandableTextView messageTextView;
+        @BindView(R.id.news_date_textview) TextView dateTextView;
+        @BindView(R.id.news_message_textview) ExpandableTextView messageTextView;
 
         NewsViewHolder(View view) {
             super(view);
