@@ -16,7 +16,6 @@ machine:
 dependencies:
     cache_directories:
         - ~/.android
-        - ~/android
     pre:
         # The files containing API keys are not tracked in git
         # Write them from environment variables
@@ -35,5 +34,5 @@ dependencies:
     
 test:
   override:
-    - ./gradlew assembleDebug:
+    - ./gradlew test:
         timeout: 1800  # Timeout after 30 minutes (Default 10 minutes)
