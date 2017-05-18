@@ -7,6 +7,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -72,14 +73,14 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    Cache provideOkHttpCache(PTSDApplication application) {
+    Cache providesOkHttpCache(PTSDApplication application) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(application.getCacheDir(), cacheSize);
     }
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClient(Cache cache) {
+    OkHttpClient providesOkHttpClient(Cache cache) {
          return new OkHttpClient.Builder()
                 .cache(cache)
                 .build();
@@ -87,7 +88,7 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    FirebaseDatabase provideFirebaseDatabase() {
+    FirebaseDatabase providesFirebaseDatabase() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.setPersistenceEnabled(true);
         return firebaseDatabase;
@@ -95,8 +96,14 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    FirebaseMessaging provideFirebaseMessaging() {
+    FirebaseMessaging providesFirebaseMessaging() {
         return FirebaseMessaging.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    FirebasePerformance providesFirebasePerformance() {
+        return FirebasePerformance.getInstance();
     }
 
     @Provides

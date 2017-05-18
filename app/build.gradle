@@ -1,8 +1,9 @@
 import com.android.ddmlib.DdmPreferences
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.google.firebase.firebase-crash'
+apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 25
@@ -16,8 +17,8 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 43
-        versionName "2.1"
+        versionCode 44
+        versionName "2.1.1"
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -71,6 +72,7 @@ dependencies {
     compile "com.google.firebase:firebase-messaging:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-config:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-database:$googlePlayServicesVersion"
+    compile "com.google.firebase:firebase-perf:$googlePlayServicesVersion"
 
     // Butterknife
     compile 'com.jakewharton:butterknife:8.5.1'

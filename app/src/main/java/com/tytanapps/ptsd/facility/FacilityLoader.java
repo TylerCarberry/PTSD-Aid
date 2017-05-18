@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.perf.FirebasePerformance;
+import com.google.firebase.perf.metrics.Trace;
 import com.tytanapps.ptsd.LocationNotFoundException;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
@@ -62,15 +64,16 @@ public abstract class FacilityLoader {
     // Key: VA Id, Value: The facility with the given id
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
-    @Inject
-    RemoteConfig remoteConfig;
+    private final Trace facilitiesTrace;
 
-    @Inject
-    OkHttpClient okHttpClient;
+    @Inject RemoteConfig remoteConfig;
+    @Inject OkHttpClient okHttpClient;
+    @Inject FirebasePerformance performance;
 
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
         ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
+        facilitiesTrace = performance.newTrace("facilities_trace");
     }
 
     public abstract void errorLoadingResults(Throwable throwable);
@@ -82,6 +85,8 @@ public abstract class FacilityLoader {
      * There are multiple PTSD programs per VA facility.
      */
     public void loadPTSDPrograms() {
+        facilitiesTrace.start();
+
         Observable<Facility> facilityObservable = Observable.just(buildPTSDUrl())
                 .map(new Func1<String, String>() {
                     @Override
@@ -402,6 +407,8 @@ public abstract class FacilityLoader {
      * Called when all facilities have loaded and knownValues is fully populated
      */
     private void allFacilitiesHaveLoaded() {
+        facilitiesTrace.stop();
+
         ArrayList<Facility> facilitiesList = new ArrayList<>();
         facilitiesList.addAll(knownFacilities.values());
 
@@ -531,6 +538,12 @@ public abstract class FacilityLoader {
             // It just means that the facility has not yet been cached.
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        }
+
+        if (facility != null) {
+            facilitiesTrace.incrementCounter("facility_cache_hit");
+        } else {
+            facilitiesTrace.incrementCounter("facility_cache_miss");
         }
 
         return facility;

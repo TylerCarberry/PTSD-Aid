@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.perf.FirebasePerformance;
+import com.google.firebase.perf.metrics.Trace;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -46,12 +48,11 @@ public abstract class NewsLoader {
     private static final String LOG_TAG = NewsLoader.class.getSimpleName();
 
     private Fragment fragment;
+    private final Trace newsTrace;
 
-    @Inject
-    RemoteConfig remoteConfig;
-
-    @Inject
-    OkHttpClient okHttpClient;
+    @Inject RemoteConfig remoteConfig;
+    @Inject OkHttpClient okHttpClient;
+    @Inject FirebasePerformance performance;
 
     // Stores the news that have already loaded
     // Key: Press id
@@ -61,6 +62,7 @@ public abstract class NewsLoader {
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
         ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
+        newsTrace = performance.newTrace("news_trace");
     }
 
     public abstract void errorLoadingResults(String errorMessage);
@@ -68,6 +70,8 @@ public abstract class NewsLoader {
 
 
     public void loadNews() {
+        newsTrace.start();
+
         // Start with the base api url
         Observable<News> fetchNews = Observable.just(calculateNewsUrl()).map(new Func1<String, JSONObject>() {
             @Override
@@ -231,6 +235,8 @@ public abstract class NewsLoader {
      * Called when all news have loaded and knownValues is fully populated
      */
     public void allNewsHaveLoaded() {
+        newsTrace.stop();
+
         ArrayList<News> newsArrayList = new ArrayList<>();
         for(News news : knownNews.values()) {
             newsArrayList.add(news);
@@ -303,6 +309,12 @@ public abstract class NewsLoader {
         } catch (IOException | ClassNotFoundException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
+        }
+
+        if (news != null) {
+            newsTrace.incrementCounter("news_cache_hit");
+        } else {
+            newsTrace.incrementCounter("news_cache_miss");
         }
 
         return news;
