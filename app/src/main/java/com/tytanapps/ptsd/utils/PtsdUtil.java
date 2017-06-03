@@ -22,6 +22,8 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.text.Html;
 import android.util.Base64;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -34,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -337,6 +340,17 @@ public class PtsdUtil {
         }
 
         return contactName;
+    }
+
+    public static List<View> getLayoutChildren(ViewGroup viewGroup) {
+        List<View> children = new ArrayList<>();
+
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+            children.add(child);
+        }
+
+        return children;
     }
 
 

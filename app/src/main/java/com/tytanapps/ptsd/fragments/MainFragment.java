@@ -33,7 +33,6 @@ import java.io.UnsupportedEncodingException;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static butterknife.ButterKnife.findById;
@@ -70,8 +69,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
         setupEmotions(rootView);
         return rootView;
     }
@@ -96,6 +94,11 @@ public class MainFragment extends BaseFragment {
     @Override
     protected int getNavigationItem() {
         return R.id.nav_recommendations;
+    }
+
+    @Override
+    public int getRootView() {
+        return R.layout.fragment_main;
     }
 
     /**

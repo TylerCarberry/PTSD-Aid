@@ -41,12 +41,6 @@ public class ResourcesFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_resources, container, false);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         new Thread(new Runnable() {
@@ -66,6 +60,11 @@ public class ResourcesFragment extends BaseFragment {
     @Override
     protected @StringRes int getTitle() {
         return R.string.resources_title;
+    }
+
+    @Override
+    public int getRootView() {
+        return R.layout.fragment_resources;
     }
 
     private void insertDefaultResources() {

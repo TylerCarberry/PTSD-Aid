@@ -17,8 +17,8 @@ android {
         applicationId "com.tytanapps.ptsd"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 44
-        versionName "2.1.1"
+        versionCode 45
+        versionName "2.1.2"
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -84,7 +84,7 @@ dependencies {
     provided 'javax.annotation:jsr250-api:1.0'
 
     // Loading animation
-    compile "com.github.bhargavms:DotLoader:1.0.0"
+    compile "com.github.bhargavms:DotLoader:1.1.1"
 
     // Picasso
     compile "com.squareup.picasso:picasso:2.5.2"

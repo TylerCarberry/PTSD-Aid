@@ -12,16 +12,10 @@ public class Location {
 
     /**
      * No args constructor for use in serialization
-     * 
      */
     public Location() {
     }
 
-    /**
-     * 
-     * @param lng
-     * @param lat
-     */
     public Location(Double lat, Double lng) {
         super();
         this.lat = lat;

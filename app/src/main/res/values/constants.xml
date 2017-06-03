@@ -19,6 +19,8 @@
     <string name="pref_feedback">provide_feedback</string>
     <string name="pref_github">open_source_github</string>
 
+    <string name="veteran_only">veteranOnly</string>
+
 
     <!-- Remote configuration keys -->
     <string name="rc_questions_sticky">questions_sticky</string>
