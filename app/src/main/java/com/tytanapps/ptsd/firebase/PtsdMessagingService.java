@@ -6,40 +6,45 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
 
+import timber.log.Timber;
+
 /**
  * Handles messages received by Firebase Messaging Service
  */
 public class PtsdMessagingService extends FirebaseMessagingService {
 
-    private static final String LOG_TAG = PtsdMessagingService.class.getSimpleName();
     public static final int NOTIFICATION_ID = 5000;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        Log.d(LOG_TAG, "onMessageReceived() called with: " + "remoteMessage = [" + remoteMessage + "]");
+        Timber.d("onMessageReceived() called with: remoteMessage = [%s]", remoteMessage);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("notification_action", "unsubscribe");
         // use System.currentTimeMillis() to have a unique ID for the pending intent
         PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
 
+        String title = remoteMessage.getData().get("title");
+        String message = remoteMessage.getData().get("message");
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .addAction(R.drawable.ic_notifications_off_black_24px, getString(R.string.unsubscribe_news_notifications), pIntent)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getData().get("message")))
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(message)
+                                .setBigContentTitle(title))
                         .setAutoCancel(true)
-                        .setContentTitle(remoteMessage.getData().get("title"))
-                        .setContentText(remoteMessage.getData().get("message"));
+                        .setContentTitle(title)
+                        .setContentText(message);
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, MainActivity.class);
         resultIntent.putExtra("fragment", "news");

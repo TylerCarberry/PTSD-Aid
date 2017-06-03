@@ -36,8 +36,6 @@ import static butterknife.ButterKnife.findById;
 
 public class SettingsFragment extends PreferenceFragment {
 
-    private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
-
     @Inject RemoteConfig remoteConfig;
     @Inject FirebaseMessaging firebaseMessaging;
     @Inject FirebaseDatabase database;

@@ -22,7 +22,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,14 +43,14 @@ import com.tytanapps.ptsd.firebase.PtsdMessagingService;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 import com.tytanapps.ptsd.fragments.MainFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
-import com.tytanapps.ptsd.phone.PhoneFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.fragments.SettingsFragment;
-import com.tytanapps.ptsd.website.WebsiteFragment;
 import com.tytanapps.ptsd.news.NewsFragment;
+import com.tytanapps.ptsd.phone.PhoneFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
+import com.tytanapps.ptsd.website.WebsiteFragment;
 
 import javax.inject.Inject;
 
@@ -61,6 +60,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import timber.log.Timber;
 
 import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION;
@@ -72,8 +72,6 @@ import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION
 public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
                     GoogleApiClient.OnConnectionFailedListener {
-
-    private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Connection to the Google API
     private static GoogleApiClient mGoogleApiClient;
@@ -699,7 +697,7 @@ public class MainActivity extends AppCompatActivity
      * Purposely crash the app to test debugging
      */
     private void crashApp() {
-        Log.e(LOG_TAG, "The crash app method has been called.");
+        Timber.e("The crash app method has been called.");
         throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
 

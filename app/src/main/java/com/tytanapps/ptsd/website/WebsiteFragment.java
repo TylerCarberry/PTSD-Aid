@@ -2,7 +2,6 @@ package com.tytanapps.ptsd.website;
 
 import android.support.annotation.StringRes;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +24,7 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import java.util.List;
 
 import butterknife.BindView;
+import timber.log.Timber;
 
 import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.utils.PtsdUtil.getLayoutChildren;
@@ -36,8 +36,6 @@ import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
  * each website. Tapping on the card opens the website.
  */
 public class WebsiteFragment extends BaseFragment {
-
-    private static final String LOG_TAG = WebsiteFragment.class.getSimpleName();
 
     @BindView(R.id.website_linear_layout) LinearLayout websitesLinearLayout;
 
@@ -126,8 +124,7 @@ public class WebsiteFragment extends BaseFragment {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(LOG_TAG, "Failed to read value.", error.toException());
+                Timber.w(error.toException(), "Failed to read value.");
             }
         });
     }

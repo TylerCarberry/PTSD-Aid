@@ -1,7 +1,6 @@
 package com.tytanapps.ptsd.news;
 
 import android.app.Fragment;
-import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.perf.FirebasePerformance;
@@ -37,22 +36,21 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-
-import static android.content.ContentValues.TAG;
+import timber.log.Timber;
 
 /**
  * Load the list of recent PTSD News Articles
  * @author Tyler Carberry
  */
 public abstract class NewsLoader {
-    private static final String LOG_TAG = NewsLoader.class.getSimpleName();
-
-    private Fragment fragment;
-    private final Trace newsTrace;
 
     @Inject RemoteConfig remoteConfig;
     @Inject OkHttpClient okHttpClient;
     @Inject FirebasePerformance performance;
+
+    private Fragment fragment;
+    private final Trace newsTrace;
+    private static final String TRACE_NAME = "news_trace";
 
     // Stores the news that have already loaded
     // Key: Press id
@@ -62,7 +60,7 @@ public abstract class NewsLoader {
     public NewsLoader(Fragment fragment) {
         this.fragment = fragment;
         ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
-        newsTrace = performance.newTrace("news_trace");
+        newsTrace = performance.newTrace(TRACE_NAME);
     }
 
     public abstract void errorLoadingResults(String errorMessage);
@@ -78,8 +76,6 @@ public abstract class NewsLoader {
             public JSONObject call(String url) {
                 try {
                     String response = PtsdUtil.readFromUrl(okHttpClient, url).substring(2);
-                    Log.d(TAG, "call() called with: url = [" + url + "]");
-                    Log.d(TAG, "call: " + response);
                     return new JSONObject(response);
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -104,7 +100,7 @@ public abstract class NewsLoader {
                     }
                     return Observable.from(pressids);
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, "call: ", e);
+                    Timber.w(e, "Failed to get press ids");
                     throw Exceptions.propagate(e);
                 }
             }
@@ -122,7 +118,6 @@ public abstract class NewsLoader {
              */
             @Override
             public void onCompleted() {
-                Log.d(LOG_TAG, "onCompleted() called");
                 allNewsHaveLoaded();
             }
 
@@ -132,7 +127,7 @@ public abstract class NewsLoader {
              */
             @Override
             public void onError(Throwable e) {
-                Log.e(LOG_TAG, e.toString());
+                Timber.e(e);
                 errorLoadingResults(fragment.getString(R.string.error_news_network));
             }
 

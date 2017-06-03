@@ -3,7 +3,6 @@ package com.tytanapps.ptsd.facility;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.perf.FirebasePerformance;
@@ -45,6 +44,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.tytanapps.ptsd.utils.PtsdUtil.distanceBetweenCoordinates;
 import static com.tytanapps.ptsd.utils.PtsdUtil.getFirstPhoneNumber;
@@ -59,8 +59,6 @@ import static rx.Observable.just;
  * Load the VA facilities that offer PTSD programs
  */
 public abstract class FacilityLoader {
-    private static final String LOG_TAG = FacilityLoader.class.getSimpleName();
-
     private Fragment fragment;
 
     // Stores the facilities that have already loaded
@@ -156,7 +154,7 @@ public abstract class FacilityLoader {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(LOG_TAG, "onError: ", e);
+                        Timber.e(e, "Error loading ptsd programs");
                         errorLoadingResults(e);
                     }
 

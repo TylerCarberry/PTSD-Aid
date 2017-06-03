@@ -36,12 +36,6 @@ import butterknife.OnClick;
 
 public class NewsFragment extends BaseFragment {
 
-    private static final String LOG_TAG = NewsFragment.class.getSimpleName();
-
-    private NewsLoader newsLoader;
-    private List<News> newsList = new ArrayList<>();
-    private NewsAdapter mAdapter;
-
     @Inject RemoteConfig remoteConfig;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
@@ -50,8 +44,11 @@ public class NewsFragment extends BaseFragment {
     @BindView(R.id.news_loading_textview) TextView loadingTextView;
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
-    public NewsFragment() {
+    private NewsLoader newsLoader;
+    private List<News> newsList = new ArrayList<>();
+    private NewsAdapter mAdapter;
 
+    public NewsFragment() {
     }
 
     @Override

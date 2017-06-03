@@ -3,7 +3,6 @@ package com.tytanapps.ptsd.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +19,13 @@ import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 
 /**
  * Shows information about PTSD. Gives symptoms, causes, and treatment for PTSD.
  */
 public class ResourcesFragment extends BaseFragment {
-
-    private static final String LOG_TAG = ResourcesFragment.class.getSimpleName();
 
     @Inject RemoteConfig remoteConfig;
 
@@ -116,7 +115,7 @@ public class ResourcesFragment extends BaseFragment {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w(LOG_TAG, "Failed to read value.", error.toException());
+                Timber.w(error.toException(), "Failed to read value.");
             }
         });
     }

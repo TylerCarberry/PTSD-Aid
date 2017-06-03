@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +33,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 import static butterknife.ButterKnife.findById;
 
@@ -43,8 +43,6 @@ import static butterknife.ButterKnife.findById;
  * and gives them recommendations based on their answer.
  */
 public class MainFragment extends BaseFragment {
-    private static final String LOG_TAG = MainFragment.class.getSimpleName();
-    private boolean firebaseDatabaseLoaded = false;
 
     @Inject RemoteConfig remoteConfig;
     @Inject FirebaseDatabase database;
@@ -53,6 +51,8 @@ public class MainFragment extends BaseFragment {
     @BindView(R.id.recommendations_linear_layout) LinearLayout recommendationsLinearLayout;
     @BindView(R.id.recommendations_container) FrameLayout recommendationsContainer;
     @BindView(R.id.main_header_text_view) TextView headerTextView;
+
+    private boolean firebaseDatabaseLoaded = false;
 
     public MainFragment() {
         // Required empty public constructor
@@ -248,7 +248,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w(LOG_TAG, "Failed to read value.", error.toException());
+                Timber.w(error.toException(), "Failed to read value.");
             }
         });
     }

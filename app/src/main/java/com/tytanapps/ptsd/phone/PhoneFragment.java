@@ -3,7 +3,6 @@ package com.tytanapps.ptsd.phone;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +23,7 @@ import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import butterknife.BindView;
+import timber.log.Timber;
 
 import static butterknife.ButterKnife.findById;
 import static com.tytanapps.ptsd.utils.PtsdUtil.getLayoutChildren;
@@ -35,8 +35,6 @@ import static com.tytanapps.ptsd.utils.PtsdUtil.isVeteran;
  * the phone number to call. Tapping on the hotline calls them.
  */
 public class PhoneFragment extends BaseFragment {
-
-    private static final String LOG_TAG = PhoneFragment.class.getSimpleName();
 
     @BindView(R.id.phone_linear_layout) LinearLayout phoneNumbersLinearLayout;
 
@@ -131,8 +129,7 @@ public class PhoneFragment extends BaseFragment {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(LOG_TAG, "Failed to read value.", error.toException());
+                Timber.w(error.toException(), "Failed to read value.");
             }
         });
     }

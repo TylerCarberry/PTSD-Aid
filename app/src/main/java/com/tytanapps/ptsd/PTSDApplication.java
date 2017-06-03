@@ -7,6 +7,8 @@ import com.squareup.leakcanary.LeakCanary;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 /**
  * The PTSD application. Used to connect the app with Google Analytics
  */
@@ -27,6 +29,8 @@ public class PTSDApplication extends Application {
             return;
         }
         LeakCanary.install(this);
+
+        Timber.plant(new Timber.DebugTree());
     }
 
     public PtsdComponent getPtsdComponent() {
