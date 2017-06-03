@@ -182,7 +182,7 @@ public class PhoneFragment extends BaseFragment {
         );
 
         params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.activity_vertical_margin));
-        phoneCardView.setLayoutParams(params);
+        //phoneCardView.setLayoutParams(params);
 
         phoneCardView.setOnClickListener(new View.OnClickListener() {
             @Override

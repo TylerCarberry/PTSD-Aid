@@ -15,18 +15,18 @@ public class PhoneDatabase {
     public static List<Phone> getPhones(Context context, boolean isVeteran) {
         List<Phone> phoneList = new ArrayList<>();
 
+        Phone veteransCrisisLine = createPhone(context, R.string.veterans_crisis_line_title, R.string.veterans_crisis_line_details, R.drawable.veterans_crisis_line, R.string.phone_veterans_crisis_line, 10, true);
+        Phone lifelineForVets = createPhone(context, R.string.lifeline_for_vets_title, R.string.lifeline_for_vets_details, R.drawable.nvf, R.string.phone_suicide_lifeline, 20, true);
+        phoneList.add(veteransCrisisLine);
+        phoneList.add(lifelineForVets);
+
         if (isVeteran) {
-            Phone suicideLifeline = createPhone(context, R.string.veterans_crisis_line_title, R.string.veterans_crisis_line_details, R.drawable.veterans_crisis_line, R.string.phone_veterans_crisis_line, 1, true);
-            Phone lifelineForVets = createPhone(context, R.string.lifeline_for_vets_title, R.string.lifeline_for_vets_details, R.drawable.nvf, R.string.phone_suicide_lifeline, 2, true);
+            Phone suicideLifeline = createPhone(context, R.string.suicide_lifeline_title, R.string.suicide_lifeline_phone_details, R.drawable.nspl, R.string.phone_suicide_lifeline, 30, false);
+            Phone ncaad = createPhone(context, R.string.ncaad_title, R.string.alcohol_phone_details, R.drawable.ncadd, R.string.phone_alcoholism, 40, false);
+
             phoneList.add(suicideLifeline);
-            phoneList.add(lifelineForVets);
+            phoneList.add(ncaad);
         }
-
-        Phone nimh = createPhone(context, R.string.suicide_lifeline_title, R.string.suicide_lifeline_phone_details, R.drawable.nspl, R.string.phone_suicide_lifeline, 3, false);
-        Phone ptsdCoach = createPhone(context, R.string.ncaad_title, R.string.alcohol_phone_details, R.drawable.ncadd, R.string.phone_alcoholism, 4, false);
-
-        phoneList.add(nimh);
-        phoneList.add(ptsdCoach);
 
         return phoneList;
     }

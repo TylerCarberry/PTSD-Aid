@@ -207,11 +207,12 @@ public abstract class NewsLoader {
         String title = rootJson.getString("PRESS_TITLE");
 
         String article = rootJson.getString("PRESS_TEXT");
-        article = PtsdUtil.htmlToText(article);
-        article = article.substring(article.indexOf("–") + 1).trim();
+        article = PtsdUtil.htmlToText(article)
+                          .substring(article.indexOf("–") + 1)
+                          .trim();
 
         // Remove the extra space at the end of the text
-        while(article.charAt(article.length() - 1) == '#' ||
+        while (article.charAt(article.length() - 1) == '#' ||
                 article.charAt(article.length() - 1) == '\n' ||
                 // The two spaces below are different symbols. Do not simplify these lines
                 article.charAt(article.length() - 1) == ' ' ||
@@ -256,9 +257,9 @@ public abstract class NewsLoader {
      * Clear the cached news articles
      */
     private void clearNewsCache() {
-        for(int pressid : knownNews.keySet()) {
+        for (int pressid : knownNews.keySet()) {
             File file = getNewsFile(pressid);
-            if(file.exists()) {
+            if (file.exists()) {
                 file.delete();
             }
         }
@@ -306,11 +307,7 @@ public abstract class NewsLoader {
             e.printStackTrace();
         }
 
-        if (news != null) {
-            newsTrace.incrementCounter("news_cache_hit");
-        } else {
-            newsTrace.incrementCounter("news_cache_miss");
-        }
+        newsTrace.incrementCounter(news != null ? "news_cache_hit" : "news_cache_miss");
 
         return news;
     }
