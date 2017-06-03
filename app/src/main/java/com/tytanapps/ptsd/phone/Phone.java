@@ -2,8 +2,10 @@ package com.tytanapps.ptsd.phone;
 
 
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Keep;
 
-public class Phone {
+@Keep
+class Phone {
 
     private String name;
     private String description;

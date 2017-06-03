@@ -2,7 +2,9 @@ package com.tytanapps.ptsd.website;
 
 
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Keep;
 
+@Keep
 class Website {
 
     private String name;
