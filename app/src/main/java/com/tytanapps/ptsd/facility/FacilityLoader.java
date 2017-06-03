@@ -6,7 +6,11 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.perf.FirebasePerformance;
+import com.google.firebase.perf.metrics.Trace;
 import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.MapsClient;
+import com.tytanapps.ptsd.MapsResult;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -33,6 +37,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -61,12 +67,17 @@ public abstract class FacilityLoader {
     // Key: VA Id, Value: The facility with the given id
     private HashMap<Integer, Facility> knownFacilities = new HashMap<>();
 
-    @Inject
-    RemoteConfig remoteConfig;
+    private final Trace facilitiesTrace;
+
+    @Inject RemoteConfig remoteConfig;
+    @Inject OkHttpClient okHttpClient;
+    @Inject FirebasePerformance performance;
+    @Inject MapsClient mapsClient;
 
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
-        ((PTSDApplication)fragment.getActivity().getApplication()).getFirebaseComponent().inject(this);
+        ((PTSDApplication)fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
+        facilitiesTrace = performance.newTrace("facilities_trace");
     }
 
     public abstract void errorLoadingResults(Throwable throwable);
@@ -78,12 +89,14 @@ public abstract class FacilityLoader {
      * There are multiple PTSD programs per VA facility.
      */
     public void loadPTSDPrograms() {
+        facilitiesTrace.start();
+
         Observable<Facility> facilityObservable = Observable.just(buildPTSDUrl())
                 .map(new Func1<String, String>() {
                     @Override
                     public String call(String s) {
                         try {
-                            return readFromUrl(s);
+                            return readFromUrl(okHttpClient, s);
                         } catch (IOException e) {
                             e.printStackTrace();
                             return null;
@@ -166,10 +179,11 @@ public abstract class FacilityLoader {
         // There are multiple programs at the same facility.
         // Combine them if necessary.
         Facility facility;
-        if (knownFacilities.containsKey(facilityID))
+        if (knownFacilities.containsKey(facilityID)) {
             facility = knownFacilities.get(facilityID);
-        else
+        } else {
             facility = new Facility(facilityID);
+        }
 
         facility.addProgram(programName);
         knownFacilities.put(facilityID, facility);
@@ -205,7 +219,7 @@ public abstract class FacilityLoader {
             @Override
             public Facility call(Integer facilityId1) {
                 try {
-                    String response = readFromUrl(buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
+                    String response = readFromUrl(okHttpClient, buildFacilityUrl(facilityId1, fragment.getString(R.string.api_key_va_facilities)));
                     // The JSON that the sever responds starts with //
                     // I am cropping the first two characters to create valid JSON.
                     response = response.substring(2);
@@ -236,12 +250,12 @@ public abstract class FacilityLoader {
 
         JSONObject locationJson = rootJson.getJSONObject("1");
 
-        String name = (String) locationJson.get("FAC_NAME");
-        String phoneNumber = (String) locationJson.get("PHONE_NUMBER");
-        String address = (String) locationJson.get("ADDRESS");
-        String city = (String) locationJson.get("CITY");
-        String state = (String) locationJson.get("STATE");
-        String zip = ""+locationJson.get("ZIP");
+        String name = locationJson.getString("FAC_NAME");
+        String phoneNumber = locationJson.getString("PHONE_NUMBER");
+        String address = locationJson.getString("ADDRESS");
+        String city = locationJson.getString("CITY");
+        String state = locationJson.getString("STATE");
+        String zip = locationJson.getString("ZIP");
         double locationLat = locationJson.getDouble("LATITUDE");
         double locationLong = locationJson.getDouble("LONGITUDE");
         String description = "";
@@ -258,7 +272,7 @@ public abstract class FacilityLoader {
             description = "Distance: " + df.format(distance) + " miles";
         }
 
-        if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
+        if (remoteConfig.getBoolean(R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
             for(String program : programs)
@@ -296,8 +310,8 @@ public abstract class FacilityLoader {
      * @param facility The facility to load the imagery for
      */
     public void loadFacilityImage(final Facility facility) {
-        int imageWidth = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_width);
-        int imageHeight = remoteConfig.getInt(fragment.getActivity(), R.string.rc_map_height);
+        int imageWidth = remoteConfig.getInt(R.string.rc_map_width);
+        int imageHeight = remoteConfig.getInt(R.string.rc_map_height);
 
         Observable<Bitmap> bitmapObservable = Observable.concat(
                 loadCacheFacilityImage(facility.getFacilityId()),
@@ -397,10 +411,10 @@ public abstract class FacilityLoader {
      * Called when all facilities have loaded and knownValues is fully populated
      */
     private void allFacilitiesHaveLoaded() {
+        facilitiesTrace.stop();
+
         ArrayList<Facility> facilitiesList = new ArrayList<>();
-        for(Facility facility : knownFacilities.values()) {
-            facilitiesList.add(facility);
-        }
+        facilitiesList.addAll(knownFacilities.values());
 
         // Sort the facilities by distance
         Collections.sort(facilitiesList);
@@ -512,11 +526,12 @@ public abstract class FacilityLoader {
                 description = "Distance: " + df.format(distance) + " miles";
             }
 
-            if(remoteConfig.getBoolean(fragment.getActivity(), R.string.rc_show_va_programs)) {
+            if (remoteConfig.getBoolean(R.string.rc_show_va_programs)) {
                 description += "\n";
                 Set<String> programs = facility.getPrograms();
-                for (String program : programs)
+                for (String program : programs) {
                     description += "\n" + program;
+                }
             }
 
             facility.setDescription(description);
@@ -527,6 +542,12 @@ public abstract class FacilityLoader {
             // It just means that the facility has not yet been cached.
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        }
+
+        if (facility != null) {
+            facilitiesTrace.incrementCounter("facility_cache_hit");
+        } else {
+            facilitiesTrace.incrementCounter("facility_cache_miss");
         }
 
         return facility;
@@ -562,23 +583,16 @@ public abstract class FacilityLoader {
         return builtUri.toString();
     }
 
-
     private boolean isStreetViewAvailableAtAddress(String address, String town, final String state) {
         try {
-            String location = encodeAddress(address, town, state);
-            Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
-                    .buildUpon()
-                    .appendQueryParameter("location", location)
-                    .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
-                    .build();
-
-            String response = readFromUrl(builtUri.toString());
-            String status = new JSONObject(response).getString("status");
-
-            return status.equalsIgnoreCase("OK");
-
-        } catch (JSONException | IOException e) {
-            Log.e(LOG_TAG, "isStreetViewAvailableAtAddress: ", e);
+            Response<MapsResult> mapsResult = mapsClient.getMapMetadata((encodeAddress(address, town, state)), fragment.getString(R.string.api_key_google))
+                    .execute();
+            if (mapsResult != null && mapsResult.body() != null) {
+                return mapsResult.body().isStreetViewAvailable();
+            }
+            return false;
+        } catch (IOException e) {
+            FirebaseCrash.report(e);
             return false;
         }
     }

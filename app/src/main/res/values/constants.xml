@@ -8,6 +8,20 @@
     <string name="pref_trusted_name_key">trusted_name_key</string>
     <string name="pref_trusted_phone_key">trusted_phone_key</string>
 
+    <string name="github_url">http://www.github.com/TylerCarberry/PTSD-Aid</string>
+    <string name="privacy_policy_url">https://tylercarberry.me/ptsd-privacy/</string>
+
+    <string name="pref_enable_trusted_contact">enable_trusted_contact</string>
+    <string name="pref_change_trusted_contact">change_trusted_contact</string>
+    <string name="pref_app_info">app_info</string>
+    <string name="pref_licenses">licenses</string>
+    <string name="pref_privacy_policy">privacy_policy</string>
+    <string name="pref_feedback">provide_feedback</string>
+    <string name="pref_github">open_source_github</string>
+
+    <string name="veteran_only">veteranOnly</string>
+
+
     <!-- Remote configuration keys -->
     <string name="rc_questions_sticky">questions_sticky</string>
     <string name="rc_show_extra_emoji">show_extra_emoji</string>

@@ -36,14 +36,8 @@ public class ResourcesFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_resources, container, false);
     }
 
     @Override
@@ -56,13 +50,21 @@ public class ResourcesFragment extends BaseFragment {
                 readResourcesFromFirebase(FirebaseDatabase.getInstance());
             }
         }).run();
+    }
 
-        setCheckedNavigationItem(R.id.nav_resources);
+    @Override
+    protected int getNavigationItem() {
+        return R.id.nav_resources;
     }
 
     @Override
     protected @StringRes int getTitle() {
         return R.string.resources_title;
+    }
+
+    @Override
+    public int getRootView() {
+        return R.layout.fragment_resources;
     }
 
     private void insertDefaultResources() {
@@ -144,7 +146,7 @@ public class ResourcesFragment extends BaseFragment {
 
         TextView headerTextView = (TextView) resourceHeaderView.findViewById(R.id.resource_header);
         headerTextView.setText(title);
-        if (remoteConfig.getBoolean(getActivity(), R.string.rc_resource_sticky)) {
+        if (remoteConfig.getBoolean(R.string.rc_resource_sticky)) {
             headerTextView.setTag("sticky");
         }
 

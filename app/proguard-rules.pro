@@ -65,3 +65,11 @@
 }
 -dontwarn sun.misc.Unsafe
 -dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry
+
+# OkHttp
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+-dontwarn okio.**

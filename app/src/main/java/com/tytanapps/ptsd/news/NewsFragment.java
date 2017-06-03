@@ -56,7 +56,7 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -149,11 +149,13 @@ public class NewsFragment extends BaseFragment {
         enableRefreshLayout();
 
         // Hide the progress bar
-        if(loadingProgressBar != null)
+        if (loadingProgressBar != null) {
             loadingProgressBar.setVisibility(View.GONE);
+        }
 
-        if(mAdapter != null)
+        if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+        }
     }
 
     private void enableRefreshLayout() {
@@ -167,8 +169,8 @@ public class NewsFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the NewsAdapter
      */
     private void setupRecyclerView() {
-        if(recyclerView != null) {
-            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(getActivity(), R.string.rc_news_to_display)));
+        if (recyclerView != null) {
+            mAdapter = new NewsAdapter(newsList, Math.min(newsList.size(), remoteConfig.getInt(R.string.rc_news_to_display)));
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -202,10 +204,10 @@ public class NewsFragment extends BaseFragment {
      * @param errorMessage The message to show to the user
      */
     private void errorLoadingResults(String errorMessage) {
-        if(getView() != null) {
+        if (getView() != null) {
             swipeRefreshLayout.setRefreshing(false);
             if (newsList.size() > 0) {
-                Snackbar.make(getView(), "Unable to refresh news articles", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), R.string.error_refresh_news, Snackbar.LENGTH_SHORT).show();
             } else {
                 loadingTextView.setVisibility(View.VISIBLE);
                 loadingTextView.setText(errorMessage);

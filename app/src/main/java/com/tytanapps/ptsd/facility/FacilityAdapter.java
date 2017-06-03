@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.SearchableAdapter;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
@@ -19,41 +20,34 @@ import com.tytanapps.ptsd.utils.PtsdUtil;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import static butterknife.ButterKnife.findById;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
 
     private Fragment fragment;
 
     class FacilityViewHolder extends RecyclerView.ViewHolder {
-        CardView rootCardView;
-        TextView nameTextView, phoneTextView, addressTextView, detailsTextView;
-        ImageView facilityImageView, callIcon, addressIcon;
-        Button moreInfoButton;
+
+        @BindView(R.id.facility_cardview) CardView rootCardView;
+        @BindView(R.id.facility_imageview) ImageView facilityImageView;
+        @BindView(R.id.facility_name_textview) TextView nameTextView;
+        @BindView(R.id.facility_phone_textview) TextView phoneTextView;
+        @BindView(R.id.facility_address_textview) TextView addressTextView;
+        @BindView(R.id.facility_details) TextView detailsTextView;
+        @BindView(R.id.facility_phone_icon) ImageView callIcon;
+        @BindView(R.id.facility_address_icon) ImageView addressIcon;
+        @BindView(R.id.more_info_button) Button moreInfoButton;
 
         FacilityViewHolder(View view) {
             super(view);
-
-            rootCardView      = findById(view, R.id.facility_cardview);
-            facilityImageView = findById(view, R.id.facility_imageview);
-            nameTextView      = findById(view, R.id.facility_name_textview);
-            phoneTextView     = findById(view, R.id.facility_phone_textview);
-            addressTextView   = findById(view, R.id.facility_address_textview);
-            detailsTextView   = findById(view, R.id.facility_details);
-            moreInfoButton    = findById(view, R.id.more_info_button);
-            callIcon          = findById(view, R.id.facility_phone_icon);
-            addressIcon       = findById(view, R.id.facility_address_icon);
+            ButterKnife.bind(this, view);
         }
 
     }
 
-    public FacilityAdapter(List<Facility> facilityList, Fragment fragment) {
-        super(facilityList);
-        this.fragment = fragment;
-    }
-
-    FacilityAdapter(List<Facility> facilityList, Fragment fragment, int facilitiesToDisplay) {
-        super(facilityList, facilitiesToDisplay);
+    FacilityAdapter(List<Facility> facilityList, Fragment fragment, int numFacilitiesToDisplay) {
+        super(facilityList, numFacilitiesToDisplay);
         this.fragment = fragment;
         loadFacilityImages();
     }
@@ -98,17 +92,17 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
                     try {
                         ExternalAppUtil.openMapIntent(fragment, ExternalAppUtil.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
                     } catch (UnsupportedEncodingException e) {
+                        FirebaseCrash.report(e);
                         e.printStackTrace();
                     }
                 }
             };
 
-            TextView addressTextView =  holder.addressTextView;
+            TextView addressTextView = holder.addressTextView;
             addressTextView.setText(facility.getFullAddress());
             addressTextView.setOnClickListener(mapOnClick);
 
-            ImageView addressIcon =  holder.addressIcon;
-            addressIcon.setOnClickListener(mapOnClick);
+            holder.addressIcon.setOnClickListener(mapOnClick);
 
             ImageView facilityImageView = holder.facilityImageView;
             Bitmap facilityImage = facility.getFacilityImage();

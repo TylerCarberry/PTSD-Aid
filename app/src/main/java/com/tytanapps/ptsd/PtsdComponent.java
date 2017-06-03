@@ -15,8 +15,8 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules={AppModule.class, FirebaseModule.class})
-public interface FirebaseComponent {
+@Component(modules={AppModule.class, PtsdModule.class})
+public interface PtsdComponent {
     void inject(PTSDApplication application);
 
     void inject(MainActivity mainActivity);

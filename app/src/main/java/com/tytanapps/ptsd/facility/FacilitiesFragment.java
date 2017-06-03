@@ -63,7 +63,7 @@ public class FacilitiesFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         facilityLoader = new FacilityLoader(this) {
@@ -104,8 +104,6 @@ public class FacilitiesFragment extends BaseFragment {
         if (facilityList.isEmpty()) {
             loadVaFacilities();
         }
-
-        setCheckedNavigationItem(R.id.nav_nearby);
     }
 
     @Override
@@ -145,6 +143,11 @@ public class FacilitiesFragment extends BaseFragment {
     }
 
     @Override
+    protected int getNavigationItem() {
+        return R.id.nav_facilities;
+    }
+
+    @Override
     protected @StringRes int getTitle() {
         return R.string.facilities_title;
     }
@@ -160,7 +163,7 @@ public class FacilitiesFragment extends BaseFragment {
      * Setup the RecyclerView and link it to the FacilityAdapter
      */
     private void setupRecyclerView() {
-        mAdapter = new FacilityAdapter(facilityList, this, remoteConfig.getInt(getActivity(), R.string.rc_facilities_to_display));
+        mAdapter = new FacilityAdapter(facilityList, this, remoteConfig.getInt(R.string.rc_facilities_to_display));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -5,11 +5,11 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:2.3.2'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.github.triplet.gradle:play-publisher:1.1.5'
-        classpath 'com.google.firebase:firebase-plugins:1.0.4'
+        classpath 'com.google.firebase:firebase-plugins:1.1.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -25,8 +25,8 @@ allprojects {
     }
 
     ext {
-        googlePlayServicesVersion = '10.2.1'
-        supportLibVersion = '25.3.0'
+        googlePlayServicesVersion = '10.2.6'
+        supportLibVersion = '25.3.1'
     }
 }
 

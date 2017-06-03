@@ -11,14 +11,14 @@ import javax.inject.Inject;
  * The PTSD application. Used to connect the app with Google Analytics
  */
 public class PTSDApplication extends Application {
-    private FirebaseComponent firebaseComponent;
+    private PtsdComponent ptsdComponent;
 
     @Inject Tracker tracker;
 
     @Override
     public void onCreate() {
-        firebaseComponent = DaggerFirebaseComponent.builder().appModule(new AppModule(this)).build();
-        firebaseComponent.inject(this);
+        ptsdComponent = DaggerPtsdComponent.builder().appModule(new AppModule(this)).build();
+        ptsdComponent.inject(this);
 
         super.onCreate();
         if (LeakCanary.isInAnalyzerProcess(this)) {
@@ -29,7 +29,7 @@ public class PTSDApplication extends Application {
         LeakCanary.install(this);
     }
 
-    public FirebaseComponent getFirebaseComponent() {
-        return firebaseComponent;
+    public PtsdComponent getPtsdComponent() {
+        return ptsdComponent;
     }
 }

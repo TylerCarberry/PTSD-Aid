@@ -1,8 +1,9 @@
 import com.android.ddmlib.DdmPreferences
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.google.firebase.firebase-crash'
+apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 25
@@ -14,10 +15,10 @@ android {
 
     defaultConfig {
         applicationId "com.tytanapps.ptsd"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
-        versionCode 42
-        versionName "2.0.9"
+        versionCode 45
+        versionName "2.1.2"
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -55,7 +56,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-
     // Support libs
     compile "com.android.support:appcompat-v7:$supportLibVersion"
     compile "com.android.support:design:$supportLibVersion"
@@ -72,6 +72,7 @@ dependencies {
     compile "com.google.firebase:firebase-messaging:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-config:$googlePlayServicesVersion"
     compile "com.google.firebase:firebase-database:$googlePlayServicesVersion"
+    compile "com.google.firebase:firebase-perf:$googlePlayServicesVersion"
 
     // Butterknife
     compile 'com.jakewharton:butterknife:8.5.1'
@@ -82,14 +83,30 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:2.9"
     provided 'javax.annotation:jsr250-api:1.0'
 
-    compile "com.github.bhargavms:DotLoader:1.0.0"
+    // Loading animation
+    compile "com.github.bhargavms:DotLoader:1.1.1"
+
+    // Picasso
     compile "com.squareup.picasso:picasso:2.5.2"
+
+    // RxAndroid
     compile "io.reactivex:rxandroid:0.25.0"
+
     compile "com.github.Angtrim:Android-Five-Stars-Library:v3.1"
     compile "com.github.techery.progresshint:library-addition:0.2.3"
     compile "com.ms-square:expandableTextView:0.1.4"
     compile "io.doorbell:android-sdk:0.2.6@aar"
-    compile "com.github.marcoscgdev.EasyLicensesDialog:appcompatversion:1.0.4"
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    compile 'se.emilsjolander:StickyScrollViewItems:1.1.0'
+
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
+    compile 'com.google.code.gson:gson:2.7'
+
+    compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
+        transitive = true
+    }
 
     // Leak canary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'

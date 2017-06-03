@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.tytanapps.ptsd.BuildConfig;
 
 /**
  * A wrapper for FirebaseRemoteConfig
@@ -12,9 +13,16 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 public class RemoteConfig {
 
     private FirebaseRemoteConfig firebaseRemoteConfig;
+    private Context context;
 
-    public RemoteConfig(@NonNull FirebaseRemoteConfig firebaseRemoteConfig) {
+    public RemoteConfig(@NonNull FirebaseRemoteConfig firebaseRemoteConfig, Context context) {
         this.firebaseRemoteConfig = firebaseRemoteConfig;
+        this.context = context;
+        fetch();
+    }
+
+    public void fetch() {
+        fetch(BuildConfig.DEBUG ? 0 : 12*60*60);
     }
 
     public void fetch(int cacheSeconds) {
@@ -31,19 +39,19 @@ public class RemoteConfig {
         return firebaseRemoteConfig;
     }
 
-    public boolean getBoolean(@NonNull Context context, int resId) {
+    public boolean getBoolean(int resId) {
         return firebaseRemoteConfig.getBoolean(context.getString(resId));
     }
 
-    public int getInt(@NonNull Context context, int resId) {
+    public int getInt(int resId) {
         return (int) firebaseRemoteConfig.getDouble(context.getString(resId));
     }
 
-    public double getDouble(@NonNull Context context, int resId) {
+    public double getDouble(int resId) {
         return firebaseRemoteConfig.getDouble(context.getString(resId));
     }
 
-    public String getString(@NonNull Context context, int resId) {
+    public String getString(int resId) {
         return firebaseRemoteConfig.getString(context.getString(resId));
     }
 }

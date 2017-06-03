@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".fragments.PTSDTestFragment">
 
-    <com.tytanapps.ptsd.StickyScrollView
+    <com.emilsjolander.components.StickyScrollViewItems.StickyScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -30,10 +30,11 @@
                 android:text="@string/stress_prompt"
                 android:textSize="@dimen/medium_text_size"
                 android:background="@color/colorPrimary"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium" />
 
         </LinearLayout>
 
-    </com.tytanapps.ptsd.StickyScrollView>
+    </com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>
 
 </RelativeLayout>

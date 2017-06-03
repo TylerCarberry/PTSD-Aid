@@ -1,5 +1,7 @@
 package com.tytanapps.ptsd;
 
+import android.content.Context;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -17,6 +19,12 @@ public class AppModule {
     @Provides
     @Singleton
     PTSDApplication providesApplication() {
+        return ptsdApplication;
+    }
+
+    @Provides
+    @Singleton
+    Context providesContext() {
         return ptsdApplication;
     }
 

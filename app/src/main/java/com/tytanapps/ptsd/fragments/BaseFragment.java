@@ -2,15 +2,15 @@ package com.tytanapps.ptsd.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,7 +22,10 @@ import com.tytanapps.ptsd.R;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static butterknife.ButterKnife.findById;
 
 /**
  * A fragment that sends screen hits to Google Analytics
@@ -37,8 +40,28 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getApplication().getFirebaseComponent().inject(this);
+        getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(getRootView(), container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    public @LayoutRes int getRootView() {
+        return -1;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        @IdRes int navigationItemId = getNavigationItem();
+        if (navigationItemId != -1) {
+            setCheckedNavigationItem(navigationItemId);
+        }
     }
 
     @Override
@@ -98,20 +121,13 @@ public abstract class BaseFragment extends Fragment {
         return null;
     }
 
-    protected void setCheckedNavigationItem(@IdRes int resId) {
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(resId).setChecked(true);
+    protected @IdRes int getNavigationItem() {
+        return -1;
     }
 
-    /**
-     * Get a shared preference String from a saved file
-     * @param prefKey The key of the String
-     * @param defaultValue The default value if no key exists
-     * @return The shared preference String with the given key
-     */
-    protected String getSharedPreferenceString(String prefKey, String defaultValue) {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(prefKey, defaultValue);
+    protected void setCheckedNavigationItem(@IdRes int resId) {
+        NavigationView navigationView = findById(getActivity(), R.id.nav_view);
+        navigationView.getMenu().findItem(resId).setChecked(true);
     }
 
     protected PTSDApplication getApplication() {

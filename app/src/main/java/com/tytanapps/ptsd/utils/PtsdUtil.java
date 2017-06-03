@@ -22,6 +22,8 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.text.Html;
 import android.util.Base64;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -34,7 +36,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
 
 /**
  * A collection of methods that do not apply to a specific fragment
@@ -235,7 +240,7 @@ public class PtsdUtil {
         }
     }
 
-    public static String readFromUrl(String urlString) throws IOException {
+    public static String readFromUrl(OkHttpClient client, String urlString) throws IOException {
         String response = "";
 
         URL url = new URL(urlString);
@@ -245,8 +250,11 @@ public class PtsdUtil {
             response += line;
         }
         reader.close();
-
         return response;
+
+        /*Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        return response.body().string(); */
     }
 
     public static Bitmap readBitmapFromUrl(String urlString) throws IOException {
@@ -283,29 +291,29 @@ public class PtsdUtil {
             e.printStackTrace();
         }
 
-        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n";
-        deviceInformation += "CODENAME: " + Build.VERSION.CODENAME + "\n";
-        deviceInformation += "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n";
-        deviceInformation += "RELEASE: " + Build.VERSION.RELEASE + "\n";
-        deviceInformation += "BOARD: " + Build.BOARD + "\n";
-        deviceInformation += "BOOTLOADER: " + Build.BOOTLOADER + "\n";
-        deviceInformation += "BRAND: " + Build.BRAND + "\n";
-        deviceInformation += "DEVICE: " + Build.DEVICE + "\n";
-        deviceInformation += "DISPLAY: " + Build.DISPLAY + "\n";
-        deviceInformation += "FP: " + Build.FINGERPRINT + "\n";
-        deviceInformation += "RADIO VERSION: " + Build.getRadioVersion() + "\n";
-        deviceInformation += "HARDWARE: " + Build.HARDWARE + "\n";
-        deviceInformation += "HOST: " + Build.HOST + "\n";
-        deviceInformation += "ID: " + Build.ID + "\n";
-        deviceInformation += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
-        deviceInformation += "MODEL: " + Build.MODEL + "\n";
-        deviceInformation += "PRODUCT: " + Build.PRODUCT + "\n";
-        deviceInformation += "SERIAL: " + Build.SERIAL + "\n";
-        deviceInformation += "TAGS: " + Build.TAGS + "\n";
-        deviceInformation += "TYPE: " + Build.TYPE + "\n";
-        deviceInformation += "UNKNOWN: " + Build.UNKNOWN + "\n";
-        deviceInformation += "USER: " + Build.USER + "\n";
-        deviceInformation += "TIME: " + Build.TIME + "\n";
+        deviceInformation += "SDK INT: " + Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")\n" +
+                "CODENAME: " + Build.VERSION.CODENAME + "\n" +
+                "INCREMENTAL: " + Build.VERSION.INCREMENTAL + "\n" +
+                "RELEASE: " + Build.VERSION.RELEASE + "\n" +
+                "BOARD: " + Build.BOARD + "\n" +
+                "BOOTLOADER: " + Build.BOOTLOADER + "\n" +
+                "BRAND: " + Build.BRAND + "\n" +
+                "DEVICE: " + Build.DEVICE + "\n" +
+                "DISPLAY: " + Build.DISPLAY + "\n" +
+                "FP: " + Build.FINGERPRINT + "\n" +
+                "RADIO VERSION: " + Build.getRadioVersion() + "\n" +
+                "HARDWARE: " + Build.HARDWARE + "\n" +
+                "HOST: " + Build.HOST + "\n" +
+                "ID: " + Build.ID + "\n" +
+                "MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+                "MODEL: " + Build.MODEL + "\n" +
+                "PRODUCT: " + Build.PRODUCT + "\n" +
+                "SERIAL: " + Build.SERIAL + "\n" +
+                "TAGS: " + Build.TAGS + "\n" +
+                "TYPE: " + Build.TYPE + "\n" +
+                "UNKNOWN: " + Build.UNKNOWN + "\n" +
+                "USER: " + Build.USER + "\n" +
+                "TIME: " + Build.TIME + "\n";
 
         return deviceInformation;
     }
@@ -332,6 +340,17 @@ public class PtsdUtil {
         }
 
         return contactName;
+    }
+
+    public static List<View> getLayoutChildren(ViewGroup viewGroup) {
+        List<View> children = new ArrayList<>();
+
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+            children.add(child);
+        }
+
+        return children;
     }
 
 

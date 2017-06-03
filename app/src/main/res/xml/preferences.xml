@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="My Info">
+        android:title="@string/my_info">
 
         <CheckBoxPreference
             android:key="@string/pref_veteran"
@@ -23,20 +23,20 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Trusted Contact">
+        android:title="@string/trusted_contact">
 
         <CheckBoxPreference
-            android:key="enable_trusted_contact"
+            android:key="@string/pref_enable_trusted_contact"
             android:defaultValue="true"
             android:title="@string/pref_trusted_contact_title"
             android:summary="@string/pref_trusted_contact_summary" />
 
         <PreferenceScreen
-            android:key="change_trusted_contact"
+            android:key="@string/pref_change_trusted_contact"
             android:title="pref_change_contact_title"
             android:summary="@string/pref_change_contact_summary"
             android:layout="?android:attr/preferenceLayoutChild"
-            android:dependency="enable_trusted_contact">
+            android:dependency="@string/pref_enable_trusted_contact">
 
         </PreferenceScreen>
 
@@ -46,7 +46,7 @@
         android:title="@string/feedback_category_title">
 
         <PreferenceScreen
-            android:key="provide_feedback"
+            android:key="@string/pref_feedback"
             android:title="@string/feedback_title"
             android:summary="@string/feedback_summary">
         </PreferenceScreen>
@@ -64,34 +64,30 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="About">
+        android:title="@string/about">
 
         <PreferenceScreen
-            android:title="This app is open source"
-            android:summary="View the code on github">
-
-            <intent android:action="android.intent.action.VIEW"
-                android:data="http://www.github.com/TylerCarberry/PTSD-Aid" />
+            android:key="@string/pref_github"
+            android:title="@string/open_source_title"
+            android:summary="@string/open_source_summary">
 
         </PreferenceScreen>
 
         <PreferenceScreen
-            android:key="licenses"
-            android:title="View licenses"
-            android:summary="View the licenses used">
+            android:key="@string/pref_licenses"
+            android:title="@string/licenses_title"
+            android:summary="@string/licenses_summary">
         </PreferenceScreen>
 
         <PreferenceScreen
-            android:title="Privacy Policy">
-
-            <intent android:action="android.intent.action.VIEW"
-                    android:data="https://tylercarberry.me/ptsd-privacy/" />
+            android:key="@string/pref_privacy_policy"
+            android:title="@string/privacy_policy">
 
         </PreferenceScreen>
 
         <PreferenceScreen
-            android:key="app_info"
-            android:title="PTSD Aid"
+            android:key="@string/pref_app_info"
+            android:title="@string/app_name"
             android:summary="Version: #">
         </PreferenceScreen>
 
