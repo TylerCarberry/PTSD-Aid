@@ -9,6 +9,8 @@ import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
 import com.tytanapps.ptsd.LocationNotFoundException;
+import com.tytanapps.ptsd.MapsClient;
+import com.tytanapps.ptsd.MapsResult;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
@@ -36,6 +38,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -69,6 +72,7 @@ public abstract class FacilityLoader {
     @Inject RemoteConfig remoteConfig;
     @Inject OkHttpClient okHttpClient;
     @Inject FirebasePerformance performance;
+    @Inject MapsClient mapsClient;
 
     public FacilityLoader(Fragment fragment) {
         this.fragment = fragment;
@@ -579,23 +583,16 @@ public abstract class FacilityLoader {
         return builtUri.toString();
     }
 
-
     private boolean isStreetViewAvailableAtAddress(String address, String town, final String state) {
         try {
-            String location = encodeAddress(address, town, state);
-            Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview/metadata")
-                    .buildUpon()
-                    .appendQueryParameter("location", location)
-                    .appendQueryParameter("key", fragment.getString(R.string.api_key_google))
-                    .build();
-
-            String response = readFromUrl(okHttpClient, builtUri.toString());
-            String status = new JSONObject(response).getString("status");
-
-            return status.equalsIgnoreCase("OK");
-
-        } catch (JSONException | IOException e) {
-            Log.e(LOG_TAG, "isStreetViewAvailableAtAddress: ", e);
+            Response<MapsResult> mapsResult = mapsClient.getMapMetadata((encodeAddress(address, town, state)), fragment.getString(R.string.api_key_google))
+                    .execute();
+            if (mapsResult != null && mapsResult.body() != null) {
+                return mapsResult.body().isStreetViewAvailable();
+            }
+            return false;
+        } catch (IOException e) {
+            FirebaseCrash.report(e);
             return false;
         }
     }
