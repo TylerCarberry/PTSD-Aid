@@ -316,12 +316,6 @@ public class MainActivity extends AppCompatActivity
         // Add the header view containing the user's information
         LayoutInflater inflater = LayoutInflater.from(this);
         ViewGroup navigationHeader = (ViewGroup) inflater.inflate(R.layout.nav_header_main, rootViewGroup(), false);
-        findById(navigationHeader, R.id.button_sign_in).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signInGoogle();
-            }
-        });
 
         // The navigation view is contained within the drawer layout
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -352,11 +346,6 @@ public class MainActivity extends AppCompatActivity
             if (googleAccount != null) {
                 String name = googleAccount.getDisplayName();
                 String email = googleAccount.getEmail();
-
-                View signInButton = findViewById(R.id.button_sign_in);
-                if (signInButton != null) {
-                    signInButton.setVisibility(View.INVISIBLE);
-                }
 
                 updateNavigationHeader(name, email);
             }
@@ -404,17 +393,6 @@ public class MainActivity extends AppCompatActivity
         // Update the name
         TextView drawerNameTextView = findById(navHeader, R.id.drawer_name);
         drawerNameTextView.setText(name);
-
-        // Update the email address
-        TextView drawerEmailTextView = findById(navHeader, R.id.drawer_subtext);
-        drawerEmailTextView.setVisibility(View.VISIBLE);
-        drawerEmailTextView.setText(email);
-
-        // Hide the sign in button
-        View signInButton = findById(navHeader, R.id.button_sign_in);
-        if (signInButton != null) {
-            signInButton.setVisibility(View.GONE);
-        }
     }
 
     /**

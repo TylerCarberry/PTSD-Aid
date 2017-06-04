@@ -149,7 +149,7 @@ public class PTSDTestFragment extends BaseFragment {
 
         // Set the appearance of the button
         submitButton.setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
-        submitButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+        submitButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary));
         submitButton.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         submitButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         submitButton.setText(getString(R.string.submit_test));

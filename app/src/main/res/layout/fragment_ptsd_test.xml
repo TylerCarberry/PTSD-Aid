@@ -29,7 +29,7 @@
                 android:gravity="center_horizontal"
                 android:text="@string/stress_prompt"
                 android:textSize="@dimen/medium_text_size"
-                android:background="@color/colorPrimary"
+                android:background="@color/primary"
                 android:textColor="@color/white"
                 android:fontFamily="sans-serif-medium" />
 

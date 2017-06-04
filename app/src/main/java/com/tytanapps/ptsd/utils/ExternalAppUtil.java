@@ -73,7 +73,7 @@ public class ExternalAppUtil {
      */
     public static void openBrowserIntent(Fragment fragment, String url) {
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(fragment.getActivity(), R.color.colorPrimary));
+        builder.setToolbarColor(ContextCompat.getColor(fragment.getActivity(), R.color.primary));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(fragment.getActivity(), Uri.parse(url));
     }

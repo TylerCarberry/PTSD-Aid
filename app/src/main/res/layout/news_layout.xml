@@ -30,7 +30,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:gravity="center_horizontal"
                 android:textSize="@dimen/medium_text_size"
-                android:background="@color/colorPrimary"
+                android:background="@color/primary_dark"
                 android:textColor="@color/white" />
 
             <TextView
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/small_text_size"
-                android:background="@color/colorPrimary"
+                android:background="@color/primary_dark"
                 android:layout_below="@id/news_title_textview"
                 android:paddingLeft="@dimen/activity_vertical_margin"
                 android:paddingStart="@dimen/activity_vertical_margin"

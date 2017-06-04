@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.SignInButton;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -76,18 +75,6 @@ public class MainFragment extends BaseFragment {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         setupEmotions(rootView);
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        if (isUserSignedIn() && getView() != null) {
-            SignInButton signInButton = findById(getView(), R.id.button_sign_in);
-            if (signInButton != null) {
-                signInButton.setVisibility(View.INVISIBLE);
-            }
-        }
     }
 
     @Override
