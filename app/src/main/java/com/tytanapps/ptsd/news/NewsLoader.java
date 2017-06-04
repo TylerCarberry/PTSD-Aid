@@ -207,9 +207,8 @@ public abstract class NewsLoader {
         String title = rootJson.getString("PRESS_TITLE");
 
         String article = rootJson.getString("PRESS_TEXT");
-        article = PtsdUtil.htmlToText(article)
-                          .substring(article.indexOf("–") + 1)
-                          .trim();
+        article = PtsdUtil.htmlToText(article);
+        article = article.substring(article.indexOf("–") + 1).trim();
 
         // Remove the extra space at the end of the text
         while (article.charAt(article.length() - 1) == '#' ||
