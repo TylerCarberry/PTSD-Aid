@@ -1,7 +1,9 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.dialog;
 
 import android.content.Context;
 
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import javax.inject.Inject;

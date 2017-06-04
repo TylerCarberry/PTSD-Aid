@@ -1,8 +1,9 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.dialog;
 
 import android.app.Activity;
 import android.view.View;
 
+import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import io.doorbell.android.Doorbell;

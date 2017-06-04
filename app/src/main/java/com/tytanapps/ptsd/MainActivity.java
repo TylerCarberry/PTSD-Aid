@@ -37,6 +37,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.tytanapps.ptsd.dialog.FeedbackDialog;
+import com.tytanapps.ptsd.dialog.RatingDialog;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.firebase.PtsdMessagingService;
 import com.tytanapps.ptsd.firebase.RemoteConfig;

@@ -1,6 +1,8 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.dagger;
 
 import android.content.Context;
+
+import com.tytanapps.ptsd.PTSDApplication;
 
 import javax.inject.Singleton;
 

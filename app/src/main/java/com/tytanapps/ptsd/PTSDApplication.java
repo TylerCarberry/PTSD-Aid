@@ -4,6 +4,9 @@ import android.app.Application;
 
 import com.google.android.gms.analytics.Tracker;
 import com.squareup.leakcanary.LeakCanary;
+import com.tytanapps.ptsd.dagger.AppModule;
+import com.tytanapps.ptsd.dagger.DaggerPtsdComponent;
+import com.tytanapps.ptsd.dagger.PtsdComponent;
 
 import javax.inject.Inject;
 
@@ -19,7 +22,9 @@ public class PTSDApplication extends Application {
 
     @Override
     public void onCreate() {
-        ptsdComponent = DaggerPtsdComponent.builder().appModule(new AppModule(this)).build();
+        ptsdComponent = DaggerPtsdComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
         ptsdComponent.inject(this);
 
         super.onCreate();

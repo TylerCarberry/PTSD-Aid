@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.dagger;
 
 import android.content.Context;
 
@@ -12,6 +12,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.tytanapps.ptsd.BuildConfig;
+import com.tytanapps.ptsd.maps.MapsClient;
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.Preferences;
+import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.firebase.RemoteConfig;
 
 import javax.inject.Singleton;

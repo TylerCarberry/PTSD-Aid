@@ -1,5 +1,8 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.dagger;
 
+import com.tytanapps.ptsd.MainActivity;
+import com.tytanapps.ptsd.PTSDApplication;
+import com.tytanapps.ptsd.dialog.RatingDialog;
 import com.tytanapps.ptsd.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.facility.FacilityLoader;
 import com.tytanapps.ptsd.fragments.BaseFragment;

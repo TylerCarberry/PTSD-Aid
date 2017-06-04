@@ -1,5 +1,5 @@
 
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.maps;
 
 import java.util.HashMap;
 import java.util.Map;
