@@ -42,6 +42,10 @@ public class PhoneFragment extends BaseFragment {
         // Required empty public constructor
     }
 
+    public static PhoneFragment newInstance() {
+        return new PhoneFragment();
+    }
+
     @Override
     public void onResume() {
         super.onResume();

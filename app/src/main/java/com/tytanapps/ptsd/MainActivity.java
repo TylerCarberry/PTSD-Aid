@@ -2,10 +2,10 @@ package com.tytanapps.ptsd;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,7 +31,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -50,6 +49,7 @@ import com.tytanapps.ptsd.phone.PhoneFragment;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
+import com.tytanapps.ptsd.utils.StringUtil;
 import com.tytanapps.ptsd.website.WebsiteFragment;
 
 import javax.inject.Inject;
@@ -60,10 +60,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
-import timber.log.Timber;
 
 import static butterknife.ButterKnife.findById;
-import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_CONTACT_PERMISSION;
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_CONTACT_PERMISSION;
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_PICK_TRUSTED_CONTACT;
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_SIGN_IN;
 
 /**
  * The only activity in the app. Each screen of the app is a fragment. The user can switch
@@ -73,21 +74,16 @@ public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
                     GoogleApiClient.OnConnectionFailedListener {
 
-    // Connection to the Google API
-    private static GoogleApiClient mGoogleApiClient;
-
     // Whether the user is signed in to the app with their Google Account
     private boolean isUserSignedIn = false;
 
     // Header image on top of the navigation view containing the user's information
     private ViewGroup navHeader;
 
-    public static final int REQUEST_SIGN_IN = 1;
-    public static final int REQUEST_PICK_TRUSTED_CONTACT = 2;
-
     @Inject RemoteConfig remoteConfig;
-    @Inject GoogleSignInOptions gso;
     @Inject FirebaseMessaging firebaseMessaging;
+    @Inject GoogleApiClient googleApiClient;
+    @Inject Preferences preferences;
 
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -117,9 +113,6 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the side drawer layout containing the user's information and navigation items
         setupDrawerLayout();
-
-        // Set up the connection to the Google API Client. This does not sign in the user.
-        setupGoogleSignIn();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -161,12 +154,19 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         super.onStart();
         fab.setVisibility(shouldShowFab() ? View.VISIBLE : View.INVISIBLE);
+        googleApiClient.connect();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         silentGoogleSignIn();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        googleApiClient.disconnect();
     }
 
     /**
@@ -202,14 +202,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean shouldShowFab() {
-        return getSharedPreferenceBoolean("enable_trusted_contact", true);
+        return preferences.getBoolean("enable_trusted_contact", true);
     }
 
     /**
      * Unsubscribe the user from notifications regarding new va news
      */
     private void unsubscribeNewsNotifications() {
-        saveSharedPreference(getString(R.string.pref_news_notification), false);
+        preferences.set(R.string.pref_news_notification, false);
         firebaseMessaging.unsubscribeFromTopic("news");
     }
 
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity
      * Subscribe or unsubscribe the user from news notifications depending on the shared preference
      */
     private void setupNewsNotifications() {
-        if (getSharedPreferenceBoolean(getString(R.string.pref_news_notification), true)) {
+        if (preferences.getBoolean(R.string.pref_news_notification, true)) {
             firebaseMessaging.subscribeToTopic("news");
         } else {
             firebaseMessaging.unsubscribeFromTopic("news");
@@ -293,18 +293,6 @@ public class MainActivity extends AppCompatActivity
      */
     public void provideFeedback() {
         new FeedbackDialog(this).show();
-    }
-
-    /**
-     * Create the client to connect with the Google sign in API
-     */
-    private void setupGoogleSignIn() {
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
     }
 
     /**
@@ -348,7 +336,7 @@ public class MainActivity extends AppCompatActivity
      * Sign in to the user's Google Account
      */
     public void signInGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, REQUEST_SIGN_IN);
     }
 
@@ -381,7 +369,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void silentGoogleSignIn() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
-                Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                Auth.GoogleSignInApi.silentSignIn(googleApiClient);
 
         if (pendingResult.isDone()) {
             // There's immediate result available.
@@ -434,8 +422,8 @@ public class MainActivity extends AppCompatActivity
      */
     @OnClick(R.id.fab)
     public void callTrustedContact() {
-        String phoneNumber = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
-        if (!phoneNumber.isEmpty()) {
+        String phoneNumber = preferences.getString(R.string.pref_trusted_phone_key);
+        if (!StringUtil.isNullOrEmpty(phoneNumber)) {
             ExternalAppUtil.openDialer(this, phoneNumber);
         } else {
             showCreateTrustedContactDialog();
@@ -480,8 +468,8 @@ public class MainActivity extends AppCompatActivity
 
         TextView currentContactTextView = (TextView) layout.findViewById(R.id.current_contact_textview);
 
-        String contactName = getSharedPreferenceString(getString(R.string.pref_trusted_name_key), "");
-        String contactPhone = getSharedPreferenceString(getString(R.string.pref_trusted_phone_key), "");
+        String contactName = preferences.getString(R.string.pref_trusted_name_key);
+        String contactPhone = preferences.getString(R.string.pref_trusted_phone_key);
 
         if (!contactPhone.isEmpty()) {
             currentContactTextView.setText("Your trusted contact is\n" + contactName + "\n" + contactPhone);
@@ -562,52 +550,9 @@ public class MainActivity extends AppCompatActivity
             cursor.close();
 
             String name = PtsdUtil.getContactName(this, phoneNumber);
-
-            saveSharedPreference(getString(R.string.pref_trusted_name_key), name);
-            saveSharedPreference(getString(R.string.pref_trusted_phone_key), phoneNumber);
+            preferences.set(R.string.pref_trusted_name_key, name);
+            preferences.set(R.string.pref_trusted_phone_key, phoneNumber);
         }
-    }
-
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
-    private String getSharedPreferenceString(String prefKey, String defaultValue) {
-        return getPreferences(Context.MODE_PRIVATE).getString(prefKey, defaultValue);
-    }
-
-    /**
-     * Read a shared preference string from memory
-     * @param prefKey The key of the shared preference
-     * @param defaultValue The value to return if the key does not exist
-     * @return The shared preference with the given key
-     */
-    private boolean getSharedPreferenceBoolean(String prefKey, boolean defaultValue) {
-        return getPreferences(Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
-    }
-
-    /**
-     * Save a String to a SharedPreference
-     * @param prefKey The key of the shared preference
-     * @param value The value to save in the shared preference
-     */
-    private void saveSharedPreference(String prefKey, String value) {
-        getPreferences(Context.MODE_PRIVATE).edit()
-                .putString(prefKey, value)
-                .apply();
-    }
-
-    /**
-     * Save a String to a SharedPreference
-     * @param prefKey The key of the shared preference
-     * @param value The value to save in the shared preference
-     */
-    private void saveSharedPreference(String prefKey, boolean value) {
-        getPreferences(Context.MODE_PRIVATE).edit()
-                .putBoolean(prefKey, value)
-                .apply();
     }
 
     /**
@@ -621,32 +566,32 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch(id) {
             case R.id.nav_recommendations:
-                newFragment = new MainFragment();
+                newFragment = MainFragment.newInstance();
                 break;
             case R.id.nav_test:
-                newFragment = new PTSDTestFragment();
+                newFragment = PTSDTestFragment.newInstance();
                 break;
             case R.id.nav_resources:
-                newFragment = new ResourcesFragment();
+                newFragment = ResourcesFragment.newInstance();
                 break;
             case R.id.nav_hotline:
-                newFragment = new PhoneFragment();
+                newFragment = PhoneFragment.newInstance();
                 break;
             case R.id.nav_websites:
-                newFragment = new WebsiteFragment();
+                newFragment = WebsiteFragment.newInstance();
                 break;
             case R.id.nav_settings:
-                newFragment = new SettingsFragment();
+                newFragment = SettingsFragment.newInstance();
                 break;
             case R.id.nav_facilities:
-                newFragment = new FacilitiesFragment();
+                newFragment = FacilitiesFragment.newInstance();
                 break;
             case R.id.nav_news:
-                newFragment = new NewsFragment();
+                newFragment = NewsFragment.newInstance();
 
-                Bundle bundle = new Bundle();
-                bundle.putString("param1", "From Activity");
-                newFragment.setArguments(bundle);
+                //Bundle bundle = new Bundle();
+                //bundle.putString("param1", "From Activity");
+                //newFragment.setArguments(bundle);
                 break;
         }
 
@@ -670,19 +615,17 @@ public class MainActivity extends AppCompatActivity
      * Precondition: newFragment is not null
      * @param newFragment The fragment to switch to
      */
-    public void switchFragment(Fragment newFragment) {
-        if (newFragment != null) {
-            if (!(newFragment.getClass().equals(currentFragment.getClass()))) {
-                android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+    public void switchFragment(@NonNull Fragment newFragment) {
+        if (currentFragment == null || !(newFragment.getClass().equals(currentFragment.getClass()))) {
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-                // Replace whatever is in the fragment_container view with this fragment
-                transaction.replace(R.id.fragment_container, newFragment);
-                transaction.addToBackStack(null);
+            // Replace whatever is in the fragment_container view with this fragment
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
 
-                // Commit the transaction
-                transaction.commit();
-                currentFragment = newFragment;
-            }
+            // Commit the transaction
+            transaction.commit();
+            currentFragment = newFragment;
         }
     }
 
@@ -691,14 +634,6 @@ public class MainActivity extends AppCompatActivity
         if (root != null && root instanceof ViewGroup)
             return (ViewGroup) root;
         return null;
-    }
-
-    /**
-     * Purposely crash the app to test debugging
-     */
-    private void crashApp() {
-        Timber.e("The crash app method has been called.");
-        throw new RuntimeException("The crash app method has been called. What did you expect to happen?");
     }
 
     @Override

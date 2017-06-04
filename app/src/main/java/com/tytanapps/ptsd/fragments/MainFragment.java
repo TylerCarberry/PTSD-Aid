@@ -55,7 +55,11 @@ public class MainFragment extends BaseFragment {
     private boolean firebaseDatabaseLoaded = false;
 
     public MainFragment() {
-        // Required empty public constructor
+
+    }
+
+    public static MainFragment newInstance() {
+        return new MainFragment();
     }
 
     @Override

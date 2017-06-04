@@ -8,11 +8,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_CONTACT_PERMISSION;
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_LOCATION_PERMISSION;
+
 
 public class PermissionUtil {
-
-    public static final int REQUEST_CONTACT_PERMISSION = 301;
-    public static final int REQUEST_LOCATION_PERMISSION = 302;
 
     /**
      * @return Whether the user has granted the READ_CONTACTS permission

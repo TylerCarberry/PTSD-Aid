@@ -4,7 +4,9 @@ import android.content.Context;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.perf.FirebasePerformance;
@@ -125,6 +127,14 @@ public class PtsdModule {
                 .build();
 
         return retrofit.create(MapsClient.class);
+    }
+
+    @Provides
+    @Singleton
+    GoogleApiClient providesGoogleApiClient(Context context, GoogleSignInOptions gso) {
+        return new GoogleApiClient.Builder(context)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
     }
 
 }

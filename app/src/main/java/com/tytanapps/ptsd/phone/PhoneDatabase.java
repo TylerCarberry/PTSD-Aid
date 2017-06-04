@@ -31,7 +31,10 @@ public class PhoneDatabase {
         return phoneList;
     }
 
-    private static Phone createPhone(Context context, @StringRes int title, @StringRes int description, @DrawableRes int iconRes, @StringRes int number, int order, boolean veteranOnly) {
-        return new Phone(context.getString(title), context.getString(description), null, iconRes, context.getString(number), order, veteranOnly);
+    private static Phone createPhone(Context context, @StringRes int title,
+                                     @StringRes int description, @DrawableRes int iconRes,
+                                     @StringRes int number, int order, boolean veteranOnly) {
+        return new Phone(context.getString(title), context.getString(description), null, iconRes,
+                context.getString(number), order, veteranOnly);
     }
 }

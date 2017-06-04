@@ -94,9 +94,7 @@ public class Preferences {
     }
 
     public void set(@StringRes int keyRes, String value) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(context.getString(keyRes), value);
-        editor.apply();
+        set(context.getString(keyRes), value);
     }
 
     public void set(String key, boolean value) {
@@ -106,9 +104,7 @@ public class Preferences {
     }
 
     public void set(@StringRes int keyRes, boolean value) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(context.getString(keyRes), value);
-        editor.apply();
+        set(context.getString(keyRes), value);
     }
 
     public void set(String key, int value) {
@@ -118,9 +114,7 @@ public class Preferences {
     }
 
     public void set(@StringRes int keyRes, int value) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(context.getString(keyRes), value);
-        editor.apply();
+        set(context.getString(keyRes), value);
     }
 
     public void set(String key, long value) {
@@ -130,9 +124,16 @@ public class Preferences {
     }
 
     public void set(@StringRes int keyRes, long value) {
+        set(context.getString(keyRes), value);
+    }
+
+    public void remove(String key) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong(context.getString(keyRes), value);
+        editor.remove(key);
         editor.apply();
     }
 
+    public void remove(@StringRes int key) {
+        remove(context.getString(key));
+    }
 }

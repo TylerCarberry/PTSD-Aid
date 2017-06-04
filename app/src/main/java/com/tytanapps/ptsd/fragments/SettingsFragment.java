@@ -41,6 +41,13 @@ public class SettingsFragment extends PreferenceFragment {
     @Inject FirebaseDatabase database;
     @Inject Preferences preferences;
 
+    public SettingsFragment() {
+    }
+
+    public static SettingsFragment newInstance() {
+        return new SettingsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         ((PTSDApplication)getActivity().getApplication()).getPtsdComponent().inject(this);

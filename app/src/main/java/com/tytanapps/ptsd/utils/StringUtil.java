@@ -1,8 +1,5 @@
 package com.tytanapps.ptsd.utils;
 
-/**
- * Created by tyler on 5/16/17.
- */
 
 public class StringUtil {
 

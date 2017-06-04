@@ -33,6 +33,10 @@ public class ResourcesFragment extends BaseFragment {
         // Required empty public constructor
     }
 
+    public static ResourcesFragment newInstance() {
+        return new ResourcesFragment();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getApplication().getPtsdComponent().inject(this);

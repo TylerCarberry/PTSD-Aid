@@ -51,6 +51,10 @@ public class NewsFragment extends BaseFragment {
     public NewsFragment() {
     }
 
+    public static NewsFragment newInstance() {
+        return new NewsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         getApplication().getPtsdComponent().inject(this);

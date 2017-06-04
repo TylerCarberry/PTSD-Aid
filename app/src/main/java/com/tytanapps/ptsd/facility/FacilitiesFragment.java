@@ -36,7 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.tytanapps.ptsd.utils.PermissionUtil.REQUEST_LOCATION_PERMISSION;
+import static com.tytanapps.ptsd.RequestCodes.REQUEST_LOCATION_PERMISSION;
 
 /**
  * Loads a list of nearby VA facilities that offer PTSD programs.
@@ -58,7 +58,10 @@ public class FacilitiesFragment extends BaseFragment {
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
     public FacilitiesFragment() {
+    }
 
+    public static FacilitiesFragment newInstance() {
+        return new FacilitiesFragment();
     }
 
     @Override

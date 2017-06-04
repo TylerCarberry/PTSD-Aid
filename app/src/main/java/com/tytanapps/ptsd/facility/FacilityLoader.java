@@ -155,6 +155,7 @@ public abstract class FacilityLoader {
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e, "Error loading ptsd programs");
+                        facilitiesTrace.stop();
                         errorLoadingResults(e);
                     }
 

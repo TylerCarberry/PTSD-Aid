@@ -43,6 +43,10 @@ public class WebsiteFragment extends BaseFragment {
         // Required empty public constructor
     }
 
+    public static WebsiteFragment newInstance() {
+        return new WebsiteFragment();
+    }
+
     @Override
     public void onResume() {
         super.onResume();

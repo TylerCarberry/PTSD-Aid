@@ -84,4 +84,32 @@ public class News implements Comparable<News>, Serializable, Searchable {
                 pressDate.toLowerCase().contains(searchTerm);
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        News news = (News) o;
+
+        if (pressId != news.pressId) return false;
+        if (title != null ? !title.equals(news.title) : news.title != null) return false;
+        if (message != null ? !message.equals(news.message) : news.message != null) return false;
+        return pressDate != null ? pressDate.equals(news.pressDate) : news.pressDate == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + pressId;
+        result = 31 * result + (pressDate != null ? pressDate.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "News{" + "title='" + title + '\'' + ", message='" + message + '\'' + ", pressId=" + pressId + ", pressDate='" + pressDate + '\'' + '}';
+    }
 }

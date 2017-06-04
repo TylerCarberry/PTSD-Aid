@@ -48,6 +48,10 @@ public class PTSDTestFragment extends BaseFragment {
         // Required empty public constructor
     }
 
+    public static PTSDTestFragment newInstance() {
+        return new PTSDTestFragment();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getApplication().getPtsdComponent().inject(this);

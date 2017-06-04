@@ -163,7 +163,7 @@
     <string name="error_load_news">Unable to load the news. Check your internet connection.</string>
     <string name="expand_message">Expand message</string>
     <string name="your_current_trusted_contact_is">Your current trusted contact is</string>
-    <string name="error_news_network">Unable to load the news. Check you internet connection.</string>
+    <string name="error_news_network">Unable to load the news. Check your internet connection.</string>
     <string name="error_va_facilities">Unable to load VA facilities</string>
     <string name="preference_notifications">Notifications</string>
     <string name="veteran_pref_title">I am a veteran</string>
