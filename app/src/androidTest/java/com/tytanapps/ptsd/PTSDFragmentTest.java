@@ -69,7 +69,7 @@ public class PTSDFragmentTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testAllSymptoms() {
         String[] questions = mainActivity.getResources().getStringArray(R.array.stress_questions);
 
-        for(String question : questions)
+        for (String question : questions)
             onView(allOf(hasSibling(withText(question)), withId(R.id.result_seekbar))).perform(scrollTo(), setProgress(99)).check(matches(isDisplayed()));
 
         onView(withText(is(mainActivity.getString(R.string.submit_test)))).perform(scrollTo(), click());

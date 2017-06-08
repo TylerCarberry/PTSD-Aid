@@ -81,7 +81,7 @@ public class WebsiteFragment extends BaseFragment {
      */
     private void insertDefaultWebsites() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             List<Website> websites = WebsiteDatabase.getWebsites(getActivity(), isVeteran(getActivity()));
@@ -109,7 +109,7 @@ public class WebsiteFragment extends BaseFragment {
                     @Override
                     public void run() {
                         View rootView = getView();
-                        if(rootView != null) {
+                        if (rootView != null) {
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {

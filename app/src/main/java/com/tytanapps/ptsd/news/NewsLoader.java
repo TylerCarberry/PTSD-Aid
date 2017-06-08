@@ -233,7 +233,7 @@ public abstract class NewsLoader {
         newsTrace.stop();
 
         ArrayList<News> newsArrayList = new ArrayList<>();
-        for(News news : knownNews.values()) {
+        for (News news : knownNews.values()) {
             newsArrayList.add(news);
         }
 

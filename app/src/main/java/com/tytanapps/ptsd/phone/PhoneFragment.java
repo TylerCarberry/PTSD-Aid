@@ -79,7 +79,7 @@ public class PhoneFragment extends BaseFragment {
      */
     private void insertDefaultPhoneNumbers() {
         View rootView = getView();
-        if(rootView != null) {
+        if (rootView != null) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             for (Phone phone : PhoneDatabase.getPhones(getActivity(), isVeteran(getActivity()))) {
@@ -114,13 +114,13 @@ public class PhoneFragment extends BaseFragment {
                     @Override
                     public void run() {
                         View rootView = getView();
-                        if(rootView != null) {
+                        if (rootView != null) {
                             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 boolean veteranOnly = snapshot.hasChild(getString(R.string.veteran_only)) && snapshot.child(getString(R.string.veteran_only)).getValue(Boolean.class);
 
-                                if(!veteranOnly || isVeteran(getActivity())) {
+                                if (!veteranOnly || isVeteran(getActivity())) {
                                     insertFirebasePhoneCard(snapshot, inflater);
                                 }
                             }

@@ -263,7 +263,7 @@ public abstract class FacilityLoader {
 
         double userLocation[] = getGPSLocation(fragment.getActivity());
         // The description contains the distance and all PTSD programs located there
-        if(userLocation[0] != 0 && userLocation[1] != 0) {
+        if (userLocation[0] != 0 && userLocation[1] != 0) {
             double distance = distanceBetweenCoordinates(locationLat, locationLong, userLocation[0], userLocation[1]);
             facility.setDistance(distance);
 
@@ -274,7 +274,7 @@ public abstract class FacilityLoader {
         if (remoteConfig.getBoolean(R.string.rc_show_va_programs)) {
             description += "\n";
             Set<String> programs = facility.getPrograms();
-            for(String program : programs)
+            for (String program : programs)
                 description += "\n" + program;
         }
 
@@ -483,14 +483,14 @@ public abstract class FacilityLoader {
      * Clear the cached news articles
      */
     private void clearFacilityCache() {
-        for(int facilityId : knownFacilities.keySet()) {
+        for (int facilityId : knownFacilities.keySet()) {
             File file = getFacilityFile(facilityId);
-            if(file.exists()) {
+            if (file.exists()) {
                 file.delete();
             }
 
             file = getFacilityImageFile(facilityId);
-            if(file.exists()) {
+            if (file.exists()) {
                 file.delete();
             }
         }
@@ -517,7 +517,7 @@ public abstract class FacilityLoader {
             String description = "";
 
             // The description contains the distance and all PTSD programs located there
-            if(userLocation[0] != 0 && userLocation[1] != 0) {
+            if (userLocation[0] != 0 && userLocation[1] != 0) {
                 distance = distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1]);
                 facility.setDistance(distance);
 

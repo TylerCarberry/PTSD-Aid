@@ -142,7 +142,7 @@ public class NewsFragment extends BaseFragment {
      */
     private void onSuccess(List<News> loadedNews) {
         newsList.clear();
-        for(News news : loadedNews) {
+        for (News news : loadedNews) {
             newsList.add(news);
         }
 
@@ -160,7 +160,7 @@ public class NewsFragment extends BaseFragment {
     }
 
     private void enableRefreshLayout() {
-        if(swipeRefreshLayout != null) {
+        if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(false);
             swipeRefreshLayout.setEnabled(true);
         }

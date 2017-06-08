@@ -235,9 +235,9 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
      */
     @Override
     public int compareTo(@NonNull Facility another) {
-        if(getDistance() < another.getDistance())
+        if (getDistance() < another.getDistance())
             return -1;
-        if(getDistance() > another.getDistance())
+        if (getDistance() > another.getDistance())
             return 1;
         return 0;
     }
@@ -285,7 +285,7 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
 
     @Override
     public boolean search(String text) {
-        if(text == null || text.isEmpty())
+        if (text == null || text.isEmpty())
             return true;
         text = text.toLowerCase();
         return name.toLowerCase().contains(text) ||

@@ -105,7 +105,7 @@ public class PtsdUtil {
     public static double[] getGPSLocation(Activity activity) {
         double[] gps = new double[2];
 
-        if(activity != null) {
+        if (activity != null) {
             LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
             List<String> providers = lm.getProviders(true);
 
@@ -169,12 +169,12 @@ public class PtsdUtil {
      * @return The first phone number in the string
      */
     public static String getFirstPhoneNumber(String phoneNumbers) {
-        if(phoneNumbers == null)
+        if (phoneNumbers == null)
             return null;
 
         int orLocation = phoneNumbers.indexOf(" Or");
 
-        if(orLocation >= 0)
+        if (orLocation >= 0)
             return phoneNumbers.substring(0, orLocation);
         return phoneNumbers;
     }
@@ -184,12 +184,12 @@ public class PtsdUtil {
 
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
+            if (bitmapDrawable.getBitmap() != null) {
                 return bitmapDrawable.getBitmap();
             }
         }
 
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+        if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
             bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
         } else {
             bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -267,7 +267,7 @@ public class PtsdUtil {
     }
 
     public static void dismissKeyboard(Activity activity) {
-        if(activity.getCurrentFocus() != null) {
+        if (activity.getCurrentFocus() != null) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }

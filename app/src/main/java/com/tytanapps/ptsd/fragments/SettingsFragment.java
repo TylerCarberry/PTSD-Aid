@@ -235,12 +235,12 @@ public class SettingsFragment extends PreferenceFragment {
 
             @Override
             public boolean onPreferenceClick(Preference z) {
-                if(responses.size() > 0) {
+                if (responses.size() > 0) {
                     tapNumber++;
                     if (tapNumber % 5 == 0 && tapNumber / 5 - 1 < responses.size()) {
                         String response = responses.get(tapNumber/5 - 1);
-                        if(response.length() > 0) {
-                            if(response.contains("zdrg")) {
+                        if (response.length() > 0) {
+                            if (response.contains("zdrg")) {
                                 ProgressDialog.show(getActivity(),
                                         response.substring(response.indexOf(">") + 1, response.indexOf("<")).trim(),
                                         response.substring(response.indexOf("<") + 1).trim(), true);

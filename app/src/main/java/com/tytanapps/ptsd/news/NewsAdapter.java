@@ -53,7 +53,7 @@ class NewsAdapter extends SearchableAdapter<NewsAdapter.NewsViewHolder, News> {
         final News news = list.get(position);
 
         // If the news does not have all of its information, do not show it
-        if(news.getTitle() != null && news.getMessage() != null) {
+        if (news.getTitle() != null && news.getMessage() != null) {
             holder.titleTextView.setText(news.getTitle());
             holder.messageTextView.setText(news.getMessage());
             holder.dateTextView.setText(news.getPressDate());

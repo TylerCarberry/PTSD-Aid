@@ -76,7 +76,7 @@ public class News implements Comparable<News>, Serializable, Searchable {
     }
 
     public boolean search(String searchTerm) {
-        if(searchTerm == null || searchTerm.isEmpty())
+        if (searchTerm == null || searchTerm.isEmpty())
             return true;
         searchTerm = searchTerm.toLowerCase();
         return  title.toLowerCase().contains(searchTerm) ||
