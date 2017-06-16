@@ -39,20 +39,21 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.tytanapps.ptsd.dialog.FeedbackDialog;
 import com.tytanapps.ptsd.dialog.RatingDialog;
-import com.tytanapps.ptsd.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.firebase.PtsdMessagingService;
-import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.network.PtsdMessagingService;
+import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.fragments.MainFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
-import com.tytanapps.ptsd.fragments.SettingsFragment;
-import com.tytanapps.ptsd.news.NewsFragment;
-import com.tytanapps.ptsd.phone.PhoneFragment;
+import com.tytanapps.ptsd.settings.SettingsFragment;
+import com.tytanapps.ptsd.va.news.NewsFragment;
+import com.tytanapps.ptsd.support.phone.PhoneFragment;
+import com.tytanapps.ptsd.settings.Preferences;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 import com.tytanapps.ptsd.utils.StringUtil;
-import com.tytanapps.ptsd.website.WebsiteFragment;
+import com.tytanapps.ptsd.support.website.WebsiteFragment;
 
 import javax.inject.Inject;
 

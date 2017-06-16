@@ -20,10 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.EmptyClickListener;
 import com.tytanapps.ptsd.MainActivity;
-import com.tytanapps.ptsd.Preferences;
+import com.tytanapps.ptsd.settings.Preferences;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import java.io.UnsupportedEncodingException;

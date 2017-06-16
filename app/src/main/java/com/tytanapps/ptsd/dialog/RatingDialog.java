@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.network.RemoteConfig;
 
 import javax.inject.Inject;
 

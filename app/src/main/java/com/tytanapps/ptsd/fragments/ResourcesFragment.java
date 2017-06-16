@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.network.RemoteConfig;
 
 import javax.inject.Inject;
 

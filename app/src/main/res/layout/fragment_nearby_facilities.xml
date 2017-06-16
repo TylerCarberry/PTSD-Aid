@@ -5,7 +5,7 @@
 
     android:id="@+id/nearby_facilities_container"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".facility.FacilitiesFragment">
+    tools:context=".va.facility.FacilitiesFragment">
 
     <com.bhargavms.dotloader.DotLoader
         android:id="@+id/facility_progressbar"

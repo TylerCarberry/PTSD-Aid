@@ -18,8 +18,8 @@ import android.widget.TextView;
 
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.firebase.RemoteConfig;
+import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 
 import javax.inject.Inject;
