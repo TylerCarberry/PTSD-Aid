@@ -1,6 +1,5 @@
 package com.tytanapps.ptsd.va.facility;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.tytanapps.ptsd.va.Searchable;
@@ -27,7 +26,7 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
     // Distance from the user in miles
     private double distance;
 
-    private Bitmap facilityImage;
+    private String facilityImageUrl;
 
     // PTSD programs offered at that location
     private final Set<String> programs;
@@ -219,12 +218,12 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
         this.zip = zipCode;
     }
 
-    public Bitmap getFacilityImage() {
-        return facilityImage;
+    public String getImageUrl() {
+        return facilityImageUrl;
     }
 
-    public void setFacilityImage(Bitmap facilityImage) {
-        this.facilityImage = facilityImage;
+    public void setImageUrl(String facilityImageUrl) {
+        this.facilityImageUrl = facilityImageUrl;
     }
 
     /**

@@ -3,13 +3,14 @@ package com.tytanapps.ptsd.injection;
 import com.tytanapps.ptsd.MainActivity;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.dialog.RatingDialog;
-import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
-import com.tytanapps.ptsd.va.facility.FacilityLoader;
 import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.fragments.MainFragment;
 import com.tytanapps.ptsd.fragments.PTSDTestFragment;
 import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.settings.SettingsFragment;
+import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
+import com.tytanapps.ptsd.va.facility.FacilityAdapter;
+import com.tytanapps.ptsd.va.facility.FacilityLoader;
 import com.tytanapps.ptsd.va.news.NewsFragment;
 import com.tytanapps.ptsd.va.news.NewsLoader;
 
@@ -35,6 +36,8 @@ public interface PtsdComponent {
     void inject(RatingDialog ratingDialog);
 
     void inject(FacilityLoader facilityLoader);
+    void inject(FacilityAdapter facilityAdapter);
+
     void inject(NewsLoader newsLoader);
 
 }

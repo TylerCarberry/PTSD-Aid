@@ -1,7 +1,7 @@
 package com.tytanapps.ptsd.va.facility;
 
 import android.app.Fragment;
-import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,22 +12,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.squareup.picasso.Picasso;
+import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
-import com.tytanapps.ptsd.va.SearchableAdapter;
 import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
+import com.tytanapps.ptsd.utils.StringUtil;
+import com.tytanapps.ptsd.va.SearchableAdapter;
+import com.tytanapps.ptsd.va.facility.maps.MapsClient;
+import com.tytanapps.ptsd.va.facility.maps.MapsResult;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import timber.log.Timber;
 
-class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
+public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
+
+    @Inject MapsClient mapsClient;
 
     private Fragment fragment;
 
-    class FacilityViewHolder extends RecyclerView.ViewHolder {
+    public class FacilityViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.facility_cardview) CardView rootCardView;
         @BindView(R.id.facility_imageview) ImageView facilityImageView;
@@ -49,7 +62,8 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
     FacilityAdapter(List<Facility> facilityList, Fragment fragment, int numFacilitiesToDisplay) {
         super(facilityList, numFacilitiesToDisplay);
         this.fragment = fragment;
-        loadFacilityImages();
+
+        ((PTSDApplication) fragment.getActivity().getApplication()).getPtsdComponent().inject(this);
     }
 
     @Override
@@ -104,12 +118,27 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
 
             holder.addressIcon.setOnClickListener(mapOnClick);
 
-            ImageView facilityImageView = holder.facilityImageView;
-            Bitmap facilityImage = facility.getFacilityImage();
-            if (facilityImage != null) {
-                facilityImageView.setImageBitmap(facility.getFacilityImage());
-            }
+            final ImageView facilityImageView = holder.facilityImageView;
             facilityImageView.setOnClickListener(mapOnClick);
+
+            final Picasso picasso = Picasso.with(facilityImageView.getContext());
+            if (!StringUtil.isNullOrEmpty(facility.getImageUrl())) {
+                picasso.load(facility.getImageUrl()).into(facilityImageView);
+            } else {
+                Call<MapsResult> imageResult = mapsClient.getFacilityImage("" + facility.getFacilityId());
+                imageResult.enqueue(new Callback<MapsResult>() {
+                    @Override
+                    public void onResponse(@NonNull Call<MapsResult> call, @NonNull Response<MapsResult> response) {
+                        facility.setImageUrl(response.body().getUrl());
+                        picasso.load(response.body().getUrl()).into(facilityImageView);
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<MapsResult> call, @NonNull Throwable t) {
+                        Timber.e(call.toString(), t);
+                    }
+                });
+            }
 
             // Tapping the more info button opens the website
             Button moreInfoButton = holder.moreInfoButton;
@@ -123,38 +152,5 @@ class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHold
 
         }
     }
-
-    @Override
-    public void filter(String search) {
-        super.filter(search);
-        loadFacilityImages();
-    }
-
-    private void loadFacilityImages() {
-        FacilityLoader facilityLoader = new FacilityLoader(fragment) {
-            @Override
-            public void errorLoadingResults(Throwable throwable) {}
-            @Override
-            public void onSuccess(List<Facility> loadedFacilities) {}
-
-            @Override
-            public void onLoadedImage(int facilityId) {
-                for (int i = 0; i < list.size(); i++) {
-                    Facility facility = list.get(i);
-                    if (facility.getFacilityId() == facilityId) {
-                        notifyItemChanged(i);
-                    }
-                }
-            }
-        };
-
-        for (int i = 0; i < numToDisplay && i < list.size(); i++) {
-            Facility facility = list.get(i);
-            if (facility.getFacilityImage() == null) {
-                facilityLoader.loadFacilityImage(list.get(i));
-            }
-        }
-    }
-
 
 }

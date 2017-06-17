@@ -1,5 +1,6 @@
 package com.tytanapps.ptsd.va;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public abstract class SearchableAdapter<K extends RecyclerView.ViewHolder, T ext
         return list.size();
     }
 
-    public void filter(String text) {
+    public void filter(@Nullable String text) {
         if (text != null) {
             text = text.toLowerCase().trim();
         }

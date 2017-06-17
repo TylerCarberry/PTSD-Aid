@@ -1,4 +1,4 @@
-package com.tytanapps.ptsd;
+package com.tytanapps.ptsd.va.facility;
 
 /**
  * The user's location can not be determined

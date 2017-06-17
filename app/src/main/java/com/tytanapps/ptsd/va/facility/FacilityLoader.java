@@ -1,18 +1,15 @@
 package com.tytanapps.ptsd.va.facility;
 
 import android.app.Fragment;
-import android.graphics.Bitmap;
 import android.net.Uri;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
-import com.tytanapps.ptsd.LocationNotFoundException;
-import com.tytanapps.ptsd.va.facility.maps.MapsClient;
-import com.tytanapps.ptsd.va.facility.maps.MapsResult;
 import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.network.RemoteConfig;
+import com.tytanapps.ptsd.va.facility.maps.MapsClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,9 +34,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
-import retrofit2.Response;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -49,10 +44,7 @@ import timber.log.Timber;
 import static com.tytanapps.ptsd.utils.PtsdUtil.distanceBetweenCoordinates;
 import static com.tytanapps.ptsd.utils.PtsdUtil.getFirstPhoneNumber;
 import static com.tytanapps.ptsd.utils.PtsdUtil.getGPSLocation;
-import static com.tytanapps.ptsd.utils.PtsdUtil.loadBitmapFromFile;
-import static com.tytanapps.ptsd.utils.PtsdUtil.readBitmapFromUrl;
 import static com.tytanapps.ptsd.utils.PtsdUtil.readFromUrl;
-import static com.tytanapps.ptsd.utils.PtsdUtil.saveBitmapToFile;
 import static rx.Observable.just;
 
 /**
@@ -303,109 +295,6 @@ public abstract class FacilityLoader {
         return url;
     }
 
-
-    /**
-     * Load the Google Maps imagery for the given facility
-     * @param facility The facility to load the imagery for
-     */
-    public void loadFacilityImage(final Facility facility) {
-        int imageWidth = remoteConfig.getInt(R.string.rc_map_width);
-        int imageHeight = remoteConfig.getInt(R.string.rc_map_height);
-
-        Observable<Bitmap> bitmapObservable = Observable.concat(
-                loadCacheFacilityImage(facility.getFacilityId()),
-                loadStreetViewImage(facility, imageWidth, imageHeight),
-                loadMapImage(facility, imageWidth, imageHeight))
-                .filter(new Func1<Bitmap, Boolean>() {
-                    @Override
-                    public Boolean call(Bitmap bitmap) {
-                        return bitmap != null;
-                    }
-                }).first();
-
-        Observer<Bitmap> bitmapObserver = new Observer<Bitmap>() {
-            @Override
-            public void onCompleted() {
-                onLoadedImage(facility.getFacilityId());
-            }
-
-            @Override
-            public void onError(Throwable e) {}
-
-            @Override
-            public void onNext(Bitmap bitmap) {
-                facility.setFacilityImage(bitmap);
-            }
-        };
-
-        bitmapObservable
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bitmapObserver);
-    }
-
-    /**
-     * Load the street view imagery for the given address.
-     * If there is no street view imagery, it uses the map view instead.
-     * You should not call this directly. Call loadFacilityImage instead
-     * @param facility The facility
-     */
-    private Observable<Bitmap> loadStreetViewImage(final Facility facility, final int imageWidth, final int imageHeight) {
-        try {
-            return Observable
-                    .just(buildStreetViewUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight))
-                    .filter(new Func1<String, Boolean>() {
-                        @Override
-                        public Boolean call(String s) {
-                            return isStreetViewAvailableAtAddress(facility.getStreetAddress(), facility.getCity(), facility.getState());
-                        }
-                    })
-                    .map(new Func1<String, Bitmap>() {
-                @Override
-                public Bitmap call(String url) {
-                    try {
-                        Bitmap bitmap = readBitmapFromUrl(url);
-                        saveFacilityImage(bitmap, facility.getFacilityId());
-                        return bitmap;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Observable.just(null);
-    }
-
-    /**
-     * Load the Google Maps imagery for the given address.
-     * If there is no map imagery, it uses the default image instead.
-     * You should not call this directly. Call loadFacilityImage instead
-     * @param facility The facility
-     */
-    private Observable<Bitmap> loadMapImage(final Facility facility, int imageWidth, int imageHeight) {
-        try {
-            return Observable.just(buildMapUrl(facility.getStreetAddress(), facility.getCity(), facility.getState(), imageWidth, imageHeight)).map(new Func1<String, Bitmap>() {
-                @Override
-                public Bitmap call(String url) {
-                    try {
-                        Bitmap bitmap = readBitmapFromUrl(url);
-                        saveFacilityImage(bitmap, facility.getFacilityId());
-                        return bitmap;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Observable.just(null);
-    }
-
     /**
      * Called when all facilities have loaded and knownValues is fully populated
      */
@@ -428,37 +317,6 @@ public abstract class FacilityLoader {
         clearFacilityCache();
         knownFacilities.clear();
         loadPTSDPrograms();
-    }
-
-    /**
-     * Save the Google Maps image of the facility to a file. This file will then be used instead
-     * of loading it from Google every time
-     * @param bitmap The image of the facility
-     * @param facilityId The id of the facility
-     */
-    public void saveFacilityImage(Bitmap bitmap, int facilityId) {
-        File file = getFacilityImageFile(facilityId);
-        saveBitmapToFile(file, bitmap);
-    }
-
-    /**
-     * Load the facility image from a file.
-     * @param facilityId The id of the facility
-     * @return The facility image. Null if the file does not exist
-     */
-    public Observable<Bitmap> loadCacheFacilityImage(int facilityId) {
-        File file = getFacilityImageFile(facilityId);
-        return Observable.just(loadBitmapFromFile(file));
-    }
-
-    /**
-     * Get the file path of the facility image
-     * @param facilityId The id of the facility
-     * @return The file path of the facility image
-     */
-    private File getFacilityImageFile(int facilityId) {
-        String fileName = "facilityImage" + facilityId;
-        return new File(fragment.getActivity().getFilesDir(), fileName);
     }
 
     /**
@@ -485,11 +343,6 @@ public abstract class FacilityLoader {
     private void clearFacilityCache() {
         for (int facilityId : knownFacilities.keySet()) {
             File file = getFacilityFile(facilityId);
-            if (file.exists()) {
-                file.delete();
-            }
-
-            file = getFacilityImageFile(facilityId);
             if (file.exists()) {
                 file.delete();
             }
@@ -560,64 +413,6 @@ public abstract class FacilityLoader {
     private File getFacilityFile(int facilityId) {
         String fileName = "facility" + facilityId;
         return new File(fragment.getActivity().getFilesDir(), fileName);
-    }
-
-    /**
-     * Get the url for the Street View Api
-     * @param address The street address
-     * @param town The town
-     * @param state The state. Can be initials or full name
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    private String buildStreetViewUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
-        String location = encodeAddress(address, town, state);
-
-        Uri builtUri = Uri.parse("https://maps.googleapis.com/maps/api/streetview")
-                .buildUpon()
-                .appendQueryParameter("size", imageWidth+"x"+imageHeight)
-                .appendQueryParameter("location", location)
-                .build();
-
-        return builtUri.toString();
-    }
-
-    private boolean isStreetViewAvailableAtAddress(String address, String town, final String state) {
-        try {
-            Response<MapsResult> mapsResult = mapsClient.getMapMetadata((encodeAddress(address, town, state)), fragment.getString(R.string.api_key_google))
-                    .execute();
-            if (mapsResult != null && mapsResult.body() != null) {
-                return mapsResult.body().isStreetViewAvailable();
-            }
-            return false;
-        } catch (IOException e) {
-            FirebaseCrash.report(e);
-            return false;
-        }
-    }
-
-
-    /**
-     * Get the url for the Google Maps Api
-     * @param address The street address
-     * @param town The town
-     * @param state The state. Can be initials or full name
-     * @return The url for the street view api
-     * @throws UnsupportedEncodingException If the address cannot be encoded into a url
-     */
-    private String buildMapUrl(String address, String town, String state, int imageWidth, int imageHeight) throws UnsupportedEncodingException {
-        String location = encodeAddress(address, town, state);
-
-        Uri mapUri = Uri.parse("http://maps.google.com/maps/api/staticmap")
-                .buildUpon()
-                .appendQueryParameter("center", location)
-                .appendQueryParameter("zoom", "16")
-                .appendQueryParameter("size", imageWidth+"x"+imageHeight)
-                .appendQueryParameter("sensor", "false")
-                .appendQueryParameter("markers", "color:redzlabel:A%7C\" + paramLocation")
-                .build();
-
-        return mapUri.toString();
     }
 
     /**

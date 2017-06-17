@@ -126,7 +126,7 @@ public class PtsdModule {
     @Singleton
     MapsClient providesMapsClient() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://maps.googleapis.com/maps/api/")
+                .baseUrl("https://be9cp3h9kf.execute-api.us-east-1.amazonaws.com/prod/")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

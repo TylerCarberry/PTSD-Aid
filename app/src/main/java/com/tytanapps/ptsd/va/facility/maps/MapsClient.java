@@ -7,7 +7,7 @@ import retrofit2.http.Query;
 
 public interface MapsClient {
 
-    @GET("streetview/metadata")
-    Call<MapsResult> getMapMetadata(@Query("location") String address, @Query("key") String apiKey);
+    @GET("get-facility-image")
+    Call<MapsResult> getFacilityImage(@Query("facility_id") String facilityId);
 
 }
