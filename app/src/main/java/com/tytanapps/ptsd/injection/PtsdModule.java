@@ -13,11 +13,11 @@ import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.tytanapps.ptsd.BuildConfig;
-import com.tytanapps.ptsd.va.facility.maps.MapsClient;
 import com.tytanapps.ptsd.PTSDApplication;
-import com.tytanapps.ptsd.settings.Preferences;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.network.RemoteConfig;
+import com.tytanapps.ptsd.settings.Preferences;
+import com.tytanapps.ptsd.va.facility.maps.MapsClient;
 
 import javax.inject.Singleton;
 
@@ -91,7 +91,7 @@ public class PtsdModule {
     @Provides
     @Singleton
     OkHttpClient providesOkHttpClient(Cache cache) {
-         return new OkHttpClient.Builder()
+        return new OkHttpClient.Builder()
                 .cache(cache)
                 .build();
     }
@@ -124,11 +124,12 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    MapsClient providesMapsClient() {
+    MapsClient providesMapsClient(OkHttpClient okHttpClient) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://be9cp3h9kf.execute-api.us-east-1.amazonaws.com/prod/")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         return retrofit.create(MapsClient.class);
