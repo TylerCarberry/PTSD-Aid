@@ -12,7 +12,6 @@ import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.va.facility.FacilityAdapter;
 import com.tytanapps.ptsd.va.facility.FacilityLoader;
 import com.tytanapps.ptsd.va.news.NewsFragment;
-import com.tytanapps.ptsd.va.news.NewsLoader;
 
 import javax.inject.Singleton;
 
@@ -37,7 +36,5 @@ public interface PtsdComponent {
 
     void inject(FacilityLoader facilityLoader);
     void inject(FacilityAdapter facilityAdapter);
-
-    void inject(NewsLoader newsLoader);
 
 }

@@ -18,6 +18,7 @@ import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.settings.Preferences;
 import com.tytanapps.ptsd.va.facility.maps.MapsClient;
+import com.tytanapps.ptsd.va.news.NewsClient;
 
 import javax.inject.Singleton;
 
@@ -124,15 +125,25 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    MapsClient providesMapsClient(OkHttpClient okHttpClient) {
-        Retrofit retrofit = new Retrofit.Builder()
+    MapsClient providesMapsClient(Retrofit retrofit) {
+        return retrofit.create(MapsClient.class);
+    }
+
+    @Provides
+    @Singleton
+    Retrofit providesRetrofit(OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
                 .baseUrl("https://be9cp3h9kf.execute-api.us-east-1.amazonaws.com/prod/")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
+    }
 
-        return retrofit.create(MapsClient.class);
+    @Provides
+    @Singleton
+    NewsClient providesNewsClient(Retrofit retrofit) {
+        return retrofit.create(NewsClient.class);
     }
 
     @Provides

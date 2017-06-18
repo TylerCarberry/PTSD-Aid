@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.va.news;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
@@ -25,6 +26,7 @@ import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,11 +34,16 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import timber.log.Timber;
 
 
 public class NewsFragment extends BaseFragment {
 
     @Inject RemoteConfig remoteConfig;
+    @Inject NewsClient newsClient;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
@@ -44,7 +51,6 @@ public class NewsFragment extends BaseFragment {
     @BindView(R.id.news_loading_textview) TextView loadingTextView;
     @BindView(R.id.retry_load_button) Button retryLoadButton;
 
-    private NewsLoader newsLoader;
     private List<News> newsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
@@ -69,8 +75,9 @@ public class NewsFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        newsLoader = setupNewsLoader();
         setupRefreshLayout();
+        loadNews();
+
         return rootView;
     }
 
@@ -107,7 +114,6 @@ public class NewsFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        newsLoader.loadNews();
         setCheckedNavigationItem(R.id.nav_news);
     }
 
@@ -122,20 +128,6 @@ public class NewsFragment extends BaseFragment {
         return R.string.news_title;
     }
 
-    private NewsLoader setupNewsLoader() {
-        return new NewsLoader(this) {
-            @Override
-            public void errorLoadingResults(String errorMessage) {
-                NewsFragment.this.errorLoadingResults(errorMessage);
-            }
-
-            @Override
-            public void onSuccess(List<News> loadedNews) {
-                NewsFragment.this.onSuccess(loadedNews);
-            }
-        };
-    }
-
     /**
      * When all of the news have loaded, add them to the recycler view and display them
      * @param loadedNews The loaded news
@@ -145,6 +137,8 @@ public class NewsFragment extends BaseFragment {
         for (News news : loadedNews) {
             newsList.add(news);
         }
+
+        Collections.sort(newsList);
 
         setupRecyclerView();
         enableRefreshLayout();
@@ -188,7 +182,7 @@ public class NewsFragment extends BaseFragment {
             @Override
             public void onRefresh() {
                 mAdapter.notifyDataSetChanged();
-                newsLoader.refresh();
+                loadNews();
             }
         });
     }
@@ -225,6 +219,23 @@ public class NewsFragment extends BaseFragment {
         loadingTextView.setVisibility(View.INVISIBLE);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
-        newsLoader.loadNews();
+        loadNews();
+    }
+
+    private void loadNews() {
+        Call<List<News>> vaNews = newsClient.getVaNews();
+        vaNews.enqueue(new Callback<List<News>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
+                Timber.d("onResponse", call, response);
+                onSuccess(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
+                Timber.e(t, "onFailure", call);
+                errorLoadingResults(getString(R.string.error_load_news));
+            }
+        });
     }
 }
