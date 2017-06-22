@@ -3,6 +3,7 @@ package com.tytanapps.ptsd;
 import android.app.Application;
 
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.leakcanary.LeakCanary;
 import com.tytanapps.ptsd.injection.AppModule;
 import com.tytanapps.ptsd.injection.DaggerPtsdComponent;
@@ -36,6 +37,8 @@ public class PTSDApplication extends Application {
         LeakCanary.install(this);
 
         Timber.plant(new Timber.DebugTree());
+
+        FirebaseCrash.setCrashCollectionEnabled(!BuildConfig.DEBUG);
     }
 
     public PtsdComponent getPtsdComponent() {
