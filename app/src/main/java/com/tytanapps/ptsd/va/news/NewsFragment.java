@@ -139,6 +139,10 @@ public class NewsFragment extends BaseFragment {
     private void onSuccess(List<News> loadedNews) {
         newsList.clear();
         for (News news : loadedNews) {
+            if (news.getPressId() != null &&
+                    news.getPressDate() != null &&
+                    news.getPressTitle() != null &&
+                    news.getPressText() != null)
             newsList.add(news);
         }
 
