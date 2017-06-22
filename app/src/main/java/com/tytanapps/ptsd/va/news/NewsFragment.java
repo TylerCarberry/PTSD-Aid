@@ -25,8 +25,10 @@ import com.tytanapps.ptsd.fragments.BaseFragment;
 import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,6 +36,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Cache;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,6 +47,7 @@ public class NewsFragment extends BaseFragment {
 
     @Inject RemoteConfig remoteConfig;
     @Inject NewsClient newsClient;
+    @Inject Cache cache;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
@@ -181,10 +185,25 @@ public class NewsFragment extends BaseFragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mAdapter.notifyDataSetChanged();
+                clearNewsCache();
                 loadNews();
             }
         });
+    }
+
+    private void clearNewsCache() {
+        try {
+            Iterator<String> iterator = cache.urls();
+            while (iterator.hasNext()) {
+                String url = iterator.next();
+                if (url.contains("get-va-news")) {
+                    iterator.remove();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
