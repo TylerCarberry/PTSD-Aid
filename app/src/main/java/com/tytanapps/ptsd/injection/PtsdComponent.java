@@ -10,7 +10,6 @@ import com.tytanapps.ptsd.fragments.ResourcesFragment;
 import com.tytanapps.ptsd.settings.SettingsFragment;
 import com.tytanapps.ptsd.va.facility.FacilitiesFragment;
 import com.tytanapps.ptsd.va.facility.FacilityAdapter;
-import com.tytanapps.ptsd.va.facility.FacilityLoader;
 import com.tytanapps.ptsd.va.news.NewsFragment;
 
 import javax.inject.Singleton;
@@ -34,7 +33,6 @@ public interface PtsdComponent {
 
     void inject(RatingDialog ratingDialog);
 
-    void inject(FacilityLoader facilityLoader);
     void inject(FacilityAdapter facilityAdapter);
 
 }

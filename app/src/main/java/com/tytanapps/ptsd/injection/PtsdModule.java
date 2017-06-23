@@ -17,7 +17,7 @@ import com.tytanapps.ptsd.PTSDApplication;
 import com.tytanapps.ptsd.R;
 import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.settings.Preferences;
-import com.tytanapps.ptsd.va.facility.maps.MapsClient;
+import com.tytanapps.ptsd.va.facility.VaClient;
 import com.tytanapps.ptsd.va.news.NewsClient;
 
 import javax.inject.Singleton;
@@ -125,8 +125,8 @@ public class PtsdModule {
 
     @Provides
     @Singleton
-    MapsClient providesMapsClient(Retrofit retrofit) {
-        return retrofit.create(MapsClient.class);
+    VaClient providesVaClient(Retrofit retrofit) {
+        return retrofit.create(VaClient.class);
     }
 
     @Provides
