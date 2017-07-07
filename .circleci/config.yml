@@ -12,7 +12,8 @@ jobs:
         steps:
             - checkout
             
-            - restore_cache: android-cache
+            - restore_cache:
+                key: android-cache
             
             # The API keys are not tracked in git, write them from environment variables
             - run: echo $google_services_json4 > app/google-services.json
