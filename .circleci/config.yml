@@ -1,0 +1,47 @@
+version: 2
+jobs:
+    build:
+        docker:
+            - image: circleci/android:api-25-alpha
+        environment:
+            JVM_OPTS: -Xmx2048m
+            GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+            ADB_INSTALL_TIMEOUT: 6000
+            
+        steps:
+            - checkout
+            
+            - restore_cache: android-cache
+            
+            # The API keys are not tracked in git, write them from environment variables
+            - run: echo $google_services_json4 > app/google-services.json
+            - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
+            
+            # Since it is only building the debug apk, the key values don't matter
+            - run: (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
+        
+            # Accept the licenses. See http://stackoverflow.com/questions/38096225/automatically-accept-all-sdk-licences
+            # This will break when Google updates the license text
+            
+            - run:
+                name: Accept Android Licenses
+                command:  |
+                    mkdir "$ANDROID_HOME/licenses" || true
+                    echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+                    echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+
+            - save_cache:
+                key: android-cache
+                paths:
+                    - ~/.android
+
+            - run:
+                name: Test Android
+                command: ./gradlew test
+          
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
