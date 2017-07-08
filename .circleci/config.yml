@@ -3,7 +3,7 @@ jobs:
     build:
         working_directory: ~/code
         docker:
-            - image: circleci/android:api-25-alpha
+            - image: circleci/android:api-26-alpha
         environment:
             JVM_OPTS: -Xmx2048m
             GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -21,9 +21,6 @@ jobs:
             
             # Since it is only building the debug apk, the key values don't matter
             - run: (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
-        
-            # Accept the licenses. See http://stackoverflow.com/questions/38096225/automatically-accept-all-sdk-licences
-            # This will break when Google updates the license text
             
             - save_cache:
                 key: android-cache
