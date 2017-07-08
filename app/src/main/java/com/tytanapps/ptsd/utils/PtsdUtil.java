@@ -73,12 +73,7 @@ public class PtsdUtil {
     }
 
     /**
-     * Calculate the distance between coordinates in miles
-     * @param lat1 Latitude of coordinate 1
-     * @param lon1 Longitude of coordinate 1
-     * @param lat2 Latitude of coordinate 2
-     * @param lon2 Longitude of coordinate 2
-     * @return The distance between the two coordinates in the specified unit
+     * @return The distance between the two coordinates in miles
      */
     public static double distanceBetweenCoordinates(double lat1, double lon1, double lat2, double lon2) {
         float[] result = {0, 0};

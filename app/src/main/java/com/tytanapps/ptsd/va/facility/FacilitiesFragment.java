@@ -26,7 +26,10 @@ import com.tytanapps.ptsd.network.RemoteConfig;
 import com.tytanapps.ptsd.utils.PermissionUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,8 +37,14 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Cache;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.tytanapps.ptsd.RequestCodes.REQUEST_LOCATION_PERMISSION;
+import static com.tytanapps.ptsd.utils.PtsdUtil.distanceBetweenCoordinates;
+import static com.tytanapps.ptsd.utils.PtsdUtil.getGPSLocation;
 
 /**
  * Loads a list of nearby VA facilities that offer PTSD programs.
@@ -44,11 +53,12 @@ import static com.tytanapps.ptsd.RequestCodes.REQUEST_LOCATION_PERMISSION;
  */
 public class FacilitiesFragment extends BaseFragment {
 
-    private FacilityLoader facilityLoader;
     private final List<Facility> facilityList = new ArrayList<>();
     private FacilityAdapter mAdapter;
 
     @Inject RemoteConfig remoteConfig;
+    @Inject VaClient vaClient;
+    @Inject Cache cache;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
@@ -67,21 +77,6 @@ public class FacilitiesFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         getApplication().getPtsdComponent().inject(this);
         super.onCreate(savedInstanceState);
-
-        facilityLoader = new FacilityLoader(this) {
-            @Override
-            public void errorLoadingResults(Throwable throwable) {
-                FacilitiesFragment.this.errorLoadingResults(throwable);
-            }
-
-            @Override
-            public void onSuccess(List<Facility> loadedFacilities) {
-                FacilitiesFragment.this.onAllFacilitiesLoaded(loadedFacilities);
-            }
-
-            @Override
-            public void onLoadedImage(int facilityId) {}
-        };
     }
 
     @Override
@@ -183,7 +178,23 @@ public class FacilitiesFragment extends BaseFragment {
      */
     public void refreshFacilities() {
         mAdapter.notifyDataSetChanged();
-        facilityLoader.refresh();
+        clearFacilitiesCache();
+        loadVaFacilities();
+    }
+
+    private void clearFacilitiesCache() {
+        try {
+            Iterator<String> iterator = cache.urls();
+            while (iterator.hasNext()) {
+                String url = iterator.next();
+                if (url.contains("get-va-facilities")) {
+                    iterator.remove();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -193,7 +204,18 @@ public class FacilitiesFragment extends BaseFragment {
         hideLoadingBar();
 
         facilityList.clear();
+
+        double[] userLocation = getGPSLocation(getActivity());
+        // If the user's GPS location cannot be found
+        if (userLocation[0] == 0 && userLocation[1] == 0) {
+            throw new LocationNotFoundException();
+        }
+        for (Facility facility : facilities) {
+            updateFacilityDistance(facility, userLocation);
+        }
+
         facilityList.addAll(facilities);
+        Collections.sort(facilityList);
 
         setupRecyclerView();
         enableRefreshLayout();
@@ -201,6 +223,12 @@ public class FacilitiesFragment extends BaseFragment {
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void updateFacilityDistance(Facility facility, double[] userLocation) {
+        double distance = distanceBetweenCoordinates(facility.getLatitude(), facility.getLongitude(), userLocation[0], userLocation[1]);
+        facility.setDistanceToUser(distance);
+        facility.setTypeDesc( ((int)(distance * 100)) / 100.0 + " miles away");
     }
 
     /**
@@ -218,7 +246,7 @@ public class FacilitiesFragment extends BaseFragment {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION: {
                 if (PermissionUtil.locationPermissionGranted(getActivity())) {
-                    facilityLoader.loadPTSDPrograms();
+                    loadVaFacilities();
                 } else {
                     errorLoadingResults(getString(R.string.error_location_permission));
                 }
@@ -271,7 +299,21 @@ public class FacilitiesFragment extends BaseFragment {
 
     private void loadVaFacilities() {
         if (PermissionUtil.locationPermissionGranted(getActivity())) {
-            facilityLoader.loadPTSDPrograms();
+
+            Call<List<Facility>> vaFacilities = vaClient.getVaFacilities();
+            vaFacilities.enqueue(new Callback<List<Facility>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<Facility>> call, @NonNull Response<List<Facility>> response) {
+                    onAllFacilitiesLoaded(response.body());
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<List<Facility>> call, @NonNull Throwable t) {
+                    errorLoadingResults(t);
+                }
+            });
+
+
         } else {
             PermissionUtil.requestLocationPermission(getActivity());
         }

@@ -1,7 +1,6 @@
 package com.tytanapps.ptsd.va.facility;
 
 import android.app.Fragment;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,24 +18,14 @@ import com.tytanapps.ptsd.utils.ExternalAppUtil;
 import com.tytanapps.ptsd.utils.PtsdUtil;
 import com.tytanapps.ptsd.utils.StringUtil;
 import com.tytanapps.ptsd.va.SearchableAdapter;
-import com.tytanapps.ptsd.va.facility.maps.MapsClient;
-import com.tytanapps.ptsd.va.facility.maps.MapsResult;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityViewHolder, Facility> {
-
-    @Inject MapsClient mapsClient;
 
     private Fragment fragment;
 
@@ -78,79 +67,62 @@ public class FacilityAdapter extends SearchableAdapter<FacilityAdapter.FacilityV
     public void onBindViewHolder(final FacilityViewHolder holder, int position) {
         final Facility facility = list.get(position);
 
-        // If the facility does not have all of its information, do not show it
-        if (facility.getName() != null && facility.getDescription() != null && facility.getPhoneNumber() != null) {
-            TextView nameTextView = holder.nameTextView;
-            nameTextView.setText(facility.getName());
+        TextView nameTextView = holder.nameTextView;
+        nameTextView.setText(facility.getFacName());
 
-            TextView descriptionTextView = holder.detailsTextView;
-            descriptionTextView.setText(facility.getDescription());
+        TextView descriptionTextView = holder.detailsTextView;
+        descriptionTextView.setText(facility.getTypeDesc());
 
-            View.OnClickListener callOnClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ExternalAppUtil.openDialer(fragment.getActivity(), PtsdUtil.getFirstPhoneNumber(facility.getPhoneNumber()));
-                }
-            };
-
-            TextView phoneTextView = holder.phoneTextView;
-            phoneTextView.setText(facility.getPhoneNumber());
-            phoneTextView.setOnClickListener(callOnClick);
-
-            ImageView phoneIcon = holder.callIcon;
-            phoneIcon.setOnClickListener(callOnClick);
-
-            View.OnClickListener mapOnClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        ExternalAppUtil.openMapIntent(fragment, ExternalAppUtil.getMapUri(facility.getName(), facility.getCity(), facility.getState()));
-                    } catch (UnsupportedEncodingException e) {
-                        FirebaseCrash.report(e);
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            TextView addressTextView = holder.addressTextView;
-            addressTextView.setText(facility.getFullAddress());
-            addressTextView.setOnClickListener(mapOnClick);
-
-            holder.addressIcon.setOnClickListener(mapOnClick);
-
-            final ImageView facilityImageView = holder.facilityImageView;
-            facilityImageView.setOnClickListener(mapOnClick);
-
-            final Picasso picasso = Picasso.with(facilityImageView.getContext());
-            if (!StringUtil.isNullOrEmpty(facility.getImageUrl())) {
-                picasso.load(facility.getImageUrl()).into(facilityImageView);
-            } else {
-                Call<MapsResult> imageResult = mapsClient.getFacilityImage("" + facility.getFacilityId());
-                imageResult.enqueue(new Callback<MapsResult>() {
-                    @Override
-                    public void onResponse(@NonNull Call<MapsResult> call, @NonNull Response<MapsResult> response) {
-                        facility.setImageUrl(response.body().getUrl());
-                        picasso.load(response.body().getUrl()).into(facilityImageView);
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<MapsResult> call, @NonNull Throwable t) {
-                        Timber.e(call.toString(), t);
-                    }
-                });
+        View.OnClickListener callOnClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExternalAppUtil.openDialer(fragment.getActivity(), PtsdUtil.getFirstPhoneNumber(facility.getPhoneNumber()));
             }
+        };
 
-            // Tapping the more info button opens the website
-            Button moreInfoButton = holder.moreInfoButton;
-            moreInfoButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String url = PtsdUtil.getFirstPhoneNumber(facility.getUrl());
-                    ExternalAppUtil.openBrowserIntent(fragment, url);
+        TextView phoneTextView = holder.phoneTextView;
+        phoneTextView.setText(facility.getPhoneNumber());
+        phoneTextView.setOnClickListener(callOnClick);
+
+        ImageView phoneIcon = holder.callIcon;
+        phoneIcon.setOnClickListener(callOnClick);
+
+        View.OnClickListener mapOnClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    ExternalAppUtil.openMapIntent(fragment, ExternalAppUtil.getMapUri(facility.getFacName(), facility.getCity(), facility.getState()));
+                } catch (UnsupportedEncodingException e) {
+                    FirebaseCrash.report(e);
+                    e.printStackTrace();
                 }
-            });
+            }
+        };
 
+        TextView addressTextView = holder.addressTextView;
+        addressTextView.setText(facility.getFullAddress());
+        addressTextView.setOnClickListener(mapOnClick);
+
+        holder.addressIcon.setOnClickListener(mapOnClick);
+
+        final ImageView facilityImageView = holder.facilityImageView;
+        facilityImageView.setOnClickListener(mapOnClick);
+
+        final Picasso picasso = Picasso.with(facilityImageView.getContext());
+        if (!StringUtil.isNullOrEmpty(facility.getImageUrl())) {
+            picasso.load(facility.getImageUrl()).into(facilityImageView);
         }
+
+        // Tapping the more info button opens the website
+        Button moreInfoButton = holder.moreInfoButton;
+        moreInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = PtsdUtil.getFirstPhoneNumber(facility.getUrl());
+                ExternalAppUtil.openBrowserIntent(fragment, url);
+            }
+        });
+
     }
 
 }
