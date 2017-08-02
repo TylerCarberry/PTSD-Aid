@@ -37,7 +37,7 @@ public class PtsdMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.notification_icon)
                         .addAction(R.drawable.ic_notifications_off_black_24px, getString(R.string.unsubscribe_news_notifications), pIntent)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message)
