@@ -21,15 +21,15 @@ jobs:
             
             # Since it is only building the debug apk, the key values don't matter
             - run: (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
-            
-            - save_cache:
-                key: android-cache
-                paths:
-                    - ~/.android
                     
             - run:
                 name: Compile Android
                 command: ./gradlew assembleDebug
+                
+            - save_cache:
+                key: android-cache
+                paths:
+                    - ~/.android
                 
             - persist_to_workspace:
                 root: .
@@ -49,6 +49,9 @@ jobs:
             - attach_workspace:
                 # Must be absolute path or relative path from working_directory
                 at: .
+                
+            - restore_cache:
+                key: android-cache
         
             - run:
                 name: Test Android
@@ -67,25 +70,16 @@ jobs:
             - attach_workspace:
                 # Must be absolute path or relative path from working_directory
                 at: .
-        
-            #- run: sudo apt-get install python-pip
-            
-            # Install gcloud
-            #- run: export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-            #- run: echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-            #- run: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            #- run: sudo apt-get update && sudo apt-get install google-cloud-sdk
-            #- run: sudo pip install -U crcmod
             
             - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
             
-            - run: sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
-            - run: sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
-            - run: sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
+            - run: gcloud --quiet components update
+            - run: gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            - run: gcloud config set project $GCLOUD_PROJECT
             
             - run: gcloud firebase test android run --app /app/build/outputs/apk/app-debug.apk --device model=Nexus6,version=21,locale=en,orientation=portrait
             
-            - run: sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
+            - run: gsutil -m cp -r -U `gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
 
                 
 
