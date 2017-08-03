@@ -80,7 +80,7 @@ jobs:
             
             - run: gcloud firebase test android run --app app/build/outputs/apk/app-debug.apk --device model=Nexus6P,version=25,locale=en,orientation=portrait --timeout 5m
             
-            - run: gsutil -m cp -r -U `gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
+            - run: gsutil -m cp -r -U `gsutil ls gs://test-lab-fivk7mhss10ru-ntf6b5dp40ir6 | tail -1` $CIRCLE_ARTIFACTS/ | true
 
                 
 
