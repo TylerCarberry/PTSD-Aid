@@ -70,10 +70,16 @@ jobs:
             - attach_workspace:
                 # Must be absolute path or relative path from working_directory
                 at: .
+                
+            - run: pwd
+            - run: ls
+            - run: ls app
+            - run: ls app/build
+            - run: ls app/build/outputs
+            - run: ls app/build/apk
             
             - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
             
-            #- run: gcloud --quiet components update
             - run: gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
             - run: gcloud config set project $GCLOUD_PROJECT
             
@@ -85,7 +91,7 @@ jobs:
 
 workflows:
   version: 2
-  build-and-deploy:
+  build-and-test:
     jobs:
       - build
       - gradle-test:
