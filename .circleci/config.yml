@@ -72,20 +72,13 @@ jobs:
             - attach_workspace:
                 # Must be absolute path or relative path from working_directory
                 at: .
-                
-            - run: pwd
-            - run: ls
-            - run: ls app
-            - run: ls app/build
-            - run: ls app/build/outputs
-            - run: ls app/build/outputs/apk
             
             - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
             
             - run: gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
             - run: gcloud config set project $GCLOUD_PROJECT
             
-            - run: gcloud firebase test android run --app app/build/outputs/apk/app-debug.apk --device model=Nexus6,version=21,locale=en,orientation=portrait
+            - run: gcloud firebase test android run --app app/build/outputs/apk/app-debug.apk --device model=Nexus6P,version=25,locale=en,orientation=portrait --timeout 5m
             
             - run: gsutil -m cp -r -U `gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
 
