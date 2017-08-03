@@ -19,7 +19,7 @@ jobs:
             - run: echo $google_services_json4 > app/google-services.json
             - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
             
-            - run: sudo apt-get install python-pip
+            - run: sudo apt-get install python-pip gcloud
             - run: sudo pip install -U crcmod
             
             # Since it is only building the debug apk, the key values don't matter
