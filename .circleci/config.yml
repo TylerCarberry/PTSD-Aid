@@ -30,6 +30,8 @@ jobs:
                 key: android-cache
                 paths:
                     - ~/.android
+                    - /usr/local/android-sdk-linux/
+                    - ~/.gradle
                 
             - persist_to_workspace:
                 root: .
