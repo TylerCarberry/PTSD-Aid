@@ -18,6 +18,7 @@ jobs:
             # The API keys are not tracked in git, write them from environment variables
             - run: echo $google_services_json4 > app/google-services.json
             - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
+            - run: sudo pip install -U crcmod
             
             # Since it is only building the debug apk, the key values don't matter
             - run: (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
@@ -26,10 +27,25 @@ jobs:
                 key: android-cache
                 paths:
                     - ~/.android
+                    
+            - run:
+                name: Compile Android
+                command: ./gradlew assembleDebug
 
             - run:
                 name: Test Android
                 command: ./gradlew test
+                
+            - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+            
+            
+            - run: sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+            - run: sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            - run: sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
+            
+            - run: gcloud firebase test android run --app /app/build/outputs/apk/app-debug.apk --device model=Nexus6,version=21,locale=en,orientation=portrait
+            
+            - run: sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
           
 
 workflows:
