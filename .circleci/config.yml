@@ -110,12 +110,12 @@ jobs:
             
             - run: (echo "storePassword=$RELEASE_STORE_PASSWORD" && echo "keyPassword=$RELEASE_KEY_PASSWORD" && echo "keyAlias=$RELEASE_KEY_ALIAS" && echo "storeFile=PTSDkey.jks") > app/keystore.properties
             
-            - run: ls
-            - run: ls app
-            
             - run:
                 name: Deploy Android
                 command: ./gradlew publishApkRelease
+                
+            - store_artifacts:
+                path: /home/circleci/code/app/app-release.apk
                 
 
 workflows:
@@ -126,10 +126,14 @@ workflows:
       - gradle-test:
           requires:
             - build
-      #- firebase-test:
-      #    requires:
-      #      - build
+      - firebase-test:
+          requires:
+            - build
       - deploy:
           requires:
             - gradle-test
-     #       - firebase-test
+            - firebase-test
+          filters:
+            branches:
+              only:
+                - release
