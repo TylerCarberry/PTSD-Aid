@@ -13,7 +13,7 @@ jobs:
             - checkout
             
             - restore_cache:
-                key: android-cache
+                key: android-cache-v2
             
             # The API keys are not tracked in git, write them from environment variables
             - run: echo $google_services_json4 > app/google-services.json
@@ -27,7 +27,7 @@ jobs:
                 command: ./gradlew assembleDebug
                 
             - save_cache:
-                key: android-cache
+                key: android-cache-v2
                 paths:
                     - ~/.android
                     - /usr/local/android-sdk-linux/
@@ -52,7 +52,7 @@ jobs:
                 at: .
                 
             - restore_cache:
-                key: android-cache
+                key: android-cache-v2
         
             - run:
                 name: Test Android
