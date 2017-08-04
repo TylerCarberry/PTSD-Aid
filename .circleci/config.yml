@@ -123,10 +123,10 @@ workflows:
       - gradle-test:
           requires:
             - build
-      - firebase-test:
-          requires:
-            - build
+      #- firebase-test:
+      #    requires:
+      #      - build
       - deploy:
           requires:
             - gradle-test
-            - firebase-test
+     #       - firebase-test
