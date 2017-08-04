@@ -105,11 +105,14 @@ jobs:
             - run: echo $google_services_json4 > app/google-services.json
             - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
             
-            - run: echo $RELEASE_KEYSTORE | base64 --decode --ignore-garbage > ${HOME}/PTSDkey.jks
+            - run: echo $RELEASE_KEYSTORE | base64 --decode --ignore-garbage > /home/circleci/code/app/PTSDkey.jks
             - run: echo $PLAY_DEPLOY_KEYS | base64 --decode --ignore-garbage > app/keys.json
             
             - run: (echo "storePassword=$RELEASE_STORE_PASSWORD" && echo "keyPassword=$RELEASE_KEY_PASSWORD" && echo "keyAlias=$RELEASE_KEY_ALIAS" && echo "storeFile=PTSDkey.jks") > app/keystore.properties
-                    
+            
+            - run: ls
+            - run: ls app
+            
             - run:
                 name: Deploy Android
                 command: ./gradlew publishApkRelease
