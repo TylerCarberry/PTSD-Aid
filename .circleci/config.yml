@@ -8,12 +8,13 @@ jobs:
             JVM_OPTS: -Xmx2048m
             GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
             ADB_INSTALL_TIMEOUT: 6000
+            GIT_COMMIT_DESC: $(git log --format=oneline -n 1 $CIRCLE_SHA1)
             
         steps:
             - checkout
             
             - restore_cache:
-                key: android-cache
+                key: android-cache-v2
             
             # The API keys are not tracked in git, write them from environment variables
             - run: echo $google_services_json4 > app/google-services.json
@@ -21,19 +22,124 @@ jobs:
             
             # Since it is only building the debug apk, the key values don't matter
             - run: (echo "storePassword=a" && echo "keyPassword=b" && echo "keyAlias=PTSD" && echo "storeFile=/PTSD/PTSDkey.jks") > app/keystore.properties
-            
+                    
+            - run:
+                name: Compile Android
+                command: ./gradlew assembleDebug
+                
             - save_cache:
-                key: android-cache
+                key: android-cache-v2
                 paths:
                     - ~/.android
-
+                    - /usr/local/android-sdk-linux/
+                    - ~/.gradle
+                
+            - persist_to_workspace:
+                root: .
+                paths:
+                    - .
+        
+    gradle-test:
+        working_directory: ~/code
+        docker:
+            - image: circleci/android:api-26-alpha
+        environment:
+            JVM_OPTS: -Xmx2048m
+            GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+            ADB_INSTALL_TIMEOUT: 6000
+            
+        steps:
+            - attach_workspace:
+                at: .
+                
+            - restore_cache:
+                key: android-cache-v2
+        
             - run:
                 name: Test Android
                 command: ./gradlew test
-          
+
+    firebase-test:
+        working_directory: ~/code
+        docker:
+            - image: google/cloud-sdk
+        environment:
+            JVM_OPTS: -Xmx2048m
+            GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+            ADB_INSTALL_TIMEOUT: 6000
+        
+        steps:
+            - attach_workspace:
+                at: .
+            
+            - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+            
+            - run: gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            - run: gcloud config set project $GCLOUD_PROJECT
+            
+            - run: gcloud firebase test android run --app app/build/outputs/apk/app-debug.apk --device model=Nexus6P,version=25,locale=en,orientation=portrait --timeout 5m
+            
+            - run: mkdir ~/artifacts
+            - run: gsutil -m cp -r -U `gsutil ls gs://test-lab-fivk7mhss10ru-ntf6b5dp40ir6 | tail -1` ~/artifacts | true
+
+            - store_artifacts:
+                path: ~/artifacts
+                
+                
+    deploy:
+        working_directory: ~/code
+        docker:
+            - image: circleci/android:api-26-alpha
+        environment:
+            JVM_OPTS: -Xmx2048m
+            GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+            ADB_INSTALL_TIMEOUT: 6000
+            GIT_COMMIT_DESC: $(git log --format=oneline -n 1 $CIRCLE_SHA1)
+            
+        steps:
+            - checkout
+            
+            - restore_cache:
+                key: android-cache-v2
+            
+            - run: echo $google_services_json4 > app/google-services.json
+            - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
+            
+            - run: echo $RELEASE_KEYSTORE | base64 --decode --ignore-garbage > /home/circleci/code/app/PTSDkey.jks
+            - run: echo $PLAY_DEPLOY_KEYS | base64 --decode --ignore-garbage > app/keys.json
+            
+            - run: (echo "storePassword=$RELEASE_STORE_PASSWORD" && echo "keyPassword=$RELEASE_KEY_PASSWORD" && echo "keyAlias=$RELEASE_KEY_ALIAS" && echo "storeFile=PTSDkey.jks") > app/keystore.properties
+            
+            - run:
+                name: Deploy Android
+                command: ./gradlew publishApkRelease
+            
+            - run: echo $CRASH_MAPPING_FILE | base64 --decode --ignore-garbage > crash_mapping.json
+            - run:
+                name: Upload crash reporting mapping
+                command: ./gradlew -PFirebaseServiceAccountFilePath=crash_mapping.json firebaseUploadReleaseProguardMapping
+
+                
+            - store_artifacts:
+                path: /home/circleci/code/app/app-release.apk
+                
 
 workflows:
   version: 2
-  build-and-deploy:
+  build-test-deploy:
     jobs:
       - build
+      - gradle-test:
+          requires:
+            - build
+      - firebase-test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - gradle-test
+            - firebase-test
+          filters:
+            branches:
+              only:
+                - release
