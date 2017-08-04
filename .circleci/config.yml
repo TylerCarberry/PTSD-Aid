@@ -8,6 +8,7 @@ jobs:
             JVM_OPTS: -Xmx2048m
             GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
             ADB_INSTALL_TIMEOUT: 6000
+            GIT_COMMIT_DESC: $(git log --format=oneline -n 1 $CIRCLE_SHA1)
             
         steps:
             - checkout
@@ -84,10 +85,39 @@ jobs:
             - store_artifacts:
                 path: ~/artifacts
                 
+                
+    deploy:
+        working_directory: ~/code
+        docker:
+            - image: circleci/android:api-26-alpha
+        environment:
+            JVM_OPTS: -Xmx2048m
+            GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+            ADB_INSTALL_TIMEOUT: 6000
+            GIT_COMMIT_DESC: $(git log --format=oneline -n 1 $CIRCLE_SHA1)
+            
+        steps:
+            - checkout
+            
+            - restore_cache:
+                key: android-cache-v2
+            
+            - run: echo $google_services_json4 > app/google-services.json
+            - run: echo $ids_xml_4 > app/src/main/res/values/ids.xml
+            
+            - run: echo $RELEASE_KEYSTORE | base64 --decode --ignore-garbage > ${HOME}/PTSDkey.jks
+            - run: echo $PLAY_DEPLOY_KEYS | base64 --decode --ignore-garbage > app/keys.json
+            
+            - run: (echo "storePassword=$RELEASE_STORE_PASSWORD" && echo "keyPassword=$RELEASE_KEY_PASSWORD" && echo "keyAlias=$RELEASE_KEY_ALIAS" && echo "storeFile=PTSDkey.jks") > app/keystore.properties
+                    
+            - run:
+                name: Deploy Android
+                command: ./gradlew publishApkRelease
+                
 
 workflows:
   version: 2
-  build-and-test:
+  build-test-deploy:
     jobs:
       - build
       - gradle-test:
@@ -96,4 +126,7 @@ workflows:
       - firebase-test:
           requires:
             - build
-
+      - deploy:
+          requires:
+            - gradle-test
+            - firebase-test
