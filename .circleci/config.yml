@@ -113,6 +113,12 @@ jobs:
             - run:
                 name: Deploy Android
                 command: ./gradlew publishApkRelease
+            
+            - run: echo $CRASH_MAPPING_FILE | base64 --decode --ignore-garbage > crash_mapping.json
+            - run:
+                name: Upload crash reporting mapping
+                command: ./gradlew -PFirebaseServiceAccountFilePath=crash_mapping.json firebaseUploadReleaseProguardMapping
+
                 
             - store_artifacts:
                 path: /home/circleci/code/app/app-release.apk
