@@ -1,6 +1,7 @@
 package com.tytanapps.ptsd.va.facility;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.tytanapps.ptsd.va.Searchable;
 
@@ -20,17 +21,17 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
     private String facName;
     private String typeDesc;
     private String regName;
-    private Integer facId;
+    private int facId;
     private String stationid;
-    private Double longitude;
-    private Integer showmap;
+    private double longitude;
+    private int showmap;
     private String url;
     private String state;
     private String imageUrl;
     private String divName;
     private String address;
-    private Double latitude;
-    private Integer showphoto;
+    private double latitude;
+    private int showphoto;
     private String facInterneturl;
     private String phoneNumber;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -70,12 +71,13 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
 
 
     @Override
-    public boolean search(String text) {
-        if (text == null || text.isEmpty())
+    public boolean search(@Nullable String text) {
+        if (text == null || text.isEmpty()) {
             return true;
+        }
         text = text.toLowerCase();
-        return facName.toLowerCase().contains(text) ||
-                phoneNumber.toLowerCase().contains(text) ||
+        return (facName != null && facName.toLowerCase().contains(text)) ||
+                (facName != null && phoneNumber.toLowerCase().contains(text)) ||
                 getFullAddress().toLowerCase().contains(text);
     }
 
@@ -138,11 +140,11 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
         this.regName = regName;
     }
 
-    public Integer getFacId() {
+    public int getFacId() {
         return facId;
     }
 
-    public void setFacId(Integer facId) {
+    public void setFacId(int facId) {
         this.facId = facId;
     }
 
@@ -154,19 +156,19 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
         this.stationid = stationid;
     }
 
-    public Double getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public Integer getShowmap() {
+    public int getShowmap() {
         return showmap;
     }
 
-    public void setShowmap(Integer showmap) {
+    public void setShowmap(int showmap) {
         this.showmap = showmap;
     }
 
@@ -210,19 +212,19 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
         this.address = address;
     }
 
-    public Double getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public Integer getShowphoto() {
+    public int getShowphoto() {
         return showphoto;
     }
 
-    public void setShowphoto(Integer showphoto) {
+    public void setShowphoto(int showphoto) {
         this.showphoto = showphoto;
     }
 
@@ -257,6 +259,12 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
 
         Facility facility = (Facility) o;
 
+        if (facId != facility.facId) return false;
+        if (Double.compare(facility.longitude, longitude) != 0) return false;
+        if (showmap != facility.showmap) return false;
+        if (Double.compare(facility.latitude, latitude) != 0) return false;
+        if (showphoto != facility.showphoto) return false;
+        if (Double.compare(facility.distanceToUser, distanceToUser) != 0) return false;
         if (facIntraneturl != null ? !facIntraneturl.equals(facility.facIntraneturl) : facility.facIntraneturl != null)
             return false;
         if (city != null ? !city.equals(facility.city) : facility.city != null) return false;
@@ -268,12 +276,7 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
             return false;
         if (regName != null ? !regName.equals(facility.regName) : facility.regName != null)
             return false;
-        if (facId != null ? !facId.equals(facility.facId) : facility.facId != null) return false;
         if (stationid != null ? !stationid.equals(facility.stationid) : facility.stationid != null)
-            return false;
-        if (longitude != null ? !longitude.equals(facility.longitude) : facility.longitude != null)
-            return false;
-        if (showmap != null ? !showmap.equals(facility.showmap) : facility.showmap != null)
             return false;
         if (url != null ? !url.equals(facility.url) : facility.url != null) return false;
         if (state != null ? !state.equals(facility.state) : facility.state != null) return false;
@@ -282,10 +285,6 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
         if (divName != null ? !divName.equals(facility.divName) : facility.divName != null)
             return false;
         if (address != null ? !address.equals(facility.address) : facility.address != null)
-            return false;
-        if (latitude != null ? !latitude.equals(facility.latitude) : facility.latitude != null)
-            return false;
-        if (showphoto != null ? !showphoto.equals(facility.showphoto) : facility.showphoto != null)
             return false;
         if (facInterneturl != null ? !facInterneturl.equals(facility.facInterneturl) : facility.facInterneturl != null)
             return false;
@@ -297,27 +296,33 @@ public class Facility implements Comparable<Facility>, Serializable, Searchable 
 
     @Override
     public int hashCode() {
-        int result = facIntraneturl != null ? facIntraneturl.hashCode() : 0;
+        int result;
+        long temp;
+        result = facIntraneturl != null ? facIntraneturl.hashCode() : 0;
         result = 31 * result + (city != null ? city.hashCode() : 0);
         result = 31 * result + (fax != null ? fax.hashCode() : 0);
         result = 31 * result + (zip != null ? zip.hashCode() : 0);
         result = 31 * result + (facName != null ? facName.hashCode() : 0);
         result = 31 * result + (typeDesc != null ? typeDesc.hashCode() : 0);
         result = 31 * result + (regName != null ? regName.hashCode() : 0);
-        result = 31 * result + (facId != null ? facId.hashCode() : 0);
+        result = 31 * result + facId;
         result = 31 * result + (stationid != null ? stationid.hashCode() : 0);
-        result = 31 * result + (longitude != null ? longitude.hashCode() : 0);
-        result = 31 * result + (showmap != null ? showmap.hashCode() : 0);
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + showmap;
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (divName != null ? divName.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
-        result = 31 * result + (latitude != null ? latitude.hashCode() : 0);
-        result = 31 * result + (showphoto != null ? showphoto.hashCode() : 0);
+        temp = Double.doubleToLongBits(latitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + showphoto;
         result = 31 * result + (facInterneturl != null ? facInterneturl.hashCode() : 0);
         result = 31 * result + (phoneNumber != null ? phoneNumber.hashCode() : 0);
         result = 31 * result + (additionalProperties != null ? additionalProperties.hashCode() : 0);
+        temp = Double.doubleToLongBits(distanceToUser);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
