@@ -49,7 +49,6 @@ jobs:
             
         steps:
             - attach_workspace:
-                # Must be absolute path or relative path from working_directory
                 at: .
                 
             - restore_cache:
@@ -70,7 +69,6 @@ jobs:
         
         steps:
             - attach_workspace:
-                # Must be absolute path or relative path from working_directory
                 at: .
             
             - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
@@ -80,8 +78,11 @@ jobs:
             
             - run: gcloud firebase test android run --app app/build/outputs/apk/app-debug.apk --device model=Nexus6P,version=25,locale=en,orientation=portrait --timeout 5m
             
-            - run: gsutil -m cp -r -U `gsutil ls gs://test-lab-fivk7mhss10ru-ntf6b5dp40ir6 | tail -1` $CIRCLE_ARTIFACTS/ | true
+            - run: mkdir ~/artifacts
+            - run: gsutil -m cp -r -U `gsutil ls gs://test-lab-fivk7mhss10ru-ntf6b5dp40ir6 | tail -1` ~/artifacts | true
 
+            - store_artifacts:
+                path: ~/artifacts
                 
 
 workflows:
